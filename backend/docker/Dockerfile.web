@@ -1,0 +1,77 @@
+# =============================================================================
+# cyber-web : web-fundamentals lab sandbox
+# -----------------------------------------------------------------------------
+# Separate from the Linux-course image (cyber-student) and the
+# network-fundamentals image (cyber-network). This container is what the
+# /api/web-terminal WebSocket attaches to. It has outbound Internet access and
+# all the HTTP/HTTPS / DNS / TLS tools students need across the nine chapters
+# of the Web & Application Fundamentals course.
+#
+# Build with:
+#   docker build -t cyber-web -f backend/docker/Dockerfile.web backend/docker
+# =============================================================================
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash \
+    coreutils \
+    findutils \
+    grep \
+    sed \
+    gawk \
+    less \
+    nano \
+    vim-tiny \
+    man-db \
+    file \
+    tree \
+    ca-certificates \
+    # --- web / HTTP toolkit ---
+    curl \
+    wget \
+    httpie \
+    jq \
+    openssl \
+    netcat-openbsd \
+    # --- DNS toolkit (the web depends on DNS) ---
+    dnsutils \
+    bind9-dnsutils \
+    whois \
+    # --- minimal networking helpers (so labs can sanity-check connectivity) ---
+    iproute2 \
+    iputils-ping \
+    # --- run a tiny in-container web server for proxy / API labs ---
+    python3 \
+    python3-pip \
+    # --- niceties ---
+    tzdata \
+    && rm -rf /var/lib/apt/lists/*
+
+# -----------------------------------------------------------------------------
+# Non-root user. uid 1002 on purpose — avoids colliding with the Linux course
+# image's uid 1000 student or the Network course image's uid 1001 netstudent
+# if all three images ever run on the same host.
+# -----------------------------------------------------------------------------
+RUN useradd -m -s /bin/bash -u 1002 webstudent
+
+USER webstudent
+WORKDIR /home/webstudent
+
+# Seed a few helper files so the home dir is not empty on first boot.
+RUN mkdir -p Documents notes captures sites \
+    && printf 'Welcome to the Web & Application Fundamentals sandbox.\nThis container is separate from the Linux and Network courses.\nType `help-web` for a cheat sheet of the most useful commands.\n' > README.txt \
+    && printf '# Web lab notebook\n' > notes/journal.md \
+    && printf '<!doctype html>\n<html><head><title>Hello</title></head>\n<body><h1>Hello from the web sandbox</h1>\n<p>Edit me with: nano sites/index.html</p>\n</body></html>\n' > sites/index.html
+
+# A small help-web script so the MOTD can stay short.
+USER root
+RUN printf '#!/usr/bin/env bash\ncat <<EOF\nWeb Fundamentals cheat sheet\n----------------------------\n  curl http://example.com           plain HTTP request\n  curl https://example.com          HTTPS request\n  curl -v https://example.com       see every step (request + response)\n  curl -I https://example.com       headers only\n  curl -H "X-Demo: 1" example.com   send a custom header\n  curl -b "session=abc" example.com send a cookie\n  curl --data "k=v" example.com     send POST form data\n  curl -x http://proxy:8080 example.com   send via a proxy\n  curl https://api.github.com | jq .   pretty-print a JSON API\n  dig example.com                   look up an IP (A record)\n  dig -t MX example.com             find the mail servers\n  dig -t NS example.com             find the nameservers\n  whois example.com                 ownership info\n  openssl s_client -connect example.com:443  peek at TLS\n  python3 -m http.server 8000       run a tiny local web server\nEOF\n' > /usr/local/bin/help-web \
+    && chmod 755 /usr/local/bin/help-web
+
+# Custom prompt + MOTD tailored to the web course.
+RUN printf '\nexport TERM=xterm-256color\nPS1='"'"'\\[\\e[0;35m\\]${STUDENT_NAME:-webstudent}@web-lab\\[\\e[0m\\]:\\[\\e[0;34m\\]\\w\\[\\e[0m\\]\\$ '"'"'\n[ -t 1 ] && printf "\\n\\033[1;35m== Web & Application Fundamentals Sandbox ==\\033[0m\\n\\033[90mChapter %%s loaded. Type help-web for a cheat sheet.\\033[0m\\n\\n" "${WF_CHAPTER:-?}"\n' >> /home/webstudent/.bashrc
+
+USER webstudent
+CMD ["/bin/bash", "-l"]

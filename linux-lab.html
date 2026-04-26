@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Linux Lab - Cybersecurity Club UTB</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=notif4" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm/css/xterm.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xterm/lib/xterm.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
+  <style>
+    body {
+      background: #0a0a0d;
+    }
+    
+    .main-layout {
+      display: flex;
+      gap: 24px;
+      max-width: 1600px;
+      margin: 0 auto;
+      margin-bottom: 24px;
+    }
+    
+    .outline-panel {
+      width: 300px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      height: calc(100vh - 280px);
+      overflow-y: auto;
+      position: sticky;
+      top: 90px;
+    }
+    
+    .outline-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,13,0.98);
+      position: sticky;
+      top: 0;
+    }
+    
+    .outline-header h3 {
+      margin: 0 0 4px 0;
+    }
+    
+    .outline-header p {
+      font-size: 12px;
+      color: #888;
+      margin: 0;
+    }
+    
+    .module-outline {
+      padding: 12px;
+    }
+    
+    .outline-module {
+      margin-bottom: 12px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    
+    .outline-module.current {
+      border-color: var(--accent);
+      background: rgba(255,47,79,0.05);
+    }
+    
+    .outline-module.completed {
+      opacity: 0.7;
+    }
+    
+    .outline-module-header {
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      background: rgba(255,255,255,0.02);
+    }
+    
+    .outline-module-header:hover {
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .outline-module-title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+    
+    .outline-module-badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .outline-module-badge.completed {
+      background: rgba(39, 201, 63, 0.2);
+      color: #27c93f;
+    }
+    
+    .outline-module-badge.locked {
+      background: rgba(255, 95, 86, 0.2);
+      color: #ff5f56;
+    }
+    
+    .outline-module-badge.current {
+      background: rgba(255, 47, 79, 0.2);
+      color: var(--accent);
+    }
+    
+    .outline-tasks {
+      padding: 8px 16px 12px 32px;
+      display: none;
+      background: rgba(0,0,0,0.2);
+    }
+    
+    .outline-tasks.show {
+      display: block;
+    }
+    
+    .outline-task {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 0;
+      font-size: 11px;
+      color: #aaa;
+    }
+    
+    .outline-task.completed {
+      color: #27c93f;
+      text-decoration: line-through;
+    }
+    
+    .outline-task .task-status {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+    }
+    
+    .explanations-panel {
+      flex: 1;
+      background: rgba(255,255,255,0.03);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      height: calc(100vh - 280px);
+      overflow-y: auto;
+    }
+    
+    .panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,13,0.98);
+      position: sticky;
+      top: 0;
+    }
+    
+    .progress-stats {
+      display: flex;
+      gap: 24px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .progress-stats span {
+      font-size: 12px;
+      color: #888;
+    }
+    
+    .progress-stats strong {
+      color: var(--accent);
+      margin-left: 6px;
+    }
+    
+    .progress-bar-custom {
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+    
+    .module-navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      background: rgba(10,10,13,0.95);
+      position: sticky;
+      bottom: 0;
+    }
+    
+    .nav-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    
+    .nav-btn:hover:not(:disabled) {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    
+    .module-indicator {
+      font-size: 13px;
+      color: var(--accent-2);
+    }
+    
+    .module-content {
+      padding: 20px;
+    }
+    
+    .module-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--accent);
+    }
+    
+    .module-desc {
+      color: #888;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+    
+    .task-card {
+      background: rgba(255,255,255,0.03);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-left: 3px solid transparent;
+    }
+    
+    .task-card.completed {
+      border-left-color: #27c93f;
+      background: rgba(39, 201, 63, 0.05);
+    }
+    
+    .task-card.pending {
+      border-left-color: var(--accent);
+    }
+    
+    .task-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .task-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .task-badge {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    
+    .task-badge.completed {
+      background: rgba(39, 201, 63, 0.2);
+      color: #27c93f;
+    }
+    
+    .task-badge.pending {
+      background: rgba(255, 189, 46, 0.2);
+      color: #ffbd2e;
+    }
+    
+    .command-box {
+      background: #0a0a0d;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-family: monospace;
+      margin: 10px 0;
+      border: 1px solid #333;
+      display: inline-block;
+    }
+    
+    .command-box code {
+      color: #ffbd2e;
+      font-size: 13px;
+    }
+    
+    .explanation-text {
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 10px 0;
+      font-size: 13px;
+    }
+    
+    .tip-box {
+      background: rgba(255, 189, 46, 0.08);
+      border-left: 3px solid #ffbd2e;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin: 10px 0;
+      font-size: 12px;
+    }
+    
+    .terminal-panel {
+      background: #0a0a0d;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 320px;
+      margin-top: 0;
+    }
+    
+    .terminal-header {
+      background: #1a1a1a;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #333;
+      flex-shrink: 0;
+    }
+    
+    .terminal-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .terminal-dot.red { background: #ff5f56; }
+    .terminal-dot.yellow { background: #ffbd2e; }
+    .terminal-dot.green { background: #27c93f; }
+    
+    .terminal-title {
+      color: #888;
+      font-size: 11px;
+      margin-left: 8px;
+    }
+    
+    #terminal {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto !important;
+      font-size: 12px;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+    .back-button:hover {
+      color: var(--accent);
+    }
+    
+    @media (max-width: 1000px) {
+      .main-layout {
+        flex-direction: column;
+      }
+      .outline-panel {
+        width: 100%;
+        height: auto;
+        position: relative;
+        top: 0;
+      }
+      .explanations-panel {
+        height: auto;
+      }
+      .terminal-panel {
+        height: 350px;
+      }
+    }
+    
+    .completion-message {
+      background: rgba(39, 201, 63, 0.1);
+      border: 1px solid rgba(39, 201, 63, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      margin-top: 16px;
+      font-size: 13px;
+    }
+    
+    .certificate-btn {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 16px;
+      width: 100%;
+      transition: transform 0.2s;
+    }
+    
+    .certificate-btn:hover {
+      transform: scale(1.02);
+    }
+    
+    .login-warning {
+      background: rgba(255, 189, 46, 0.1);
+      border: 1px solid #ffbd2e;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .login-warning a {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+
+    /* ===== Persistent XP toasts =====
+     * Mirrors the toast used by the network/web/crypto/ethics/pentest
+     * courses so finishing a Linux task gives the same visible feedback. */
+    #xpToastStack {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+      max-width: 360px;
+    }
+    .xp-toast {
+      pointer-events: auto;
+      background: linear-gradient(135deg, rgba(39, 201, 63, 0.18), rgba(60, 170, 255, 0.12));
+      border: 1px solid rgba(39, 201, 63, 0.55);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #e3ffe7;
+      font-size: 13px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      animation: xp-toast-in 0.35s ease;
+    }
+    .xp-toast.fading { animation: xp-toast-out 0.6s ease forwards; }
+    .xp-toast .head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-weight: 700;
+      color: #27c93f;
+      font-family: 'Menlo', monospace;
+      font-size: 13px;
+    }
+    .xp-toast .close {
+      background: transparent;
+      border: none;
+      color: #cde6ff;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      padding: 0 4px;
+    }
+    .xp-toast .body {
+      margin-top: 4px;
+      font-size: 12.5px;
+      color: #d8e6cf;
+      line-height: 1.4;
+    }
+    @keyframes xp-toast-in {
+      from { transform: translateY(20px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    @keyframes xp-toast-out {
+      from { transform: translateY(0);     opacity: 1; }
+      to   { transform: translateY(-20px); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+<header class="header">
+  <div class="container nav">
+    <a class="logo logo-utb" href="https://www.utb.edu.bh/" target="_blank" rel="noopener" aria-label="University of Technology Bahrain">
+      <img src="assets/images/utblogo.png" alt="University of Technology Bahrain">
+    </a>
+    <a class="logo logo-club" href="index.html">
+      <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB">
+    </a>
+    <div class="auth-controls" data-auth-controls></div>
+    <button class="menu-toggle" aria-label="Toggle menu"></button>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About Us</a>
+      <a href="news.html">News</a>
+      <a href="join.html">Apply to Join</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="events.html">Events</a>
+      <a href="learning.html">Learning</a>
+      <a href="resources.html">Resources</a>
+      <a href="tracks.html">Cybersecurity Areas</a>
+      <a href="plan.html">Plan</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="back-button" onclick="window.location.href='learning.html'">
+      ← Back to Learning Paths
+    </div>
+    <span class="eyebrow">Linux Course</span>
+    <h1 style="margin-top:14px">Linux Fundamentals</h1>
+    <p id="userGreeting">Complete each level in order to unlock the Docker capstone and capture the UTB flag</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top: 0;">
+  <div class="container">
+    <div id="loginWarning" class="login-warning" style="display: none;">
+      ⚠️ You are not logged in! Your progress will not be saved. 
+      <a href="login.html">Login here</a> or <a href="join.html">create an account</a> to save your progress.
+    </div>
+    
+    <div class="main-layout">
+      <div class="outline-panel">
+        <div class="outline-header">
+          <h3>Course Content</h3>
+          <p id="userStats">9 Modules • 34 Tasks</p>
+        </div>
+        <div class="module-outline" id="outlineContainer"></div>
+      </div>
+      
+      <div class="explanations-panel">
+        <div class="panel-header">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <h3 style="margin: 0;">Module <span id="currentModuleNum">1</span> of <span id="totalModules">9</span></h3>
+            <div class="progress-stats" style="margin-top: 0;">
+              <div><span>Progress:</span> <strong id="progressPercent">0%</strong></div>
+              <div><span>XP:</span> <strong id="xpEarned">0</strong></div>
+              <div><span>Tasks:</span> <strong id="tasksCompleted">0</strong>/<strong id="totalTasks">34</strong></div>
+            </div>
+          </div>
+          <div class="progress-bar-custom">
+            <span id="progressBar" style="width: 0%; display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2));"></span>
+          </div>
+        </div>
+        
+        <div id="moduleContent" class="module-content"></div>
+        
+        <div class="module-navigation">
+          <button class="nav-btn prev" id="prevBtn" disabled>← Previous</button>
+          <span class="module-indicator" id="moduleIndicator">Module 1: Introduction</span>
+          <button class="nav-btn next" id="nextBtn">Next →</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="terminal-panel">
+      <div class="terminal-header">
+        <div class="terminal-dot red"></div>
+        <div class="terminal-dot yellow"></div>
+        <div class="terminal-dot green"></div>
+        <div class="terminal-title">Linux Terminal - Practice Here</div>
+      </div>
+      <div id="terminal"></div>
+    </div>
+  </div>
+</section>
+
+<footer class="clean-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col footer-brand">
+        <div class="footer-logos">
+          <a href="https://www.utb.edu.bh/" target="_blank" rel="noopener" aria-label="University of Technology Bahrain">
+            <img src="assets/images/utblogo.png" alt="University of Technology Bahrain" class="footer-logo">
+          </a>
+          <a href="index.html" aria-label="Cybersecurity Club UTB">
+            <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB" class="footer-logo">
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul class="footer-links">
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="news.html">News</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="learning.html">Learning</a></li>
+          <li><a href="join.html">Apply to Join</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>University</h4>
+        <ul class="footer-links">
+          <li><a href="https://www.utb.edu.bh/" target="_blank" rel="noopener">UTB Website</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Follow Us</h4>
+        <ul class="footer-links">
+          <li><a href="https://www.instagram.com/utb_bahrain/" target="_blank" rel="noopener">Instagram — UTB</a></li>
+          <li><a href="https://www.instagram.com/sc_utb/" target="_blank" rel="noopener">Instagram — Student Council</a></li>
+          <li><a href="https://www.instagram.com/cyber_security_club_utb/" target="_blank" rel="noopener">Instagram — Cybersecurity Club</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <small>College of Computer Studies &middot; &copy; 2026 Cybersecurity Club &mdash; University of Technology Bahrain</small>
+    </div>
+  </div>
+</footer>
+
+<!-- Shared site JS (auth controls + notification bell). Must load BEFORE
+     linux-lab.js because linux-lab.js relies on the API_BASE constant
+     declared at the top of app.js. -->
+<script src="assets/js/app.js?v=notif5"></script>
+<script src="assets/js/linux-lab.js?v=6"></script>
+
+</body>
+</html>

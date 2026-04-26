@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Events</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=notif4" />
+</head>
+<body>
+<header class="header">
+  <div class="container nav">
+    <a class="logo logo-utb" href="https://www.utb.edu.bh/" target="_blank" rel="noopener" aria-label="University of Technology Bahrain">
+      <img src="assets/images/utblogo.png" alt="University of Technology Bahrain">
+    </a>
+    <a class="logo logo-club" href="index.html">
+      <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB">
+    </a>
+    <div class="auth-controls" data-auth-controls></div>
+    <button class="menu-toggle" aria-label="Toggle menu"></button>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About Us</a>
+      <a href="news.html">News</a>
+      <a href="join.html">Apply to Join</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="events.html">Events</a>
+      <a href="learning.html">Learning</a>
+      <a href="resources.html">Resources</a>
+      <a href="tracks.html">Cybersecurity Areas</a>
+      <a href="plan.html">Plan</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <span class="eyebrow">Club events</span>
+    <h1 style="margin-top:14px">Upcoming events and live CTF activity</h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 style="margin-bottom:16px">Upcoming events</h2>
+    <div data-events-list class="grid grid-2">
+      <div class="card" data-events-empty style="display:none;">
+        <p>No upcoming events. Check back soon!</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="card">
+      <span class="tag">Live CTF Event</span>
+      <h2 style="margin-top:14px">Campus CTF 2026</h2>
+      <div class="chips" style="margin-top:14px">
+        <span class="chip">Web</span>
+        <span class="chip">Crypto</span>
+        <span class="chip">Forensics</span>
+        <span class="chip">OSINT</span>
+        <span class="chip">Reversing</span>
+      </div>
+      <h3 style="margin-top:22px">Live Scoreboard</h3>
+      <div class="table-wrap" style="margin-top:16px">
+        <table>
+          <thead><tr><th>Rank</th><th>Team</th><th>Solved</th><th>Score</th></tr></thead>
+          <tbody data-scoreboard></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="clean-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col footer-brand">
+        <div class="footer-logos">
+          <a href="https://www.utb.edu.bh/" target="_blank" rel="noopener" aria-label="University of Technology Bahrain">
+            <img src="assets/images/utblogo.png" alt="University of Technology Bahrain" class="footer-logo">
+          </a>
+          <a href="index.html" aria-label="Cybersecurity Club UTB">
+            <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB" class="footer-logo">
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul class="footer-links">
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="news.html">News</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="learning.html">Learning</a></li>
+          <li><a href="join.html">Apply to Join</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>University</h4>
+        <ul class="footer-links">
+          <li><a href="https://www.utb.edu.bh/" target="_blank" rel="noopener">UTB Website</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Follow Us</h4>
+        <ul class="footer-links">
+          <li><a href="https://www.instagram.com/utb_bahrain/" target="_blank" rel="noopener">Instagram — UTB</a></li>
+          <li><a href="https://www.instagram.com/sc_utb/" target="_blank" rel="noopener">Instagram — Student Council</a></li>
+          <li><a href="https://www.instagram.com/cyber_security_club_utb/" target="_blank" rel="noopener">Instagram — Cybersecurity Club</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <small>College of Computer Studies &middot; &copy; 2026 Cybersecurity Club &mdash; University of Technology Bahrain</small>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/app.js?v=notif4"></script>
+</body>
+</html>

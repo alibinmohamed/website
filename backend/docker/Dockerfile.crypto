@@ -1,0 +1,129 @@
+# =============================================================================
+# cyber-crypto : cryptography lab sandbox
+# -----------------------------------------------------------------------------
+# Separate from the Linux / Network / Web sandbox images. The /api/crypto-
+# terminal WebSocket attaches to this container. It ships with the toolkit
+# students need across the nine cryptography chapters: openssl, gpg, base64,
+# xxd, python3, sha?sum, plus a tiny `vig` helper for Vigenere.
+#
+# Build with:
+#   docker build -t cyber-crypto -f backend/docker/Dockerfile.crypto backend/docker
+# =============================================================================
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash \
+    coreutils \
+    findutils \
+    grep \
+    sed \
+    gawk \
+    less \
+    nano \
+    vim-tiny \
+    man-db \
+    file \
+    tree \
+    ca-certificates \
+    # --- the crypto toolkit ---
+    openssl \
+    gnupg \
+    xxd \
+    # --- runtime for the Vigenere helper + capstone scripts ---
+    python3 \
+    # --- reach out for chapter 9 (TLS inspection) ---
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# -----------------------------------------------------------------------------
+# Non-root user, uid 1003 (avoids 1000=student / 1001=netstudent / 1002=webstudent).
+# -----------------------------------------------------------------------------
+RUN useradd -m -s /bin/bash -u 1003 cryptostudent
+
+# -----------------------------------------------------------------------------
+# A tiny Vigenere helper. Used by Chapter 3 labs:
+#   $ vig encrypt KEY HELLOWORLD     -> RIJVSUYVJN
+#   $ vig decrypt KEY RIJVSUYVJN     -> HELLOWORLD
+# Kept short on purpose so a curious student can `cat $(which vig)` and see
+# exactly what's going on.
+# -----------------------------------------------------------------------------
+RUN cat > /usr/local/bin/vig <<'PY' && chmod 755 /usr/local/bin/vig
+#!/usr/bin/env python3
+"""Tiny Vigenere helper. usage: vig encrypt|decrypt KEY TEXT"""
+import sys
+
+def vig(text, key, encrypt=True):
+    key_shifts = [ord(k.upper()) - 65 for k in key if k.isalpha()]
+    if not key_shifts:
+        return text
+    out = []
+    j = 0
+    for c in text:
+        if c.isalpha():
+            base = 65 if c.isupper() else 97
+            shift = key_shifts[j % len(key_shifts)]
+            if not encrypt:
+                shift = -shift
+            out.append(chr((ord(c) - base + shift) % 26 + base))
+            j += 1
+        else:
+            out.append(c)
+    return "".join(out)
+
+if __name__ == "__main__":
+    if len(sys.argv) < 4:
+        print("usage: vig encrypt|decrypt KEY TEXT", file=sys.stderr)
+        sys.exit(2)
+    cmd, key, text = sys.argv[1], sys.argv[2], " ".join(sys.argv[3:])
+    if cmd not in ("encrypt", "decrypt"):
+        print("first arg must be 'encrypt' or 'decrypt'", file=sys.stderr)
+        sys.exit(2)
+    print(vig(text, key, encrypt=(cmd == "encrypt")))
+PY
+
+USER cryptostudent
+WORKDIR /home/cryptostudent
+
+# Seed a few helper files so the home dir is not empty on first boot.
+RUN mkdir -p Documents notes ciphers \
+    && printf 'Welcome to the Cryptography sandbox.\nThis container is separate from the other courses.\nType `help-crypto` for a cheat sheet.\n' > README.txt \
+    && printf 'The quick brown fox jumps over the lazy dog. THE QUICK BROWN FOX.\nFrequency analysis is easier on a long sample of text like this one.\n' > plaintext.txt \
+    && printf 'Wkh txlfn eurzq ira mxpsv ryhu wkh odcb grj.\n' > ciphertext.txt \
+    && printf '# Vigenere cipher\nA polyalphabetic substitution cipher invented in the 1500s.\nUse a *keyword* whose letters define a shift for each plaintext\nletter; repeat the keyword as needed.\n\n  Plain:   HELLOWORLD\n  Key:     KEYKEYKEYK\n  Cipher:  RIJVSUYVJN\n\nIts weakness is that once you know (or guess) the key length,\nfrequency analysis on every Nth letter recovers the key.\n' > vigenere.md \
+    && printf '# Modes of operation\n* ECB  encrypts each 16-byte block independently. Patterns leak.\n* CBC  XORs each block with the previous ciphertext. No patterns.\n* GCM  CBC + an authentication tag. Modern default.\n' > modes.md
+
+# A small help-crypto script.
+USER root
+RUN cat > /usr/local/bin/help-crypto <<'SH' && chmod 755 /usr/local/bin/help-crypto
+#!/usr/bin/env bash
+cat <<EOF
+Cryptography cheat sheet
+------------------------
+  echo HELLO | tr 'A-Za-z' 'N-ZA-Mn-za-m'           ROT13
+  echo HELLO | tr 'A-Za-z' 'D-ZA-Cd-za-c'           Caesar shift 3
+  echo HELLO | tr 'A-Za-z' 'Z-Az-a'                 Atbash
+  vig encrypt KEY HELLOWORLD                        Vigenere encrypt
+  vig decrypt KEY RIJVSUYVJN                        Vigenere decrypt
+  openssl enc -aes-256-cbc -pbkdf2 -in F -out F.enc -k pwd     AES encrypt
+  openssl enc -aes-256-cbc -d -pbkdf2 -in F.enc -k pwd          AES decrypt
+  openssl dgst -sha256 file                         hash a file
+  openssl dgst -sha256 -hmac KEY                    HMAC
+  openssl genrsa -out priv.pem 2048                 generate RSA key
+  openssl rsa -in priv.pem -pubout -out pub.pem     extract public key
+  openssl pkeyutl -encrypt -pubin -inkey pub.pem    encrypt with public key
+  openssl pkeyutl -decrypt        -inkey priv.pem   decrypt with private key
+  openssl dgst -sha256 -sign priv.pem -out sig file sign a file
+  openssl dgst -sha256 -verify pub.pem -signature sig file  verify
+  openssl x509 -in cert.pem -text -noout            inspect a certificate
+  openssl s_client -connect example.com:443         peek at TLS
+  openssl rand -hex 16                              random bytes
+EOF
+SH
+
+# Custom prompt + MOTD.
+RUN printf '\nexport TERM=xterm-256color\nPS1='"'"'\\[\\e[0;33m\\]${STUDENT_NAME:-cryptostudent}@crypto-lab\\[\\e[0m\\]:\\[\\e[0;34m\\]\\w\\[\\e[0m\\]\\$ '"'"'\n[ -t 1 ] && printf "\\n\\033[1;33m== Cryptography Sandbox ==\\033[0m\\n\\033[90mChapter %%s loaded. Type help-crypto for a cheat sheet.\\033[0m\\n\\n" "${CR_CHAPTER:-?}"\n' >> /home/cryptostudent/.bashrc
+
+USER cryptostudent
+CMD ["/bin/bash", "-l"]

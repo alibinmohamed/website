@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Cybersecurity Club UTB</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=notif4" />
+  <style>
+    .friend-feed-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .friend-feed-row:last-child { border-bottom: none; }
+    .friend-feed-row .meta {
+      font-size: 12px;
+      color: var(--muted, #888);
+      margin-top: 2px;
+    }
+    .friend-feed-row a.member-link {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .friend-feed-row a.member-link:hover { color: var(--accent); }
+    .friend-feed-row .xp {
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .compare-row {
+      padding: 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      margin-bottom: 12px;
+    }
+    .compare-row .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .compare-row .verdict {
+      font-size: 13px;
+      margin: 6px 0 8px;
+    }
+    .compare-row .verdict.behind { color: #ff9b3d; }
+    .compare-row .verdict.ahead  { color: #27c93f; }
+    .compare-row .verdict.tied   { color: var(--muted, #888); }
+    .compare-bar {
+      position: relative;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }
+    .compare-bar .fill {
+      position: absolute;
+      top: 0; left: 0;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+    .compare-bar .ghost {
+      position: absolute;
+      top: 0; left: 0;
+      height: 100%;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+    }
+    .compare-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted, #888);
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+<header class="header">
+  <div class="container nav">
+    <a class="logo logo-utb" href="https://www.utb.edu.bh/" target="_blank" rel="noopener" aria-label="University of Technology Bahrain">
+      <img src="assets/images/utblogo.png" alt="University of Technology Bahrain">
+    </a>
+    <a class="logo logo-club" href="index.html">
+      <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB">
+    </a>
+    <div class="auth-controls" data-auth-controls></div>
+    <button class="menu-toggle" aria-label="Toggle menu"></button>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About Us</a>
+      <a href="news.html">News</a>
+      <a href="join.html">Apply to Join</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="events.html">Events</a>
+      <a href="learning.html">Learning</a>
+      <a href="resources.html">Resources</a>
+      <a href="tracks.html">Cybersecurity Areas</a>
+      <a href="plan.html">Plan</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero clean">
+  <div class="container">
+    <span class="eyebrow">Dashboard</span>
+    <h1 style="margin-top:14px">Member Dashboard</h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <!-- Member Ranking - Visible to everyone -->
+    <div class="card" style="margin-bottom: 32px;">
+      <h2>Member Ranking</h2>
+      <p>Top performers in the Cybersecurity Club</p>
+      <div class="table-wrap" style="margin-top: 16px;">
+        <table style="width: 100%;">
+          <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Member</th>
+                <th>Total Points</th>
+                <th>Tasks Completed</th>
+              </tr>
+          </thead>
+          <tbody id="leaderboardBody">
+              <tr><td colspan="4" style="text-align: center;">Loading members...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Member Only Content - Only visible when logged in -->
+    <div id="memberOnlyContent" style="display: none;">
+      <div class="card" style="margin-bottom: 32px; background: linear-gradient(135deg, rgba(255,47,79,0.1), transparent);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <span class="tag">Welcome back</span>
+            <h2 id="memberName" style="margin: 12px 0 4px;">Loading...</h2>
+            <p id="memberEmail" style="margin: 0;">Loading...</p>
+          </div>
+          <div>
+            <span class="chip" id="memberStatus">Active Member</span>
+            <button id="logoutBtn" class="btn btn-secondary" style="margin-left: 12px;">Logout</button>
+          </div>
+        </div>
+      </div>
+      
+      <h3 style="margin-bottom: 20px;">Your Personal Statistics</h3>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px;">
+        <div class="card" style="text-align: center;">
+          <div style="font-size: 2.5rem; font-weight: 800; color: var(--accent);" id="statPoints">0</div>
+          <div>Total Points</div>
+          <small>From completed tasks</small>
+        </div>
+        <div class="card" style="text-align: center;">
+          <div style="font-size: 2.5rem; font-weight: 800; color: var(--accent);" id="statTasks">0</div>
+          <div>Tasks Completed</div>
+          <small>tasks completed</small>
+        </div>
+        <div class="card" style="text-align: center;">
+          <div style="font-size: 2.5rem; font-weight: 800; color: var(--accent);" id="statModules">0</div>
+          <div>Modules Completed</div>
+          <small>modules completed</small>
+        </div>
+        <div class="card" style="text-align: center;">
+          <div style="font-size: 2.5rem; font-weight: 800; color: var(--accent);" id="statRank">0</div>
+          <div>Member Rank</div>
+          <small id="rankOutOf">out of members</small>
+        </div>
+      </div>
+      
+      <!-- Courses Section -->
+      <div class="card" style="margin-bottom: 32px;">
+        <h2>Your Courses</h2>
+        <div id="coursesList"></div>
+      </div>
+      
+      <!-- Recent Activity -->
+      <div class="card">
+        <h2>Your Recent Activity</h2>
+        <div id="recentActivity" style="display: grid; gap: 12px; margin-top: 16px;"></div>
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span>Progress to Next Rank</span>
+            <strong id="pointsNeeded">0 points needed</strong>
+          </div>
+          <div class="progress" style="height: 8px;">
+            <span id="progressBar" style="width: 0%; display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: 999px;"></span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+            <small id="currentPoints">Current: 0 pts</small>
+            <small id="topPoints">Top #1: 0 pts</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Friends' Latest Updates -->
+      <div class="card" id="friendsFeedCard" style="display: none; margin-top: 32px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+          <h2 style="margin: 0;">Friends' Latest Updates</h2>
+          <small style="color: var(--muted, #888);">From your accepted friends</small>
+        </div>
+        <div id="friendsActivityList" style="margin-top: 16px;"></div>
+      </div>
+
+      <!-- Friends Comparison -->
+      <div class="card" id="friendsComparisonCard" style="display: none; margin-top: 32px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+          <h2 style="margin: 0;">How You Compare</h2>
+          <small style="color: var(--muted, #888);">XP head-to-head with each friend</small>
+        </div>
+        <div id="friendsComparisonList" style="margin-top: 16px;"></div>
+      </div>
+    </div>
+
+    <!-- Login Prompt - Only visible when NOT logged in -->
+    <div id="loginPrompt" style="display: block; text-align: center;">
+      <div class="card" style="padding: 48px;">
+        <div style="font-size: 48px; margin-bottom: 16px;">🔐</div>
+        <h3>Login to View Your Personal Statistics</h3>
+        <p style="margin: 16px 0;">Member ranking is visible to everyone, but your personal stats and activity are private.</p>
+        <a href="login.html" class="btn btn-primary">Login Now</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="clean-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col footer-brand">
+        <div class="footer-logos">
+          <a href="https://www.utb.edu.bh/" target="_blank" rel="noopener" aria-label="University of Technology Bahrain">
+            <img src="assets/images/utblogo.png" alt="University of Technology Bahrain" class="footer-logo">
+          </a>
+          <a href="index.html" aria-label="Cybersecurity Club UTB">
+            <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB" class="footer-logo">
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul class="footer-links">
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="news.html">News</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="learning.html">Learning</a></li>
+          <li><a href="join.html">Apply to Join</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>University</h4>
+        <ul class="footer-links">
+          <li><a href="https://www.utb.edu.bh/" target="_blank" rel="noopener">UTB Website</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Follow Us</h4>
+        <ul class="footer-links">
+          <li><a href="https://www.instagram.com/utb_bahrain/" target="_blank" rel="noopener">Instagram — UTB</a></li>
+          <li><a href="https://www.instagram.com/sc_utb/" target="_blank" rel="noopener">Instagram — Student Council</a></li>
+          <li><a href="https://www.instagram.com/cyber_security_club_utb/" target="_blank" rel="noopener">Instagram — Cybersecurity Club</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <small>College of Computer Studies &middot; &copy; 2026 Cybersecurity Club &mdash; University of Technology Bahrain</small>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/app.js?v=notif4"></script>
+</body>
+</html>

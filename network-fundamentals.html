@@ -1,0 +1,2392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Network Fundamentals — Cybersecurity Club UTB</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=notif4" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm/css/xterm.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xterm/lib/xterm.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
+  <style>
+    body {
+      background: #0a0a0d;
+    }
+
+    /* ===== Layout ===== */
+    .nf-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 28px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .nf-toc {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 14px;
+      height: calc(100vh - 140px);
+      overflow-y: auto;
+      position: sticky;
+      top: 90px;
+    }
+
+    .nf-toc h4 {
+      margin: 0 0 12px 4px;
+      font-size: 14px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .nf-toc a {
+      display: block;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      color: var(--text);
+      text-decoration: none;
+      margin-bottom: 4px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .nf-toc a:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .nf-toc a.active {
+      background: rgba(255, 47, 79, 0.15);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .nf-toc a .num {
+      font-family: monospace;
+      color: var(--accent-2);
+      margin-right: 8px;
+      font-size: 11px;
+    }
+
+    .nf-content {
+      min-width: 0;
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .back-button:hover {
+      color: var(--accent);
+    }
+
+    /* ===== Module card ===== */
+    .module {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 30px;
+      margin-bottom: 28px;
+      scroll-margin-top: 100px;
+    }
+
+    .module-label {
+      display: inline-block;
+      font-family: monospace;
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .module h2 {
+      margin: 0 0 8px;
+      font-size: 26px;
+    }
+
+    .module .lead {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+      margin: 0 0 18px;
+    }
+
+    .module h3 {
+      font-size: 18px;
+      margin: 22px 0 10px;
+      color: var(--accent-2);
+    }
+
+    .module p {
+      line-height: 1.65;
+      color: #ccc;
+      font-size: 14px;
+    }
+
+    .module ul,
+    .module ol {
+      line-height: 1.7;
+      color: #ccc;
+      font-size: 14px;
+      padding-left: 22px;
+    }
+
+    .module li {
+      margin-bottom: 6px;
+    }
+
+    .module strong {
+      color: #fff;
+    }
+
+    .module code {
+      background: rgba(0, 0, 0, 0.45);
+      color: #ffbd2e;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12.5px;
+      font-family: 'Menlo', 'Courier New', monospace;
+    }
+
+    .module em {
+      color: #eee;
+    }
+
+    /* ===== Diagram tables ===== */
+    .nf-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 13px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .nf-table th,
+    .nf-table td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nf-table th {
+      background: rgba(255, 47, 79, 0.12);
+      color: var(--accent);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .nf-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* ===== OSI Ladder ===== */
+    .osi-ladder {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin: 14px 0 18px;
+    }
+
+    .osi-row {
+      display: grid;
+      grid-template-columns: 40px 1fr 110px 160px;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border-left: 4px solid var(--accent-2);
+      font-size: 13px;
+    }
+
+    .osi-row .osi-num {
+      font-family: monospace;
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 16px;
+    }
+
+    .osi-row .osi-name {
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .osi-row .osi-pdu {
+      font-family: monospace;
+      color: #ffbd2e;
+      font-size: 12px;
+    }
+
+    .osi-row .osi-ex {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* ===== Callout boxes ===== */
+    .tip,
+    .warn,
+    .lab {
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .tip {
+      background: rgba(60, 170, 255, 0.07);
+      border-left: 4px solid #3caaff;
+      color: #cde6ff;
+    }
+
+    .tip strong {
+      color: #3caaff;
+    }
+
+    .warn {
+      background: rgba(255, 95, 86, 0.08);
+      border-left: 4px solid #ff5f56;
+      color: #ffd0cd;
+    }
+
+    .warn strong {
+      color: #ff5f56;
+    }
+
+    .lab {
+      background: linear-gradient(135deg, rgba(255, 189, 46, 0.08), rgba(255, 47, 79, 0.05));
+      border: 1px solid rgba(255, 189, 46, 0.25);
+      border-left: 4px solid #ffbd2e;
+    }
+
+    .lab .lab-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      color: #ffbd2e;
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    .lab ol {
+      margin: 6px 0 0;
+      padding-left: 20px;
+    }
+
+    .lab .expected {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #ccc;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(255, 189, 46, 0.3);
+    }
+
+    .lab .expected strong {
+      color: #ffbd2e;
+    }
+
+    /* ===== Interactive lab launcher buttons ===== */
+    .lab-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(255, 189, 46, 0.25);
+    }
+
+    .lab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 189, 46, 0.3);
+      color: #ffbd2e;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.15s, border-color 0.15s;
+      font-family: inherit;
+      text-decoration: none;
+    }
+
+    .lab-btn:hover {
+      background: rgba(255, 189, 46, 0.15);
+      border-color: #ffbd2e;
+      transform: translateY(-1px);
+    }
+
+    .lab-btn.primary {
+      background: linear-gradient(135deg, #ffbd2e, #ff8a2e);
+      color: #1a1a1a;
+      border-color: transparent;
+    }
+
+    .lab-btn.primary:hover {
+      filter: brightness(1.1);
+    }
+
+    .lab-btn.docker {
+      border-color: rgba(60, 170, 255, 0.4);
+      color: #3caaff;
+    }
+
+    .lab-btn.docker:hover {
+      background: rgba(60, 170, 255, 0.1);
+      border-color: #3caaff;
+    }
+
+    .lab-btn.external {
+      border-color: rgba(124, 77, 255, 0.4);
+      color: #b29cff;
+    }
+
+    .lab-btn.external:hover {
+      background: rgba(124, 77, 255, 0.1);
+      border-color: #b29cff;
+    }
+
+    /* ===== In-page terminal ===== */
+    .terminal-section {
+      margin-top: 32px;
+      scroll-margin-top: 100px;
+    }
+
+    .terminal-section h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      color: var(--accent-2);
+    }
+
+    .terminal-section .sub {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 0 0 14px;
+    }
+
+    .terminal-panel {
+      background: #0a0a0d;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 380px;
+    }
+
+    .terminal-header {
+      background: #1a1a1a;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #333;
+      flex-shrink: 0;
+    }
+
+    .terminal-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .terminal-dot.red { background: #ff5f56; }
+    .terminal-dot.yellow { background: #ffbd2e; }
+    .terminal-dot.green { background: #27c93f; }
+
+    .terminal-title {
+      color: #888;
+      font-size: 11px;
+      margin-left: 8px;
+      flex: 1;
+    }
+
+    .terminal-status {
+      font-size: 11px;
+      padding: 2px 10px;
+      border-radius: 20px;
+      background: rgba(39, 201, 63, 0.15);
+      color: #27c93f;
+    }
+
+    .terminal-status.offline {
+      background: rgba(255, 189, 46, 0.15);
+      color: #ffbd2e;
+    }
+
+    #networkTerminal {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto !important;
+      font-size: 12px;
+      font-family: 'Menlo', 'Courier New', monospace;
+    }
+
+    /* ===== Toolbox strip ===== */
+    .toolbox-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .toolbox-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 13px;
+    }
+
+    .toolbox-card h4 {
+      margin: 0 0 6px;
+      font-size: 14px;
+      color: var(--accent);
+    }
+
+    .toolbox-card p {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .toolbox-card a {
+      color: var(--accent-2);
+      font-size: 12px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .toolbox-card a:hover {
+      text-decoration: underline;
+    }
+
+    /* ===== Per-chapter lab (task panel + terminal) ===== */
+    .chapter-lab {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px dashed rgba(255, 189, 46, 0.25);
+    }
+
+    .chapter-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 1100px) {
+      .chapter-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .task-panel {
+      background: rgba(60, 170, 255, 0.05);
+      border: 1px solid rgba(60, 170, 255, 0.25);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .task-panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #cde6ff;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(60, 170, 255, 0.15);
+    }
+
+    .task-panel-head .task-xp {
+      background: rgba(60, 170, 255, 0.15);
+      color: #3caaff;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-family: 'Menlo', monospace;
+    }
+
+    .task-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .task-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 10px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 10px;
+      font-size: 12.5px;
+      color: #ddd;
+      line-height: 1.45;
+      border: 1px solid transparent;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .task-list li .dot {
+      flex: 0 0 14px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #3caaff;
+      margin-top: 2px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .task-list li .title {
+      flex: 1;
+    }
+
+    .task-list li .xp {
+      font-family: 'Menlo', monospace;
+      font-size: 11px;
+      color: #ffbd2e;
+      white-space: nowrap;
+    }
+
+    .task-list li.done {
+      background: rgba(39, 201, 63, 0.1);
+      border-color: rgba(39, 201, 63, 0.4);
+      color: #bfe3c3;
+    }
+
+    .task-list li.done .dot {
+      background: #27c93f;
+      border-color: #27c93f;
+      box-shadow: 0 0 8px rgba(39, 201, 63, 0.6);
+    }
+
+    .task-list li.done .title {
+      text-decoration: line-through;
+      text-decoration-color: rgba(39, 201, 63, 0.4);
+    }
+
+    .task-list li.just-awarded {
+      animation: task-pop 0.5s ease;
+    }
+
+    @keyframes task-pop {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+
+    .xp-floater {
+      position: fixed;
+      pointer-events: none;
+      font-family: 'Menlo', monospace;
+      font-weight: 700;
+      font-size: 16px;
+      color: #27c93f;
+      text-shadow: 0 0 8px rgba(39, 201, 63, 0.6);
+      z-index: 2000;
+      animation: xp-float 1.4s ease-out forwards;
+    }
+
+    @keyframes xp-float {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-60px); opacity: 0; }
+    }
+
+    /* ===== Persistent XP toasts =====
+     * Each successful command (or topology objective) drops a toast in
+     * the bottom-right that stays visible long enough for the student to
+     * actually read what they just earned. They stack vertically so a
+     * burst of commands doesn't clobber earlier toasts. */
+    #xpToastStack {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+      max-width: 360px;
+    }
+    .xp-toast {
+      pointer-events: auto;
+      background: linear-gradient(135deg, rgba(39, 201, 63, 0.18), rgba(60, 170, 255, 0.12));
+      border: 1px solid rgba(39, 201, 63, 0.55);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #e3ffe7;
+      font-size: 13px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      animation: xp-toast-in 0.35s ease;
+    }
+    .xp-toast.fading { animation: xp-toast-out 0.6s ease forwards; }
+    .xp-toast .head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-weight: 700;
+      color: #27c93f;
+      font-family: 'Menlo', monospace;
+      font-size: 13px;
+    }
+    .xp-toast .close {
+      background: transparent;
+      border: none;
+      color: #cde6ff;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      padding: 0 4px;
+    }
+    .xp-toast .body {
+      margin-top: 4px;
+      font-size: 12.5px;
+      color: #d8e6cf;
+      line-height: 1.4;
+    }
+    @keyframes xp-toast-in {
+      from { transform: translateY(20px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    @keyframes xp-toast-out {
+      from { transform: translateY(0);     opacity: 1; }
+      to   { transform: translateY(-20px); opacity: 0; }
+    }
+
+    /* ===== Chapter lock overlay =====
+     * Chapters become available one-at-a-time: the student must finish
+     * every visible task in chapter N before chapter N+1's body is
+     * interactive. The lock dims the article and shows a centred banner
+     * explaining what they still need to do. */
+    article.module.chapter-locked {
+      position: relative;
+      filter: grayscale(0.6);
+    }
+    article.module.chapter-locked > *:not(.chapter-lock-overlay) {
+      opacity: 0.35;
+      pointer-events: none;
+      user-select: none;
+    }
+    .chapter-lock-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, rgba(10,10,13,0.55), rgba(10,10,13,0.85));
+      border-radius: 18px;
+      z-index: 5;
+      pointer-events: auto;
+    }
+    .chapter-lock-card {
+      max-width: 420px;
+      text-align: center;
+      background: rgba(20, 20, 28, 0.92);
+      border: 1px solid rgba(255, 189, 46, 0.45);
+      border-radius: 16px;
+      padding: 22px 24px;
+      color: #ffe2a3;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    .chapter-lock-card .icon { font-size: 32px; line-height: 1; }
+    .chapter-lock-card h4 {
+      margin: 6px 0 8px;
+      font-size: 16px;
+      color: #ffd479;
+    }
+    .chapter-lock-card p {
+      margin: 0;
+      font-size: 13px;
+      color: #cdd6e3;
+      line-height: 1.5;
+    }
+
+    .chapter-term-wrap {
+      background: #0a0a0d;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 320px;
+    }
+
+    .chapter-term-head {
+      background: #1a1a1a;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #333;
+      flex-shrink: 0;
+    }
+
+    .chapter-term-head .terminal-title {
+      color: #888;
+      font-size: 11px;
+      margin-left: 8px;
+      flex: 1;
+    }
+
+    .chapter-term-head .terminal-status {
+      font-size: 11px;
+      padding: 2px 10px;
+      border-radius: 20px;
+      background: rgba(39, 201, 63, 0.15);
+      color: #27c93f;
+    }
+
+    .chapter-term-head .terminal-status.offline {
+      background: rgba(255, 189, 46, 0.15);
+      color: #ffbd2e;
+    }
+
+    .chapter-terminal {
+      flex: 1;
+      padding: 10px;
+      min-height: 280px;
+      font-size: 12px;
+      font-family: 'Menlo', 'Courier New', monospace;
+    }
+
+    /* ===== Sticky course-wide XP bar ===== */
+    .course-xp-bar {
+      position: sticky;
+      top: 72px;
+      z-index: 50;
+      background: rgba(10, 10, 13, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .course-xp-bar .label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .course-xp-bar .value {
+      font-family: 'Menlo', monospace;
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 14px;
+    }
+
+    .course-xp-bar .xp-track {
+      flex: 1;
+      min-width: 160px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .course-xp-bar .xp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .course-xp-bar .chapters-done {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .course-xp-bar .chapters-done strong {
+      color: #fff;
+    }
+
+    /* ===== In-browser topology builder (Lab 6) ===== */
+    .topo-builder {
+      margin-top: 14px;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(60,170,255,0.05), rgba(124,77,255,0.04));
+      border: 1px solid rgba(60, 170, 255, 0.25);
+      border-radius: 18px;
+    }
+
+    .topo-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .topo-btn {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(60, 170, 255, 0.35);
+      color: #cde6ff;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform 0.15s, background 0.15s, border-color 0.15s;
+    }
+
+    .topo-btn:hover {
+      background: rgba(60, 170, 255, 0.12);
+      border-color: #3caaff;
+      transform: translateY(-1px);
+    }
+
+    .topo-btn.primary {
+      background: linear-gradient(135deg, #3caaff, #6ea6ff);
+      color: #0a0a0d;
+      border-color: transparent;
+    }
+
+    .topo-btn.primary:hover { filter: brightness(1.1); }
+
+    .topo-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .topo-stage {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .topo-stage { grid-template-columns: 1fr; }
+    }
+
+    .topo-canvas {
+      width: 100%;
+      height: 380px;
+      background: radial-gradient(ellipse at top, #101018 0%, #050507 80%);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      display: block;
+    }
+
+    .topo-canvas .device {
+      cursor: pointer;
+      transition: transform 0.15s;
+      transform-box: fill-box;
+      transform-origin: 42px 30px; /* centre of the 84×60 inner box */
+    }
+
+    /* Hover scale lives on the INNER group only, which means it composes
+       with the outer group's SVG translate instead of replacing it. */
+    .topo-canvas .device:hover { transform: scale(1.05); }
+
+    .topo-canvas .device.selected .device-bg {
+      stroke: #ffbd2e;
+      stroke-width: 3;
+      filter: drop-shadow(0 0 10px rgba(255,189,46,0.7));
+    }
+
+    .topo-canvas .cable {
+      stroke: #6ea6ff;
+      stroke-width: 2.5;
+      fill: none;
+      opacity: 0.75;
+      transition: stroke 0.3s, opacity 0.3s, stroke-dasharray 0.3s;
+    }
+
+    .topo-canvas .cable.broken {
+      stroke: #ff5f56;
+      stroke-dasharray: 4 6;
+      opacity: 0.6;
+    }
+
+    .topo-canvas .packet {
+      fill: #27c93f;
+      filter: drop-shadow(0 0 8px rgba(39,201,63,0.9));
+    }
+
+    .topo-canvas .packet.fail { fill: #ff5f56; filter: drop-shadow(0 0 8px rgba(255,95,86,0.9)); }
+    .topo-canvas .packet.reply { fill: #3caaff; filter: drop-shadow(0 0 8px rgba(60,170,255,0.9)); }
+
+    .topo-canvas .device-label {
+      font-family: 'Menlo', monospace;
+      font-size: 11px;
+      fill: #fff;
+      text-anchor: middle;
+      pointer-events: none;
+    }
+
+    .topo-canvas .device-ip {
+      font-family: 'Menlo', monospace;
+      font-size: 10px;
+      fill: #ffbd2e;
+      text-anchor: middle;
+      pointer-events: none;
+    }
+
+    .topo-info {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: #ddd;
+      overflow-y: auto;
+      max-height: 380px;
+    }
+
+    .topo-info-head {
+      font-weight: 700;
+      color: #3caaff;
+      margin-bottom: 8px;
+      font-size: 13px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(60,170,255,0.2);
+    }
+
+    .topo-info-body strong { color: #fff; }
+    .topo-info-body code { color: #ffbd2e; background: rgba(0,0,0,0.4); padding: 1px 5px; border-radius: 4px; }
+
+    .topo-info-body .kv {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 4px 8px;
+      margin: 6px 0;
+      font-size: 12px;
+    }
+
+    .topo-info-body .kv div:nth-child(odd) {
+      color: #888;
+    }
+
+    .topo-log {
+      margin-top: 8px;
+      padding: 8px;
+      background: #050507;
+      border-radius: 8px;
+      font-family: 'Menlo', monospace;
+      font-size: 11px;
+      color: #9ef7a7;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    .topo-log .fail { color: #ff5f56; }
+    .topo-log .reply { color: #3caaff; }
+    .topo-log .muted { color: #666; }
+
+    .topo-objectives-wrap {
+      background: rgba(0,0,0,0.25);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+
+    .topo-obj-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #cde6ff;
+      margin-bottom: 10px;
+    }
+
+    .topo-obj-xp {
+      background: rgba(60, 170, 255, 0.15);
+      color: #3caaff;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-family: 'Menlo', monospace;
+    }
+
+    .topo-objectives {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 8px;
+    }
+
+    .topo-objectives li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 10px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.4;
+      color: #ddd;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .topo-objectives li .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid #3caaff;
+      margin-top: 3px;
+      flex-shrink: 0;
+    }
+
+    .topo-objectives li.done {
+      background: rgba(39, 201, 63, 0.1);
+      border-color: rgba(39, 201, 63, 0.35);
+      color: #bfe3c3;
+    }
+
+    .topo-objectives li.done .dot {
+      background: #27c93f;
+      border-color: #27c93f;
+      box-shadow: 0 0 8px rgba(39,201,63,0.6);
+    }
+
+    .topo-objectives li.done .title {
+      text-decoration: line-through;
+      text-decoration-color: rgba(39,201,63,0.4);
+    }
+
+    .topo-objectives li .xp {
+      margin-left: auto;
+      color: #ffbd2e;
+      font-family: 'Menlo', monospace;
+      font-size: 11px;
+    }
+
+    .cmd-block {
+      background: #050507;
+      border: 1px solid #1f1f25;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-family: 'Menlo', 'Courier New', monospace;
+      color: #9ef7a7;
+      font-size: 12.5px;
+      margin: 10px 0;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+
+    .cmd-block .prompt {
+      color: var(--accent);
+      user-select: none;
+    }
+
+    .cmd-block .comment {
+      color: #666;
+    }
+
+    /* ===== Handshake diagram ===== */
+    .handshake {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0;
+      margin: 14px 0;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .handshake .hs-col {
+      text-align: center;
+      color: #fff;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .handshake .hs-step {
+      display: contents;
+    }
+
+    .handshake .hs-step .arrow {
+      font-family: monospace;
+      color: var(--accent);
+      font-size: 13px;
+      white-space: nowrap;
+      padding: 6px 10px;
+      align-self: center;
+    }
+
+    .handshake .hs-dot {
+      height: 2px;
+      background: rgba(255, 255, 255, 0.08);
+      align-self: center;
+    }
+
+    /* ===== Topology illustrations ===== */
+    .topo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    .topo-card {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 12.5px;
+    }
+
+    .topo-card h5 {
+      margin: 0 0 4px;
+      color: var(--accent);
+      font-size: 13px;
+    }
+
+    .topo-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    /* ===== Progress / header bar ===== */
+    .nf-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .nf-header-bar .stats {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .nf-header-bar .stats .chip {
+      font-size: 12px;
+    }
+
+    /* ===== Final certificate-style box ===== */
+    .finish-box {
+      background: linear-gradient(135deg, rgba(255, 47, 79, 0.1), rgba(124, 77, 255, 0.08));
+      border: 1px solid var(--accent);
+      border-radius: 20px;
+      padding: 28px 30px;
+      text-align: center;
+    }
+
+    .finish-box h3 {
+      margin: 0 0 6px;
+      font-size: 22px;
+    }
+
+    .finish-box p {
+      color: var(--muted);
+      margin: 6px 0 16px;
+      font-size: 14px;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 1000px) {
+      .nf-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .nf-toc {
+        position: relative;
+        top: 0;
+        height: auto;
+        max-height: none;
+      }
+
+      .osi-row {
+        grid-template-columns: 32px 1fr;
+      }
+
+      .osi-row .osi-pdu,
+      .osi-row .osi-ex {
+        grid-column: 2;
+        font-size: 11px;
+      }
+
+      .handshake {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a class="logo logo-utb" href="https://www.utb.edu.bh/" target="_blank" rel="noopener"
+        aria-label="University of Technology Bahrain">
+        <img src="assets/images/utblogo.png" alt="University of Technology Bahrain">
+      </a>
+      <a class="logo logo-club" href="index.html">
+        <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB">
+      </a>
+      <div class="auth-controls" data-auth-controls></div>
+      <button class="menu-toggle" aria-label="Toggle menu"></button>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="news.html">News</a>
+        <a href="join.html">Apply to Join</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="events.html">Events</a>
+        <a href="learning.html">Learning</a>
+        <a href="resources.html">Resources</a>
+        <a href="tracks.html">Cybersecurity Areas</a>
+        <a href="plan.html">Plan</a>
+        <a href="login.html">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="container">
+      <a class="back-button" href="learning.html">Back to Learning Paths</a>
+      <span class="eyebrow">Network Course</span>
+      <h1 style="margin-top:14px">Network Fundamentals</h1>
+      <p>A beginner-friendly course that teaches you how computer networks work.
+        Nine short chapters, each with a simple explanation and a hands-on lab you
+        can do right here in your browser.</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 0;">
+    <div class="container">
+      <div class="course-xp-bar" id="courseXpBar">
+        <span class="label">Course XP</span>
+        <span class="value" id="courseXpValue">0 / 0</span>
+        <div class="xp-track"><div class="xp-fill" id="courseXpFill"></div></div>
+        <span class="chapters-done"><strong id="chaptersDone">0</strong> / 9 chapters complete</span>
+      </div>
+
+      <div class="nf-header-bar">
+        <div class="stats">
+          <span class="chip">Beginner</span>
+          <span class="chip">9 Chapters</span>
+          <span class="chip">9 Practical Labs</span>
+          <span class="chip">~20 Hours</span>
+        </div>
+      </div>
+
+      <!--
+        Everything a student needs runs inside this page:
+        - a small terminal under every chapter (for typing real commands)
+        - an interactive topology lab in Chapter 6 (Topology)
+        No external tool or website is required to complete this course.
+      -->
+
+      <div class="nf-layout">
+        <!-- ================= TOC ================= -->
+        <aside class="nf-toc" id="nfToc">
+          <h4>Curriculum</h4>
+          <a href="#m1"><span class="num">01</span>Introduction</a>
+          <a href="#m2"><span class="num">02</span>The OSI Model</a>
+          <a href="#m3"><span class="num">03</span>IP Addresses</a>
+          <a href="#m4"><span class="num">04</span>Ports</a>
+          <a href="#m5"><span class="num">05</span>Service Types</a>
+          <a href="#m6"><span class="num">06</span>Topology</a>
+          <a href="#m7"><span class="num">07</span>Application Protocols</a>
+          <a href="#m8"><span class="num">08</span>Command Lines</a>
+          <a href="#m9"><span class="num">09</span>Synchronization</a>
+          <a href="#finish"><span class="num"></span>Capstone</a>
+        </aside>
+
+        <!-- ================= CONTENT ================= -->
+        <main class="nf-content">
+
+          <!-- =============== MODULE 1 =============== -->
+          <article class="module" id="m1">
+            <div class="module-label">MODULE 01 · FOUNDATIONS</div>
+            <h2>Introduction to Networks</h2>
+            <p class="lead">
+              Before anything else, we need a shared mental model of what a network actually is. A
+              <strong>computer network</strong> is simply a group of devices that can exchange data with one
+              another using an agreed-upon set of rules. That's it. Everything else in this course is detail
+              built on top of that single idea.
+            </p>
+
+            <h3>The Postal-System Analogy</h3>
+            <p>
+              Think of a network like a postal system. You write a letter (<em>data</em>), put it in an
+              envelope with an address (<em>packet header</em>), drop it in a mailbox (<em>network
+              interface</em>), and the postal service routes it through sorting centres
+              (<em>switches &amp; routers</em>) until it arrives at the destination. If the letter is too
+              big for one envelope, you split it into several numbered envelopes (<em>fragmentation</em>).
+              If an envelope is lost, you might send it again (<em>retransmission</em>). Every networking
+              concept in this course maps onto this analogy.
+            </p>
+
+            <h3>Why Networks Matter</h3>
+            <ul>
+              <li><strong>Communication:</strong> email, chat, video calls, VoIP.</li>
+              <li><strong>Resource sharing:</strong> printers, storage, GPUs, databases.</li>
+              <li><strong>The Internet:</strong> the largest network of networks ever built.</li>
+              <li><strong>Security:</strong> you cannot defend what you do not understand. Every
+                cyberattack uses a network.</li>
+            </ul>
+
+            <h3>Types of Networks (by Size)</h3>
+            <table class="nf-table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Scope</th>
+                  <th>Typical Example</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>PAN</strong> — Personal Area Network</td>
+                  <td>~ 1–10 m</td>
+                  <td>Your phone + Bluetooth earbuds</td>
+                </tr>
+                <tr>
+                  <td><strong>LAN</strong> — Local Area Network</td>
+                  <td>One building / campus</td>
+                  <td>Your home Wi-Fi, a UTB computer lab</td>
+                </tr>
+                <tr>
+                  <td><strong>MAN</strong> — Metropolitan Area Network</td>
+                  <td>A city</td>
+                  <td>A city-wide ISP backbone in Manama</td>
+                </tr>
+                <tr>
+                  <td><strong>WAN</strong> — Wide Area Network</td>
+                  <td>Country / continent</td>
+                  <td>A multinational bank connecting its branches</td>
+                </tr>
+                <tr>
+                  <td><strong>Internet</strong></td>
+                  <td>Global</td>
+                  <td>The public network-of-networks itself</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>Key Measurements You Will Hear Every Day</h3>
+            <ul>
+              <li><strong>Bandwidth</strong> — the maximum amount of data a link can carry per second
+                (Mbps, Gbps). Think: the <em>width</em> of a pipe.</li>
+              <li><strong>Throughput</strong> — the actual data rate you observe. Always ≤ bandwidth.</li>
+              <li><strong>Latency</strong> — the time a single packet takes to travel from A to B,
+                measured in milliseconds.</li>
+              <li><strong>Jitter</strong> — variation in latency between packets (critical for VoIP).</li>
+              <li><strong>Packet loss</strong> — the percentage of packets that never arrive.</li>
+            </ul>
+
+            <div class="tip">
+              <strong>Professor's note:</strong> Bandwidth and speed are <em>not</em> the same thing. A
+              1 Gbps link with 200 ms latency will <em>feel</em> slower than a 50 Mbps link with 20 ms
+              latency for most interactive applications.
+            </div>
+
+            <div class="lab">
+              <div class="lab-title">Lab 1 — Meet Your Own Network</div>
+              <ol>
+                <li>Open a terminal on your own laptop (<code>Terminal</code> on macOS/Linux,
+                  <code>cmd</code> or <code>PowerShell</code> on Windows).</li>
+                <li>Run a round-trip test to Cloudflare and to a public training target:</li>
+              </ol>
+              <div class="cmd-block"><span class="prompt">$</span> ping -c 4 1.1.1.1
+<span class="prompt">$</span> ping -c 4 testphp.vulnweb.com <span class="comment"># on Windows: ping testphp.vulnweb.com</span></div>
+              <ol start="3">
+                <li>Record the <strong>minimum</strong>, <strong>average</strong>, and
+                  <strong>maximum</strong> round-trip times.</li>
+                <li>On paper or in a drawing app, sketch your home network: modem, router, Wi-Fi,
+                  laptop, phone. Label what type of network each segment is (PAN, LAN, WAN).</li>
+              </ol>
+              <div class="expected">
+                <strong>Deliverable:</strong> a one-page diagram + a short paragraph explaining why the
+                latency to <code>1.1.1.1</code> differs from the latency to <code>testphp.vulnweb.com</code>.
+              </div>
+              <div class="chapter-lab" data-chapter="1"></div>
+            </div>
+          </article>
+
+          <!-- =============== MODULE 2 =============== -->
+          <article class="module" id="m2">
+            <div class="module-label">MODULE 02 · MENTAL MODEL</div>
+            <h2>The OSI Model</h2>
+            <p class="lead">
+              The Open Systems Interconnection (OSI) model is the single most important mental model in
+              networking. It splits the impossibly complex problem of "how do two computers talk?" into
+              seven smaller, independent problems called <strong>layers</strong>. Each layer only has to
+              do its own job and hand the data off to the layer below.
+            </p>
+
+            <h3>Why Layering?</h3>
+            <p>
+              Layering is <em>separation of concerns</em>. The engineer who designs a web browser should
+              not have to worry about whether the cable is copper or fibre. The engineer who lays the
+              cable should not have to know HTTP. As long as every layer respects its interface, the
+              layers can evolve independently.
+            </p>
+
+            <h3>The Seven Layers (Top-Down)</h3>
+            <div class="osi-ladder">
+              <div class="osi-row">
+                <span class="osi-num">7</span><span class="osi-name">Application</span><span class="osi-pdu">Data</span><span class="osi-ex">HTTP · DNS · SSH · FTP</span>
+              </div>
+              <div class="osi-row">
+                <span class="osi-num">6</span><span class="osi-name">Presentation</span><span class="osi-pdu">Data</span><span class="osi-ex">TLS · JPEG · ASCII</span>
+              </div>
+              <div class="osi-row">
+                <span class="osi-num">5</span><span class="osi-name">Session</span><span class="osi-pdu">Data</span><span class="osi-ex">NetBIOS · RPC</span>
+              </div>
+              <div class="osi-row">
+                <span class="osi-num">4</span><span class="osi-name">Transport</span><span class="osi-pdu">Segment / Datagram</span><span class="osi-ex">TCP · UDP</span>
+              </div>
+              <div class="osi-row">
+                <span class="osi-num">3</span><span class="osi-name">Network</span><span class="osi-pdu">Packet</span><span class="osi-ex">IP · ICMP · routing</span>
+              </div>
+              <div class="osi-row">
+                <span class="osi-num">2</span><span class="osi-name">Data Link</span><span class="osi-pdu">Frame</span><span class="osi-ex">Ethernet · MAC · ARP</span>
+              </div>
+              <div class="osi-row">
+                <span class="osi-num">1</span><span class="osi-name">Physical</span><span class="osi-pdu">Bits</span><span class="osi-ex">Cables · Wi-Fi radio · voltages</span>
+              </div>
+            </div>
+
+            <h3>Mnemonic (memorise this)</h3>
+            <p>
+              <strong>"All People Seem To Need Data Processing"</strong> — Application, Presentation,
+              Session, Transport, Network, Data Link, Physical (top → bottom).
+            </p>
+
+            <h3>OSI vs TCP/IP</h3>
+            <p>
+              The real Internet runs on the simpler <strong>TCP/IP model</strong>, which collapses the 7
+              OSI layers into 4 practical ones: <em>Application</em>, <em>Transport</em>,
+              <em>Internet</em>, and <em>Link</em>. In practice, engineers mix-and-match the vocabulary:
+              you will hear "layer 3" (meaning IP) and "layer 7 firewall" (meaning application-aware)
+              every day of your career.
+            </p>
+
+            <h3>Encapsulation — The Most Important Idea</h3>
+            <p>
+              When your browser sends an HTTP request, the data travels <em>downwards</em> through the
+              stack. Each layer wraps the data in its own header, like Russian nesting dolls:
+            </p>
+            <div class="cmd-block">[ Ethernet | IP | TCP | HTTP data ] <span class="comment">← what leaves your NIC</span></div>
+            <p>
+              On the receiving computer, the same happens in reverse: each layer strips off its header
+              and hands the inner data upwards. That is <strong>de-encapsulation</strong>.
+            </p>
+
+            <div class="lab">
+              <div class="lab-title">Lab 2 — Trace a Request Through the Stack</div>
+              <ol>
+                <li>Install <strong>Wireshark</strong> (free, wireshark.org).</li>
+                <li>Start a capture on your active network interface.</li>
+                <li>Visit <code>http://example.com</code> (HTTP, not HTTPS) in your browser.</li>
+                <li>Stop the capture. Find the first <code>HTTP GET /</code> packet.</li>
+                <li>Click the packet and expand the tree on the left. You will see, from top to bottom:
+                  <strong>Frame → Ethernet → IP → TCP → HTTP</strong>. Match each expansion to an OSI
+                  layer.</li>
+              </ol>
+              <div class="expected">
+                <strong>Deliverable:</strong> a screenshot with your own annotations labelling each layer
+                and its PDU (frame, packet, segment, data).
+              </div>
+              <div class="chapter-lab" data-chapter="2"></div>
+            </div>
+          </article>
+
+          <!-- =============== MODULE 3 =============== -->
+          <article class="module" id="m3">
+            <div class="module-label">MODULE 03 · IDENTITY</div>
+            <h2>IP Addresses</h2>
+            <p class="lead">
+              If a network is a postal system, the <strong>IP address</strong> is the street address. It
+              uniquely identifies a network interface so that packets can be delivered to the correct
+              machine anywhere in the world.
+            </p>
+
+            <h3>IPv4 at a Glance</h3>
+            <p>
+              An IPv4 address is <strong>32 bits</strong>, usually written as four decimal octets
+              separated by dots (e.g. <code>192.168.1.10</code>). Each octet is 8 bits, so each value is
+              in the range <code>0–255</code>.
+            </p>
+
+            <table class="nf-table">
+              <thead>
+                <tr>
+                  <th>Notation</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Dotted decimal</td>
+                  <td><code>192.168.1.10</code></td>
+                </tr>
+                <tr>
+                  <td>Binary</td>
+                  <td><code>11000000.10101000.00000001.00001010</code></td>
+                </tr>
+                <tr>
+                  <td>Hexadecimal</td>
+                  <td><code>C0.A8.01.0A</code></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>Public vs Private (RFC 1918)</h3>
+            <p>
+              Because IPv4 only allows ~4.3 billion addresses, we reserve three ranges for private use
+              inside homes and offices. Your router uses <strong>NAT</strong> to let many private
+              devices share one public address.
+            </p>
+            <table class="nf-table">
+              <thead>
+                <tr>
+                  <th>Range</th>
+                  <th>CIDR</th>
+                  <th>Typical Use</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>10.0.0.0 – 10.255.255.255</code></td>
+                  <td><code>/8</code></td>
+                  <td>Large enterprises</td>
+                </tr>
+                <tr>
+                  <td><code>172.16.0.0 – 172.31.255.255</code></td>
+                  <td><code>/12</code></td>
+                  <td>Medium networks</td>
+                </tr>
+                <tr>
+                  <td><code>192.168.0.0 – 192.168.255.255</code></td>
+                  <td><code>/16</code></td>
+                  <td>Home routers</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>Special Addresses Worth Knowing</h3>
+            <ul>
+              <li><code>127.0.0.1</code> — <strong>loopback</strong>. Refers to <em>this</em> machine.</li>
+              <li><code>0.0.0.0</code> — <strong>any address</strong>. "Listen on everything."</li>
+              <li><code>255.255.255.255</code> — limited broadcast.</li>
+              <li><code>169.254.x.x</code> — <strong>APIPA</strong>. Your OS auto-assigns this when
+                DHCP fails. If you see it, you have no working DHCP.</li>
+            </ul>
+
+            <h3>Subnet Masks &amp; CIDR</h3>
+            <p>
+              A subnet mask tells a device where the <em>network</em> portion of an address ends and the
+              <em>host</em> portion begins. Modern notation uses CIDR: <code>/24</code> means "the first
+              24 bits are the network", which equals <code>255.255.255.0</code>.
+            </p>
+
+            <h3>IPv6 — The Successor</h3>
+            <p>
+              IPv6 addresses are <strong>128 bits</strong>, written as eight groups of four hex digits
+              (e.g. <code>2001:0db8:85a3:0000:0000:8a2e:0370:7334</code>). That gives 3.4 × 10<sup>38</sup>
+              addresses — enough for every grain of sand on Earth to have its own public IP.
+            </p>
+
+            <div class="tip">
+              <strong>Professor's note:</strong> Loopback in IPv6 is simply <code>::1</code>. Any run of
+              zeros can be compressed with <code>::</code>, but only once per address.
+            </div>
+
+            <div class="lab">
+              <div class="lab-title">Lab 3 — Know Your Own Address</div>
+              <div class="cmd-block"><span class="comment"># macOS / Linux</span>
+<span class="prompt">$</span> ifconfig <span class="comment"># or: ip a</span>
+
+<span class="comment"># Windows</span>
+<span class="prompt">&gt;</span> ipconfig /all</div>
+              <ol>
+                <li>Identify your IPv4 address, subnet mask, default gateway, and DNS servers.</li>
+                <li>Classify your address: public or private? Which RFC 1918 range?</li>
+                <li>Note your IPv6 address if you have one. Is it link-local
+                  (<code>fe80::/10</code>) or global?</li>
+                <li>Find your MAC address on the same interface.</li>
+              </ol>
+              <div class="expected">
+                <strong>Deliverable:</strong> a filled-in table with IPv4, mask, gateway, DNS, MAC, and
+                IPv6 for <em>your</em> active network interface, plus a one-line classification of each.
+              </div>
+              <div class="chapter-lab" data-chapter="3"></div>
+            </div>
+          </article>
+
+          <!-- =============== MODULE 4 =============== -->
+          <article class="module" id="m4">
+            <div class="module-label">MODULE 04 · ENDPOINTS</div>
+            <h2>Ports</h2>
+            <p class="lead">
+              An IP address gets a packet to the right machine. But a single machine runs dozens of
+              services at once — a web server, an SSH daemon, a DNS resolver. How does the OS know which
+              program should receive an incoming packet? The answer is the <strong>port number</strong>.
+            </p>
+
+            <h3>The Apartment Analogy</h3>
+            <p>
+              The IP address is the <em>building</em>. The port is the <em>apartment number</em>. The
+              combination of <code>(IP address, port)</code> is called a <strong>socket</strong> and it
+              uniquely identifies one endpoint of a conversation.
+            </p>
+
+            <h3>The Port Number Space</h3>
+            <p>Ports are 16-bit numbers, so they range from <code>0</code> to <code>65535</code>.</p>
+            <table class="nf-table">
+              <thead>
+                <tr>
+                  <th>Range</th>
+                  <th>Name</th>
+                  <th>Meaning</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>0 – 1023</code></td>
+                  <td>Well-known</td>
+                  <td>Reserved for standard services. Binding usually requires admin rights.</td>
+                </tr>
+                <tr>
+                  <td><code>1024 – 49151</code></td>
+                  <td>Registered</td>
+                  <td>Assigned by IANA to specific products.</td>
+                </tr>
+                <tr>
+                  <td><code>49152 – 65535</code></td>
+                  <td>Dynamic / Ephemeral</td>
+                  <td>Your OS picks one of these as the <em>source</em> port for outbound connections.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>Ports Every Networker Memorises</h3>
+            <table class="nf-table">
+              <thead>
+                <tr>
+                  <th>Port</th>
+                  <th>Protocol</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>20 / 21</td><td>FTP</td><td>Data / Control — plaintext, legacy.</td></tr>
+                <tr><td>22</td><td>SSH / SFTP</td><td>Encrypted remote shell &amp; file transfer.</td></tr>
+                <tr><td>23</td><td>Telnet</td><td>Plaintext remote shell — <em>do not use</em>.</td></tr>
+                <tr><td>25</td><td>SMTP</td><td>Sending mail between servers.</td></tr>
+                <tr><td>53</td><td>DNS</td><td>Domain name resolution.</td></tr>
+                <tr><td>67 / 68</td><td>DHCP</td><td>Automatic IP configuration.</td></tr>
+                <tr><td>80</td><td>HTTP</td><td>Plaintext web.</td></tr>
+                <tr><td>110 / 143</td><td>POP3 / IMAP</td><td>Receiving mail.</td></tr>
+                <tr><td>443</td><td>HTTPS</td><td>Encrypted web (TLS).</td></tr>
+                <tr><td>445</td><td>SMB</td><td>Windows file sharing.</td></tr>
+                <tr><td>3389</td><td>RDP</td><td>Windows remote desktop.</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Source Port vs Destination Port</h3>
+            <p>
+              Every TCP or UDP segment carries <em>two</em> port numbers. When your browser talks to
+              <code>testphp.vulnweb.com:80</code>, the server sees a source port like <code>54321</code> (an
+              ephemeral port your OS picked) and a destination port of <code>443</code>. When the server
+              replies, the source and destination flip. This is how one server can simultaneously serve
+              thousands of clients on port 443.
+            </p>
+
+            <div class="warn">
+              <strong>Security angle:</strong> every open port is a potential attack surface. The first
+              thing an attacker does is scan for open ports. The first thing a defender does is close
+              the ones they do not need.
+            </div>
+
+            <div class="lab">
+              <div class="lab-title">Lab 4 — What's Listening on My Machine?</div>
+              <div class="cmd-block"><span class="comment"># List all listening sockets</span>
+<span class="prompt">$</span> netstat -an | grep LISTEN <span class="comment"># macOS / Linux</span>
+<span class="prompt">$</span> ss -tulpn <span class="comment"># modern Linux</span>
+<span class="prompt">&gt;</span> netstat -ano <span class="comment"># Windows</span></div>
+              <ol>
+                <li>List every port your machine is currently listening on.</li>
+                <li>For each one, identify which program is bound to it (use <code>lsof -i :PORT</code>
+                  on macOS/Linux, or the PID column on Windows and <code>tasklist</code>).</li>
+                <li>Ask yourself: <em>do I actually need each of these services running?</em></li>
+              </ol>
+              <div class="expected">
+                <strong>Deliverable:</strong> a table of <code>port → program → purpose → keep or
+                close?</code> for at least 5 listening ports on your system.
+              </div>
+              <div class="chapter-lab" data-chapter="4"></div>
+            </div>
+          </article>
+
+          <!-- =============== MODULE 5 =============== -->
+          <article class="module" id="m5">
+            <div class="module-label">MODULE 05 · HOW DATA FLOWS</div>
+            <h2>Service Types</h2>
+            <p class="lead">
+              Not every conversation on a network works the same way. A video call, a file download, and
+              a DNS lookup have very different requirements. Networking gives us a small number of
+              <strong>service types</strong> and lets each application pick the right one.
+            </p>
+
+            <h3>1. Connection-Oriented vs Connectionless</h3>
+            <table class="nf-table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>TCP (connection-oriented)</th>
+                  <th>UDP (connectionless)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Setup</td><td>Three-way handshake first</td><td>Just send</td></tr>
+                <tr><td>Delivery</td><td>Guaranteed &amp; ordered</td><td>Best-effort — may lose / reorder</td></tr>
+                <tr><td>Overhead</td><td>Higher</td><td>Lower</td></tr>
+                <tr><td>Good for</td><td>Web, SSH, file transfer, email</td><td>DNS, VoIP, video, games</td></tr>
+              </tbody>
+            </table>
+
+            <h3>The TCP Three-Way Handshake</h3>
+            <p>
+              Before any data is exchanged, TCP performs a three-step "hello" that synchronises both
+              sides on starting sequence numbers. You <em>will</em> see this in Wireshark every day.
+            </p>
+            <div class="handshake">
+              <div class="hs-col">Client</div>
+              <div></div>
+              <div class="hs-col">Server</div>
+
+              <div class="hs-dot"></div>
+              <div class="arrow">— SYN →</div>
+              <div class="hs-dot"></div>
+
+              <div class="hs-dot"></div>
+              <div class="arrow">← SYN, ACK —</div>
+              <div class="hs-dot"></div>
+
+              <div class="hs-dot"></div>
+              <div class="arrow">— ACK →</div>
+              <div class="hs-dot"></div>
+            </div>
+            <p>
+              After the third packet, the connection is <em>established</em> and real data can flow in
+              both directions. Tearing down the connection uses a similar exchange of <code>FIN</code>
+              and <code>ACK</code> packets.
+            </p>
+
+            <h3>2. Delivery Scopes</h3>
+            <ul>
+              <li><strong>Unicast</strong> — one sender → one receiver (the default for almost everything).</li>
+              <li><strong>Broadcast</strong> — one sender → every device on the LAN (used by ARP, DHCP).</li>
+              <li><strong>Multicast</strong> — one sender → a group of interested receivers (IPTV,
+                routing protocols).</li>
+              <li><strong>Anycast</strong> — one sender → the <em>nearest</em> of many identical
+                receivers (how <code>8.8.8.8</code> and CDNs work).</li>
+            </ul>
+
+            <h3>3. Service Models</h3>
+            <ul>
+              <li><strong>Client–Server</strong>: one side requests, the other serves (web, email, DNS).</li>
+              <li><strong>Peer-to-Peer</strong>: every node is both client and server (BitTorrent, some
+                blockchains).</li>
+            </ul>
+
+            <div class="lab">
+              <div class="lab-title">Lab 5 — Watch TCP and UDP Live</div>
+              <ol>
+                <li>Start a Wireshark capture.</li>
+                <li>In your browser, visit <code>http://testphp.vulnweb.com</code>. Stop capture.</li>
+                <li>Filter by <code>tcp.flags.syn == 1</code>. Find the three-way handshake:
+                  <strong>SYN → SYN/ACK → ACK</strong>.</li>
+                <li>Now filter by <code>udp.port == 53</code>. Inspect a DNS query and its reply —
+                  notice there is no handshake, no retransmissions, just a request and a response.</li>
+              </ol>
+              <div class="expected">
+                <strong>Deliverable:</strong> two annotated screenshots — one of a full TCP handshake
+                and one of a UDP DNS exchange — explaining in your own words why each protocol was the
+                right choice.
+              </div>
+              <div class="chapter-lab" data-chapter="5"></div>
+            </div>
+          </article>
+
+          <!-- =============== MODULE 6 =============== -->
+          <article class="module" id="m6">
+            <div class="module-label">MODULE 06 · SHAPE</div>
+            <h2>Topology</h2>
+            <p class="lead">
+              <strong>Topology</strong> is the shape of a network — both the physical wiring and the
+              logical data paths. Choosing the right topology affects performance, cost, and how
+              gracefully the network fails.
+            </p>
+
+            <h3>Physical vs Logical</h3>
+            <ul>
+              <li><strong>Physical topology</strong> — how cables and devices are actually arranged.</li>
+              <li><strong>Logical topology</strong> — how data <em>appears</em> to flow between nodes,
+                which can differ from the wiring.</li>
+            </ul>
+
+            <h3>Classical Topologies</h3>
+            <div class="topo-grid">
+              <div class="topo-card">
+                <h5>Star</h5>
+                <p>Every device connects to a central switch. Today's default. One cable fault affects
+                  only one device — but the switch itself is a single point of failure.</p>
+              </div>
+              <div class="topo-card">
+                <h5>Bus</h5>
+                <p>All devices share one backbone cable. Cheap but one cable fault breaks everything.
+                  Mostly historical.</p>
+              </div>
+              <div class="topo-card">
+                <h5>Ring</h5>
+                <p>Each device connects to exactly two neighbours forming a closed loop (Token Ring,
+                  FDDI). Predictable but fragile.</p>
+              </div>
+              <div class="topo-card">
+                <h5>Mesh</h5>
+                <p>Every node connects to every other. Extremely reliable, extremely expensive. Used in
+                  the Internet backbone and some wireless sensor networks.</p>
+              </div>
+              <div class="topo-card">
+                <h5>Tree</h5>
+                <p>Hierarchical — a root switch with branches. Most enterprise LANs are a star-of-stars,
+                  which is a tree.</p>
+              </div>
+              <div class="topo-card">
+                <h5>Hybrid</h5>
+                <p>A combination chosen for cost/performance reasons. The real Internet is a hybrid of
+                  every topology on this list.</p>
+              </div>
+            </div>
+
+            <h3>The Devices You'll Find on a Diagram</h3>
+            <table class="nf-table">
+              <thead>
+                <tr>
+                  <th>Device</th>
+                  <th>OSI Layer</th>
+                  <th>Role</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Hub</td><td>1</td><td>Dumb repeater. Obsolete — repeats every bit to every port.</td></tr>
+                <tr><td>Switch</td><td>2</td><td>Forwards frames using MAC addresses. Learns a MAC table.</td></tr>
+                <tr><td>Router</td><td>3</td><td>Forwards packets between different networks using IP.</td></tr>
+                <tr><td>Access Point</td><td>1–2</td><td>Bridges Wi-Fi clients onto a wired LAN.</td></tr>
+                <tr><td>Firewall</td><td>3–7</td><td>Allows / denies traffic based on rules.</td></tr>
+                <tr><td>Modem</td><td>1–2</td><td>Translates between ISP's medium (fibre, DSL, cable) and Ethernet.</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Collision &amp; Broadcast Domains</h3>
+            <p>
+              A <strong>collision domain</strong> is a segment where two devices can have their signals
+              overlap. Switches break up collision domains (one per port). A <strong>broadcast
+              domain</strong> is a segment where a broadcast frame reaches every device. Routers break up
+              broadcast domains.
+            </p>
+
+            <div class="lab">
+              <div class="lab-title">Lab 6 — Build and Test a Small Network</div>
+              <p style="color:var(--muted); font-size:13px; line-height:1.6; margin-top:6px;">
+                The picture below is a tiny network with one router, one switch, three
+                computers, and the Internet. Click any device to see what it is and what
+                it does. Then press the buttons to send small test messages (pings) between
+                devices and watch them travel along the cables.
+              </p>
+
+              <!--
+                Interactive topology widget.
+                - The diagram is drawn by assets/js/topology-lab.js as pure SVG.
+                - Clicking a device shows its IP, MAC, and OSI layer in the side panel.
+                - The buttons below send animated packets through the real cable path.
+                - Clicking a cable breaks it; click again to restore it.
+                - Completing the objectives awards XP and updates the Chapter 6 checklist.
+              -->
+              <div class="topo-builder" id="topoBuilder">
+                <div class="topo-toolbar">
+                  <button class="topo-btn primary" data-action="ping-pc1-pc2">Ping PC1 to PC2</button>
+                  <button class="topo-btn primary" data-action="ping-pc1-internet">Ping PC1 to the Internet</button>
+                  <button class="topo-btn" data-action="break-uplink">Break cable (switch - router)</button>
+                  <button class="topo-btn" data-action="restore-cables">Fix all cables</button>
+                  <button class="topo-btn" data-action="reset">Reset</button>
+                </div>
+                <div class="topo-stage">
+                  <svg class="topo-canvas" id="topoCanvas" viewBox="0 0 900 380"
+                       preserveAspectRatio="xMidYMid meet"></svg>
+                  <div class="topo-info" id="topoInfo">
+                    <div class="topo-info-head">Click a device to inspect it</div>
+                    <div class="topo-info-body" id="topoInfoBody">
+                      Every device in a network has a job. Click the router, the switch, or
+                      any PC to learn its IP address, its MAC address, and which part of the
+                      OSI model it belongs to.
+                    </div>
+                  </div>
+                </div>
+                <div class="topo-objectives-wrap">
+                  <div class="topo-obj-head">
+                    <span>Lab 6 objectives</span>
+                    <span class="topo-obj-xp" id="topoObjXp">0 / 50 XP</span>
+                  </div>
+                  <ul class="topo-objectives" id="topoObjectives"></ul>
+                </div>
+              </div>
+
+              <!-- The small terminal under this chapter is injected by network-lab.js -->
+              <div class="chapter-lab" data-chapter="6"></div>
+            </div>
+          </article>
+
+          <!-- =============== MODULE 7 =============== -->
+          <article class="module" id="m7">
+            <div class="module-label">MODULE 07 · LAYER 7</div>
+            <h2>Application Protocols</h2>
+            <p class="lead">
+              This is where the user-facing internet lives. Every app on your phone speaks at least one
+              of these protocols. Learn them by name, port, and whether they are plaintext or encrypted.
+            </p>
+
+            <h3>The Daily-Use Protocol Table</h3>
+            <table class="nf-table">
+              <thead>
+                <tr>
+                  <th>Protocol</th>
+                  <th>Port</th>
+                  <th>Transport</th>
+                  <th>What It Does</th>
+                  <th>Encrypted?</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>HTTP</td><td>80</td><td>TCP</td><td>Web pages</td><td>No</td></tr>
+                <tr><td>HTTPS</td><td>443</td><td>TCP</td><td>Web pages (over TLS)</td><td>Yes</td></tr>
+                <tr><td>DNS</td><td>53</td><td>UDP / TCP</td><td>Names to IPs</td><td>No (unless DoT/DoH)</td></tr>
+                <tr><td>DHCP</td><td>67 / 68</td><td>UDP</td><td>Auto IP configuration</td><td>No</td></tr>
+                <tr><td>FTP</td><td>21</td><td>TCP</td><td>File transfer</td><td>No</td></tr>
+                <tr><td>SFTP / SCP</td><td>22</td><td>TCP</td><td>File transfer over SSH</td><td>Yes</td></tr>
+                <tr><td>SSH</td><td>22</td><td>TCP</td><td>Remote shell</td><td>Yes</td></tr>
+                <tr><td>Telnet</td><td>23</td><td>TCP</td><td>Remote shell (legacy)</td><td>No</td></tr>
+                <tr><td>SMTP</td><td>25 / 587</td><td>TCP</td><td>Sending mail</td><td>Starts plaintext, upgrades</td></tr>
+                <tr><td>POP3</td><td>110 / 995</td><td>TCP</td><td>Downloading mail</td><td>Yes on 995</td></tr>
+                <tr><td>IMAP</td><td>143 / 993</td><td>TCP</td><td>Reading mail on the server</td><td>Yes on 993</td></tr>
+                <tr><td>SNMP</td><td>161</td><td>UDP</td><td>Network device monitoring</td><td>Only in v3</td></tr>
+                <tr><td>NTP</td><td>123</td><td>UDP</td><td>Time synchronization</td><td>No (see Chapter 9)</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Anatomy of an HTTP Request</h3>
+            <div class="cmd-block">GET /index.html HTTP/1.1
+Host: testphp.vulnweb.com
+User-Agent: Mozilla/5.0
+Accept: text/html
+<span class="comment">(blank line)</span></div>
+            <p>
+              The server replies with a status line (<code>HTTP/1.1 200 OK</code>), headers, a blank
+              line, and the response body. HTTPS is exactly the same HTTP — just wrapped inside a TLS
+              tunnel after a handshake that proves the server's identity via a certificate.
+            </p>
+
+            <h3>DNS in Two Steps</h3>
+            <ol>
+              <li>Your resolver asks "what is the A record for <code>testphp.vulnweb.com</code>?"</li>
+              <li>The authoritative server replies with an IP like <code>44.228.249.3</code>. Your
+                resolver caches the answer for a TTL (time to live).</li>
+            </ol>
+
+            <div class="tip">
+              <strong>Professor's note:</strong> DNS is often called "the phone book of the Internet" —
+              but it's also the most frequently exploited protocol. DNS hijacking, cache poisoning, and
+              tunnelling are all topics you'll revisit in Web Security and Digital Forensics.
+            </div>
+
+            <div class="lab">
+              <div class="lab-title">Lab 7 — Plaintext vs Encrypted in the Wild</div>
+              <div class="cmd-block"><span class="prompt">$</span> curl -v http://example.com
+<span class="prompt">$</span> curl -v https://example.com</div>
+              <ol>
+                <li>Run both commands. Compare the verbose output — notice the TLS handshake in the
+                  second one.</li>
+                <li>Start a Wireshark capture and repeat. Filter by <code>http</code> then by
+                  <code>tls</code>. Can you read the URL in the HTTP capture? Can you read anything in
+                  the TLS capture?</li>
+                <li>Run <code>nslookup testphp.vulnweb.com</code> and then <code>nslookup -type=MX testphp.vulnweb.com</code>.
+                  Record the results.</li>
+              </ol>
+              <div class="expected">
+                <strong>Deliverable:</strong> a short report explaining, with screenshots, exactly why
+                HTTPS protects privacy and HTTP does not, plus the A and MX records you resolved for
+                <code>testphp.vulnweb.com</code>.
+              </div>
+              <div class="chapter-lab" data-chapter="7"></div>
+            </div>
+          </article>
+
+          <!-- =============== MODULE 8 =============== -->
+          <article class="module" id="m8">
+            <div class="module-label">MODULE 08 · THE ENGINEER'S TOOLBOX</div>
+            <h2>Command Lines</h2>
+            <p class="lead">
+              A real networking engineer does 90% of their diagnostic work from a terminal. These
+              commands are the stethoscope and blood-pressure cuff of the field — you <strong>must</strong>
+              be fluent in them.
+            </p>
+
+            <h3>The Essential Eight</h3>
+            <table class="nf-table">
+              <thead>
+                <tr>
+                  <th>Command</th>
+                  <th>Purpose</th>
+                  <th>Typical Use</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>ping</code></td>
+                  <td>Is the host reachable? How fast?</td>
+                  <td><code>ping 8.8.8.8</code></td>
+                </tr>
+                <tr>
+                  <td><code>traceroute</code> / <code>tracert</code></td>
+                  <td>Which hops does a packet pass through?</td>
+                  <td><code>traceroute testphp.vulnweb.com</code></td>
+                </tr>
+                <tr>
+                  <td><code>ipconfig</code> / <code>ifconfig</code> / <code>ip a</code></td>
+                  <td>What is my own IP configuration?</td>
+                  <td><code>ip a</code></td>
+                </tr>
+                <tr>
+                  <td><code>netstat</code> / <code>ss</code></td>
+                  <td>What sockets are open on this machine?</td>
+                  <td><code>ss -tulpn</code></td>
+                </tr>
+                <tr>
+                  <td><code>nslookup</code> / <code>dig</code></td>
+                  <td>Resolve DNS records manually</td>
+                  <td><code>dig testphp.vulnweb.com ANY</code></td>
+                </tr>
+                <tr>
+                  <td><code>arp</code></td>
+                  <td>Show / clear the IP→MAC mapping table</td>
+                  <td><code>arp -a</code></td>
+                </tr>
+                <tr>
+                  <td><code>route</code> / <code>ip route</code></td>
+                  <td>Inspect the routing table</td>
+                  <td><code>ip route</code></td>
+                </tr>
+                <tr>
+                  <td><code>curl</code> / <code>wget</code></td>
+                  <td>Speak HTTP/HTTPS from the shell</td>
+                  <td><code>curl -I http://testphp.vulnweb.com</code></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>A Structured Way to Troubleshoot</h3>
+            <p>
+              When something is broken, follow the OSI model from the bottom up:
+            </p>
+            <ol>
+              <li><strong>Layer 1 (Physical)</strong> — Is the cable plugged in? Is the Wi-Fi associated?</li>
+              <li><strong>Layer 2 (Data Link)</strong> — <code>arp -a</code>. Can you resolve the MAC of
+                the gateway?</li>
+              <li><strong>Layer 3 (Network)</strong> — <code>ping</code> the gateway, then
+                <code>ping 1.1.1.1</code> (no DNS needed).</li>
+              <li><strong>DNS</strong> — <code>nslookup testphp.vulnweb.com</code>. If this fails but pinging
+                <code>1.1.1.1</code> works, your DNS is broken.</li>
+              <li><strong>Layer 4+</strong> — <code>curl -v</code> to check if the app-layer service is
+                actually responding.</li>
+            </ol>
+
+            <h3>Cheat Sheet — "I Cannot Reach the Internet"</h3>
+            <div class="cmd-block"><span class="prompt">$</span> ip a <span class="comment"># do I have a valid IP?</span>
+<span class="prompt">$</span> ip route <span class="comment"># do I have a default gateway?</span>
+<span class="prompt">$</span> ping &lt;gateway&gt; <span class="comment"># can I reach my own router?</span>
+<span class="prompt">$</span> ping 1.1.1.1 <span class="comment"># can I reach the Internet?</span>
+<span class="prompt">$</span> nslookup example.com <span class="comment"># does DNS work?</span>
+<span class="prompt">$</span> curl -v https://example.com <span class="comment"># does the app layer respond?</span></div>
+
+            <div class="lab">
+              <div class="lab-title">Lab 8 — The Diagnostic Walkthrough</div>
+              <ol>
+                <li>Starting from a freshly opened terminal, run every command in the cheat sheet above
+                  against your own machine and <code>testphp.vulnweb.com</code>.</li>
+                <li>Record the output of each command.</li>
+                <li>For <code>traceroute testphp.vulnweb.com</code>, identify the <em>first</em> public hop.
+                  That is your ISP's edge router.</li>
+                <li>Disable your Wi-Fi for 5 seconds and re-run the commands. Observe which ones fail
+                  first and why.</li>
+              </ol>
+              <div class="expected">
+                <strong>Deliverable:</strong> a log file (<code>diagnostics.txt</code>) containing the
+                output of every command, with comments explaining what each result told you.
+              </div>
+              <div class="chapter-lab" data-chapter="8"></div>
+            </div>
+          </article>
+
+          <!-- =============== MODULE 9 =============== -->
+          <article class="module" id="m9">
+            <div class="module-label">MODULE 09 · KEEPING TIME</div>
+            <h2>Synchronization</h2>
+            <p class="lead">
+              Modern networks are useless if the devices on them disagree about <em>when</em> things
+              happen. Synchronization — of clocks, of connections, and of state — is one of the deepest
+              topics in networking and one of the easiest places for security to break.
+            </p>
+
+            <h3>1. Why Time Synchronization Matters</h3>
+            <ul>
+              <li><strong>Logs:</strong> if your firewall and your server disagree by 5 minutes, you
+                can't correlate an attack.</li>
+              <li><strong>TLS certificates:</strong> if your clock is wrong, every HTTPS site will look
+                expired or not-yet-valid.</li>
+              <li><strong>Kerberos / Active Directory:</strong> refuses authentication if clocks differ
+                by more than 5 minutes — this is the #1 cause of "I can't log in to the domain."</li>
+              <li><strong>Two-factor codes (TOTP):</strong> rotate every 30 seconds and fail if the
+                phone and server disagree.</li>
+              <li><strong>Distributed databases &amp; blockchains:</strong> rely on ordered, timestamped
+                events.</li>
+            </ul>
+
+            <h3>2. NTP — Network Time Protocol</h3>
+            <p>
+              <strong>NTP</strong> runs on UDP port <code>123</code>. Devices ask a <strong>time
+              source</strong> for the current time and adjust their local clock gradually to avoid
+              jumping. Time sources form a hierarchy called <em>strata</em>:
+            </p>
+            <table class="nf-table">
+              <thead>
+                <tr>
+                  <th>Stratum</th>
+                  <th>Source</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>0</td><td>Atomic clock, GPS receiver — the reference itself.</td></tr>
+                <tr><td>1</td><td>Servers directly connected to a stratum-0 source.</td></tr>
+                <tr><td>2</td><td>Servers that synchronise from stratum 1 over the network.</td></tr>
+                <tr><td>…</td><td>Up to stratum 15. Stratum 16 means "not synchronised".</td></tr>
+              </tbody>
+            </table>
+            <p>
+              Public pools you can use for free: <code>pool.ntp.org</code>, <code>time.google.com</code>,
+              <code>time.apple.com</code>, <code>time.windows.com</code>.
+            </p>
+
+            <h3>3. TCP Synchronization — The SYN Flag Revisited</h3>
+            <p>
+              "Synchronization" in networking doesn't only mean clocks. Every TCP connection begins with
+              a <code>SYN</code> segment, short for <em>synchronize sequence numbers</em>. Both ends
+              pick a random initial sequence number and use the handshake to agree on where the byte
+              stream starts. From that point, every byte sent is numbered, which is how TCP guarantees
+              in-order, reliable delivery.
+            </p>
+            <div class="warn">
+              <strong>Security angle:</strong> a <strong>SYN flood</strong> is a classic denial-of-service
+              attack where the attacker sends thousands of SYN packets and never completes the handshake,
+              exhausting the server's connection table. Modern OSes defend with <em>SYN cookies</em>.
+            </div>
+
+            <h3>4. Clock Skew &amp; Drift</h3>
+            <ul>
+              <li><strong>Skew</strong> — the constant offset between two clocks at a single moment.</li>
+              <li><strong>Drift</strong> — how fast that skew grows because every crystal oscillator
+                runs at a slightly different rate.</li>
+              <li>This is exactly why we need NTP to <em>continuously</em> correct, not just set-and-forget.</li>
+            </ul>
+
+            <h3>5. Beyond NTP</h3>
+            <ul>
+              <li><strong>PTP (IEEE 1588)</strong> — Precision Time Protocol. Sub-microsecond accuracy,
+                used in finance, telecom, and broadcast.</li>
+              <li><strong>NTS</strong> — Network Time Security. Adds cryptographic authentication to NTP
+                so you can trust the time you receive.</li>
+              <li><strong>Distributed consensus</strong> (Paxos, Raft) — how clusters stay "in sync" on
+                <em>state</em> when they can't fully trust any single clock.</li>
+            </ul>
+
+            <div class="lab">
+              <div class="lab-title">Lab 9 — Is Your Clock Lying?</div>
+              <div class="cmd-block"><span class="comment"># macOS</span>
+<span class="prompt">$</span> sntp -sS time.apple.com
+
+<span class="comment"># Linux (systemd)</span>
+<span class="prompt">$</span> timedatectl status
+<span class="prompt">$</span> timedatectl timesync-status
+
+<span class="comment"># Windows (PowerShell, run as admin)</span>
+<span class="prompt">&gt;</span> w32tm /query /status
+<span class="prompt">&gt;</span> w32tm /stripchart /computer:time.windows.com /samples:5</div>
+              <ol>
+                <li>Run the command for your OS and record your current offset from the reference
+                  server. Is your clock ahead or behind?</li>
+                <li>In Wireshark, capture for 30 seconds while filtering on <code>ntp</code>. You
+                  should see your OS periodically asking a time server for the time.</li>
+                <li>Now capture again while running <code>curl http://testphp.vulnweb.com</code>. Filter by
+                  <code>tcp.flags.syn == 1 and tcp.flags.ack == 0</code> to isolate the initial SYN.
+                  Note the sequence number chosen.</li>
+                <li>Deliberately set your system clock 10 minutes into the past and try visiting any
+                  HTTPS site. Note the certificate error. Reset your clock.</li>
+              </ol>
+              <div class="expected">
+                <strong>Deliverable:</strong> a short write-up that answers: (a) what was your clock's
+                offset? (b) how often does your OS sync with NTP? (c) which error did HTTPS show when
+                your clock was wrong, and what OSI layers did that error involve?
+              </div>
+              <div class="chapter-lab" data-chapter="9"></div>
+            </div>
+          </article>
+
+          <!-- =============== CAPSTONE =============== -->
+          <article class="finish-box" id="finish">
+            <h3>Capstone — Put It All Together</h3>
+            <p>
+              You've learned what networks are, the OSI model, IP addresses, ports, service types,
+              topology, application protocols, the command-line toolbox, and synchronization. For your
+              capstone, design a small office network in <strong>GNS3</strong>, <strong>EVE-NG</strong>,
+              or <strong>Cisco Packet Tracer</strong> that uses <strong>every</strong> concept above:
+            </p>
+            <ul style="text-align:left; max-width:780px; margin: 0 auto; color:#ccc; font-size:14px; line-height:1.7;">
+              <li>Two subnets (Staff <code>192.168.10.0/24</code>, Guest <code>192.168.20.0/24</code>)
+                separated by a router.</li>
+              <li>A switch per subnet (star topology).</li>
+              <li>DHCP on both subnets; an internal DNS server for <code>office.local</code>.</li>
+              <li>A web server on port 443 reachable only from Staff.</li>
+              <li>An NTP server (or upstream pool) so every device agrees on the time.</li>
+              <li>A one-page written report that identifies, for each device, which OSI layer(s) it
+                operates on and which ports you have opened.</li>
+            </ul>
+            <p style="margin-top:18px">
+              When your report and topology file are ready, share them in the club Discord for feedback
+              from a senior member. Completing this capstone qualifies you to move on to
+              <strong>Web Security</strong> and <strong>Digital Forensics</strong>.
+            </p>
+          </article>
+
+        </main>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="clean-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col footer-brand">
+          <div class="footer-logos">
+            <a href="https://www.utb.edu.bh/" target="_blank" rel="noopener"
+              aria-label="University of Technology Bahrain">
+              <img src="assets/images/utblogo.png" alt="University of Technology Bahrain" class="footer-logo">
+            </a>
+            <a href="index.html" aria-label="Cybersecurity Club UTB">
+              <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB" class="footer-logo">
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="news.html">News</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="learning.html">Learning</a></li>
+            <li><a href="join.html">Apply to Join</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>University</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.utb.edu.bh/" target="_blank" rel="noopener">UTB Website</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Follow Us</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.instagram.com/utb_bahrain/" target="_blank" rel="noopener">Instagram — UTB</a></li>
+            <li><a href="https://www.instagram.com/sc_utb/" target="_blank" rel="noopener">Instagram — Student
+                Council</a></li>
+            <li><a href="https://www.instagram.com/cyber_security_club_utb/" target="_blank" rel="noopener">Instagram —
+                Cybersecurity Club</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <small>College of Computer Studies &middot; &copy; 2026 Cybersecurity Club &mdash; University of Technology
+          Bahrain</small>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/app.js?v=notif4"></script>
+  <script src="assets/js/network-lab.js?v=11"></script>
+  <script src="assets/js/topology-lab.js?v=9"></script>
+  <script>
+    // Highlight the active module in the sidebar as the user scrolls.
+    (function () {
+      const tocLinks = document.querySelectorAll('#nfToc a');
+      const sections = Array.from(tocLinks)
+        .map(a => document.querySelector(a.getAttribute('href')))
+        .filter(Boolean);
+
+      function onScroll() {
+        const y = window.scrollY + 160;
+        let current = sections[0];
+        for (const s of sections) {
+          if (s.offsetTop <= y) current = s;
+        }
+        tocLinks.forEach(a => {
+          a.classList.toggle('active', a.getAttribute('href') === '#' + current.id);
+        });
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      document.addEventListener('DOMContentLoaded', onScroll);
+    })();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cryptography — Cybersecurity Club UTB</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=notif4" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm/css/xterm.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xterm/lib/xterm.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
+  <style>
+    body { background: #0a0a0d; }
+    .nf-layout { display: grid; grid-template-columns: 260px 1fr; gap: 28px; max-width: 1400px; margin: 0 auto; }
+    .nf-toc {
+      background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border);
+      border-radius: 18px; padding: 18px 14px; height: calc(100vh - 140px);
+      overflow-y: auto; position: sticky; top: 90px;
+    }
+    .nf-toc h4 { margin: 0 0 12px 4px; font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; }
+    .nf-toc a { display: block; padding: 10px 12px; border-radius: 10px; font-size: 13px; color: var(--text); text-decoration: none; margin-bottom: 4px; transition: background 0.15s, color 0.15s; }
+    .nf-toc a:hover { background: rgba(255, 255, 255, 0.06); }
+    .nf-toc a.active { background: rgba(255, 189, 46, 0.15); color: #ffbd2e; font-weight: 600; }
+    .nf-toc a .num { font-family: monospace; color: #ffbd2e; margin-right: 8px; font-size: 11px; }
+    .nf-content { min-width: 0; }
+    .back-button { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); margin-bottom: 16px; cursor: pointer; text-decoration: none; }
+    .back-button:hover { color: var(--accent); }
+
+    .module {
+      background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px 30px; margin-bottom: 28px; scroll-margin-top: 100px;
+    }
+    .module-label { display: inline-block; font-family: monospace; font-size: 12px; letter-spacing: 2px; color: #ffbd2e; font-weight: 700; margin-bottom: 8px; }
+    .module h2 { margin: 0 0 8px; font-size: 26px; }
+    .module .lead { color: var(--muted); font-size: 15px; line-height: 1.65; margin: 0 0 18px; }
+    .module h3 { font-size: 18px; margin: 22px 0 10px; color: #ffbd2e; }
+    .module p { line-height: 1.65; color: #ccc; font-size: 14px; }
+    .module ul, .module ol { line-height: 1.7; color: #ccc; font-size: 14px; padding-left: 22px; }
+    .module li { margin-bottom: 6px; }
+    .module strong { color: #fff; }
+    .module em { color: #eee; }
+    .module code {
+      background: rgba(0, 0, 0, 0.45); color: #ffbd2e; padding: 2px 6px;
+      border-radius: 4px; font-size: 12.5px; font-family: 'Menlo', 'Courier New', monospace;
+    }
+
+    .nf-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; background: rgba(0, 0, 0, 0.2); border-radius: 10px; overflow: hidden; }
+    .nf-table th, .nf-table td { text-align: left; padding: 10px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    .nf-table th { background: rgba(255, 189, 46, 0.12); color: #ffbd2e; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    .nf-table tr:last-child td { border-bottom: none; }
+
+    .tip, .warn { border-radius: 12px; padding: 14px 18px; margin: 16px 0; font-size: 13px; line-height: 1.6; }
+    .tip { background: rgba(60, 170, 255, 0.07); border-left: 4px solid #3caaff; color: #cde6ff; }
+    .tip strong { color: #3caaff; }
+    .warn { background: rgba(255, 95, 86, 0.08); border-left: 4px solid #ff5f56; color: #ffd0cd; }
+    .warn strong { color: #ff5f56; }
+
+    .cmd-block {
+      background: #050507; border: 1px solid #1f1f25; border-radius: 10px;
+      padding: 12px 16px; font-family: 'Menlo', 'Courier New', monospace;
+      color: #9ef7a7; font-size: 12.5px; margin: 10px 0; overflow-x: auto; line-height: 1.6;
+    }
+    .cmd-block .prompt { color: var(--accent); user-select: none; }
+    .cmd-block .comment { color: #666; }
+
+    /* ---- Per-chapter lab (task panel + terminal) ---- */
+    .chapter-lab { margin-top: 18px; padding-top: 14px; border-top: 1px dashed rgba(255, 189, 46, 0.25); }
+    .chapter-grid { display: grid; grid-template-columns: 320px 1fr; gap: 14px; }
+    @media (max-width: 1100px) { .chapter-grid { grid-template-columns: 1fr; } }
+    .task-panel {
+      background: rgba(255, 189, 46, 0.05); border: 1px solid rgba(255, 189, 46, 0.25);
+      border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column;
+    }
+    .task-panel-head {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 13px; font-weight: 700; color: #ffe9b5;
+      margin-bottom: 10px; padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 189, 46, 0.18);
+    }
+    .task-panel-head .task-xp {
+      background: rgba(255, 189, 46, 0.18); color: #ffbd2e;
+      padding: 3px 10px; border-radius: 20px; font-size: 11px; font-family: 'Menlo', monospace;
+    }
+    .task-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .task-list li {
+      display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px;
+      background: rgba(0, 0, 0, 0.25); border-radius: 10px; font-size: 12.5px;
+      color: #ddd; line-height: 1.45; border: 1px solid transparent;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .task-list li .dot {
+      flex: 0 0 14px; width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid #ffbd2e; margin-top: 2px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .task-list li .title { flex: 1; }
+    .task-list li .xp { font-family: 'Menlo', monospace; font-size: 11px; color: #ffbd2e; white-space: nowrap; }
+    .task-list li.done { background: rgba(39, 201, 63, 0.1); border-color: rgba(39, 201, 63, 0.4); color: #bfe3c3; }
+    .task-list li.done .dot { background: #27c93f; border-color: #27c93f; box-shadow: 0 0 8px rgba(39, 201, 63, 0.6); }
+    .task-list li.done .title { text-decoration: line-through; text-decoration-color: rgba(39, 201, 63, 0.4); }
+    .task-list li.just-awarded { animation: task-pop 0.5s ease; }
+    @keyframes task-pop { 0% { transform: scale(1); } 40% { transform: scale(1.03); } 100% { transform: scale(1); } }
+    .xp-floater {
+      position: fixed; pointer-events: none; font-family: 'Menlo', monospace;
+      font-weight: 700; font-size: 16px; color: #27c93f;
+      text-shadow: 0 0 8px rgba(39, 201, 63, 0.6); z-index: 2000;
+      animation: xp-float 1.4s ease-out forwards;
+    }
+    @keyframes xp-float { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-60px); opacity: 0; } }
+
+    /* ---- Toasts ---- */
+    #xpToastStack { position: fixed; right: 20px; bottom: 20px; z-index: 3000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; max-width: 360px; }
+    .xp-toast {
+      pointer-events: auto;
+      background: linear-gradient(135deg, rgba(39, 201, 63, 0.18), rgba(255, 189, 46, 0.12));
+      border: 1px solid rgba(39, 201, 63, 0.55); border-radius: 12px;
+      padding: 12px 14px; color: #e3ffe7; font-size: 13px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); backdrop-filter: blur(8px);
+      animation: xp-toast-in 0.35s ease;
+    }
+    .xp-toast.fading { animation: xp-toast-out 0.6s ease forwards; }
+    .xp-toast .head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-weight: 700; color: #27c93f; font-family: 'Menlo', monospace; font-size: 13px; }
+    .xp-toast .close { background: transparent; border: none; color: #ffe9b5; cursor: pointer; font-size: 14px; line-height: 1; padding: 0 4px; }
+    .xp-toast .body { margin-top: 4px; font-size: 12.5px; color: #d8e6cf; line-height: 1.4; }
+    @keyframes xp-toast-in  { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes xp-toast-out { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-20px); opacity: 0; } }
+
+    /* ---- Lock overlay ---- */
+    article.module.chapter-locked { position: relative; filter: grayscale(0.6); }
+    article.module.chapter-locked > *:not(.chapter-lock-overlay) { opacity: 0.35; pointer-events: none; user-select: none; }
+    .chapter-lock-overlay {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, rgba(10,10,13,0.55), rgba(10,10,13,0.85));
+      border-radius: 18px; z-index: 5; pointer-events: auto;
+    }
+    .chapter-lock-card {
+      max-width: 420px; text-align: center; background: rgba(20, 20, 28, 0.92);
+      border: 1px solid rgba(255, 189, 46, 0.45); border-radius: 16px;
+      padding: 22px 24px; color: #ffe2a3; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    .chapter-lock-card .icon { font-size: 32px; line-height: 1; }
+    .chapter-lock-card h4 { margin: 6px 0 8px; font-size: 16px; color: #ffd479; }
+    .chapter-lock-card p { margin: 0; font-size: 13px; color: #cdd6e3; line-height: 1.5; }
+
+    /* ---- Terminal ---- */
+    .chapter-term-wrap {
+      background: #0a0a0d; border-radius: 14px; border: 1px solid var(--border);
+      overflow: hidden; display: flex; flex-direction: column; min-height: 320px;
+    }
+    .chapter-term-head { background: #1a1a1a; padding: 10px 14px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #333; flex-shrink: 0; }
+    .chapter-term-head .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .chapter-term-head .terminal-dot.red    { background: #ff5f56; }
+    .chapter-term-head .terminal-dot.yellow { background: #ffbd2e; }
+    .chapter-term-head .terminal-dot.green  { background: #27c93f; }
+    .chapter-term-head .terminal-title { color: #888; font-size: 11px; margin-left: 8px; flex: 1; }
+    .chapter-term-head .terminal-status { font-size: 11px; padding: 2px 10px; border-radius: 20px; background: rgba(39, 201, 63, 0.15); color: #27c93f; }
+    .chapter-term-head .terminal-status.offline { background: rgba(255, 189, 46, 0.15); color: #ffbd2e; }
+    .chapter-terminal { flex: 1; padding: 10px; min-height: 280px; font-size: 12px; font-family: 'Menlo', 'Courier New', monospace; }
+
+    /* ---- Sticky XP bar ---- */
+    .course-xp-bar {
+      position: sticky; top: 72px; z-index: 50;
+      background: rgba(10, 10, 13, 0.95); backdrop-filter: blur(8px);
+      border: 1px solid var(--border); border-radius: 14px;
+      padding: 10px 16px; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    }
+    .course-xp-bar .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; }
+    .course-xp-bar .value { font-family: 'Menlo', monospace; font-weight: 700; color: #ffbd2e; font-size: 14px; }
+    .course-xp-bar .xp-track { flex: 1; min-width: 160px; height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden; }
+    .course-xp-bar .xp-fill { height: 100%; background: linear-gradient(90deg, #ffbd2e, #ff8a2e); width: 0%; transition: width 0.5s ease; }
+    .course-xp-bar .chapters-done { font-size: 12px; color: var(--muted); }
+    .course-xp-bar .chapters-done strong { color: #fff; }
+
+    .nf-header-bar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+    .nf-header-bar .stats { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .finish-box {
+      background: linear-gradient(135deg, rgba(255, 189, 46, 0.12), rgba(255, 138, 46, 0.08));
+      border: 1px solid #ffbd2e; border-radius: 20px; padding: 28px 30px; text-align: center;
+    }
+    .finish-box h3 { margin: 0 0 6px; font-size: 22px; }
+    .finish-box p { color: var(--muted); margin: 6px 0 16px; font-size: 14px; }
+
+    @media (max-width: 1000px) {
+      .nf-layout { grid-template-columns: 1fr; }
+      .nf-toc { position: relative; top: 0; height: auto; max-height: none; }
+    }
+
+    /* ---- Method explainer cards (Objective / Weakness / Alternative) ---- */
+    .method-card {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
+      margin: 18px 0 10px;
+    }
+    @media (max-width: 900px) { .method-card { grid-template-columns: 1fr; } }
+    .method-card > div {
+      border-radius: 12px; padding: 14px 16px;
+      font-size: 13px; line-height: 1.6;
+    }
+    .method-card .obj {
+      background: rgba(39, 201, 63, 0.08); border: 1px solid rgba(39, 201, 63, 0.35); color: #cdf3d2;
+    }
+    .method-card .obj strong { color: #27c93f; }
+    .method-card .weak {
+      background: rgba(255, 95, 86, 0.08); border: 1px solid rgba(255, 95, 86, 0.35); color: #ffd0cd;
+    }
+    .method-card .weak strong { color: #ff5f56; }
+    .method-card .alt {
+      background: rgba(60, 170, 255, 0.07); border: 1px solid rgba(60, 170, 255, 0.35); color: #cde6ff;
+    }
+    .method-card .alt strong { color: #3caaff; }
+    .method-card h4 {
+      margin: 0 0 6px; font-size: 12px; letter-spacing: 1.5px;
+      text-transform: uppercase; font-family: 'Menlo', monospace;
+    }
+
+    /* ---- Crypto scene diagrams ---- */
+    .crypto-scene {
+      background: rgba(0,0,0,0.35); border: 1px solid var(--border);
+      border-radius: 14px; padding: 14px; margin: 16px 0;
+      display: block; overflow-x: auto;
+    }
+    .crypto-scene svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+    .crypto-scene .caption {
+      text-align: center; color: var(--muted); font-size: 12px;
+      margin-top: 8px; font-style: italic;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a class="logo logo-utb" href="https://www.utb.edu.bh/" target="_blank" rel="noopener" aria-label="University of Technology Bahrain">
+        <img src="assets/images/utblogo.png" alt="University of Technology Bahrain">
+      </a>
+      <a class="logo logo-club" href="index.html"><img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB"></a>
+      <div class="auth-controls" data-auth-controls></div>
+      <button class="menu-toggle" aria-label="Toggle menu"></button>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="news.html">News</a>
+        <a href="join.html">Apply to Join</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="events.html">Events</a>
+        <a href="learning.html">Learning</a>
+        <a href="resources.html">Resources</a>
+        <a href="tracks.html">Cybersecurity Areas</a>
+        <a href="plan.html">Plan</a>
+        <a href="login.html">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="container">
+      <a class="back-button" href="learning.html">Back to Learning Paths</a>
+      <span class="eyebrow">Cryptography Track</span>
+      <h1 style="margin-top:14px">Cryptography</h1>
+      <p>From the first letter-shifting ciphers to modern AES, RSA and digital
+        signatures — nine short, connected chapters. Each ends with a tiny
+        <code>openssl</code> lab in your own sandbox terminal that earns XP for
+        the dashboard and the leaderboard.</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 0;">
+    <div class="container">
+      <div class="course-xp-bar" id="courseXpBar">
+        <span class="label">Course XP</span>
+        <span class="value" id="courseXpValue">0 / 0</span>
+        <div class="xp-track"><div class="xp-fill" id="courseXpFill"></div></div>
+        <span class="chapters-done"><strong id="chaptersDone">0</strong> / 9 chapters complete</span>
+      </div>
+
+      <div class="nf-header-bar">
+        <div class="stats">
+          <span class="chip">Beginner-friendly</span>
+          <span class="chip">9 Chapters</span>
+          <span class="chip">36 Lab Tasks</span>
+          <span class="chip">~6 Hours</span>
+        </div>
+      </div>
+
+      <div class="nf-layout">
+        <aside class="nf-toc" id="nfToc">
+          <h4>Curriculum</h4>
+          <a href="#m1"><span class="num">01</span>Why we encrypt</a>
+          <a href="#m2"><span class="num">02</span>The first ciphers</a>
+          <a href="#m3"><span class="num">03</span>Vigenère</a>
+          <a href="#m4"><span class="num">04</span>Symmetric: AES</a>
+          <a href="#m5"><span class="num">05</span>Modes (ECB vs CBC)</a>
+          <a href="#m6"><span class="num">06</span>Hashing</a>
+          <a href="#m7"><span class="num">07</span>Asymmetric: RSA</a>
+          <a href="#m8"><span class="num">08</span>Digital signatures</a>
+          <a href="#m9"><span class="num">09</span>Crypto in the wild</a>
+          <a href="#finish"><span class="num"></span>Capstone</a>
+        </aside>
+
+        <main class="nf-content">
+
+          <!-- ============================ MODULE 1 ============================ -->
+          <article class="module" id="m1">
+            <div class="module-label">MODULE 01 · WHY</div>
+            <h2>What is cryptography, and why?</h2>
+            <p class="lead">
+              Cryptography is the art of turning data you don't want anyone to
+              read into data they can't read — and back again. It exists to do
+              four jobs.
+            </p>
+            <table class="nf-table">
+              <thead><tr><th>Goal</th><th>Plain English</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Confidentiality</strong></td><td>Only the right person can read it.</td></tr>
+                <tr><td><strong>Integrity</strong></td><td>The message hasn't been changed in transit.</td></tr>
+                <tr><td><strong>Authentication</strong></td><td>The message really came from who it claims.</td></tr>
+                <tr><td><strong>Non-repudiation</strong></td><td>The sender can't later deny sending it.</td></tr>
+              </tbody>
+            </table>
+            <p>
+              Every algorithm in the rest of this course is just a way to
+              achieve one or more of those four goals. We'll meet them one at a
+              time.
+            </p>
+
+            <div class="tip">
+              <strong>Encoding ≠ encryption.</strong> Base64, hex, URL-encoding
+              are all reversible by anyone. They hide nothing. The lab below
+              has you experience that the hard way.
+            </div>
+
+            <div class="chapter-lab" data-chapter="1"></div>
+
+            <p style="margin-top:14px">
+              Now that we know <em>why</em>, the next chapter answers <em>how
+              did people do this before computers?</em>
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 2 ============================ -->
+          <article class="module" id="m2">
+            <div class="module-label">MODULE 02 · CLASSIC CIPHERS</div>
+            <h2>The first ciphers — substitution</h2>
+            <p class="lead">
+              Before computers, people encrypted by hand. The simplest method
+              is to <strong>replace each letter with a different letter</strong>.
+              That's a substitution cipher.
+            </p>
+
+            <table class="nf-table">
+              <thead><tr><th>Cipher</th><th>Rule</th><th>Example: HELLO →</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Caesar</strong> (≈50 BC)</td><td>Shift every letter by 3 (A→D, B→E…)</td><td>KHOOR</td></tr>
+                <tr><td><strong>ROT13</strong></td><td>Caesar with shift 13 — its own inverse</td><td>URYYB</td></tr>
+                <tr><td><strong>Atbash</strong></td><td>Flip the alphabet (A↔Z, B↔Y…)</td><td>SVOOL</td></tr>
+              </tbody>
+            </table>
+
+            <p>
+              These are easy to break. Caesar has only 25 possible shifts; you
+              can try them all in seconds. And in English, the most common
+              letter is almost always <code>e</code>. That trick is called
+              <strong>frequency analysis</strong>, and it's the lab below.
+            </p>
+
+            <div class="chapter-lab" data-chapter="2"></div>
+
+            <p style="margin-top:14px">
+              Single-letter substitution falls fast. Chapter 3 asks: can we
+              make substitution stronger?
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 3 ============================ -->
+          <article class="module" id="m3">
+            <div class="module-label">MODULE 03 · STRONGER SUBSTITUTION</div>
+            <h2>Vigenère — substitution with a keyword</h2>
+            <p class="lead">
+              Caesar shifts every letter by the same amount. <strong>Vigenère</strong>
+              (1500s) shifts by a <em>keyword</em>: each letter of the key gives
+              a different shift, and the key repeats for as long as the message.
+            </p>
+
+            <div class="cmd-block">Plain:   HELLOWORLD
+Key:     KEYKEYKEYK
+Cipher:  RIJVSUYVJN</div>
+
+            <p>
+              For 300 years it was nicknamed <em>“the unbreakable cipher.”</em>
+              Then in the 1860s Charles Babbage and Friedrich Kasiski showed
+              that frequency analysis still works — you just have to find the
+              key length first.
+            </p>
+
+            <p>
+              The lab below uses a tiny <code>vig</code> helper inside the
+              sandbox so you can try encrypting and decrypting in seconds.
+            </p>
+
+            <div class="chapter-lab" data-chapter="3"></div>
+
+            <p style="margin-top:14px">
+              The lesson: any cipher humans can do by hand eventually falls.
+              We need maths and computers. Chapter 4.
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 4 ============================ -->
+          <article class="module" id="m4">
+            <div class="module-label">MODULE 04 · SYMMETRIC</div>
+            <h2>Symmetric encryption — one shared key</h2>
+            <p class="lead">
+              Modern symmetric encryption uses a single key that both sides
+              share. Same key encrypts and decrypts.
+            </p>
+
+            <table class="nf-table">
+              <thead><tr><th>Algorithm</th><th>Year</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td><strong>DES</strong></td><td>1977</td><td>Broken since 1999. Don't use.</td></tr>
+                <tr><td><strong>3DES</strong></td><td>1998</td><td>DES three times. Slow, retired.</td></tr>
+                <tr><td><strong>AES</strong></td><td>2001</td><td>Today's standard. 128/192/256-bit keys.</td></tr>
+                <tr><td><strong>ChaCha20</strong></td><td>2008</td><td>AES alternative, fast on phones.</td></tr>
+              </tbody>
+            </table>
+
+            <p>
+              In the lab you'll use <code>openssl enc -aes-256-cbc</code> to
+              encrypt a file, then decrypt it back. The same key (here, a
+              password) is used for both. That single shared key is exactly
+              what makes symmetric encryption fast — and what makes the next
+              question hard.
+            </p>
+
+            <h3>What it achieves &amp; what it can't</h3>
+            <div class="method-card">
+              <div class="obj">
+                <h4>Objective</h4>
+                <strong>Confidentiality.</strong> Hide the message so only
+                someone holding the same secret key K can read it. Fast,
+                unbroken at AES-256 — perfect for big files and live streams.
+              </div>
+              <div class="weak">
+                <h4>Weakness</h4>
+                <strong>Key distribution.</strong> Both sides need the same K
+                <em>before</em> they can talk. If you send K through the same
+                channel an attacker is watching, they grab K too and decrypt
+                everything. (See diagram below.)
+              </div>
+              <div class="alt">
+                <h4>Alternatives</h4>
+                <strong>Diffie-Hellman</strong> derives K in public without
+                ever sending it. <strong>Asymmetric encryption</strong>
+                (Chapter 7) lets Alice encrypt K with Bob's public key. Or
+                deliver K out-of-band (in person, QR code, hardware token).
+              </div>
+            </div>
+
+            <div class="crypto-scene">
+              <svg viewBox="0 0 720 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Alice sends the shared key to Bob; Eve in the middle copies it and can decrypt every message.">
+                <defs>
+                  <marker id="arrR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 z" fill="#ffbd2e"/>
+                  </marker>
+                  <marker id="arrRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 z" fill="#ff5f56"/>
+                  </marker>
+                </defs>
+                <!-- Alice -->
+                <circle cx="80"  cy="80" r="34" fill="#1a1a22" stroke="#27c93f" stroke-width="2"/>
+                <text x="80" y="86" text-anchor="middle" font-size="22" fill="#27c93f">A</text>
+                <text x="80" y="135" text-anchor="middle" font-size="13" fill="#cdf3d2" font-family="Menlo">Alice</text>
+                <text x="80" y="152" text-anchor="middle" font-size="11" fill="#888" font-family="Menlo">key K</text>
+                <!-- Bob -->
+                <circle cx="640" cy="80" r="34" fill="#1a1a22" stroke="#3caaff" stroke-width="2"/>
+                <text x="640" y="86" text-anchor="middle" font-size="22" fill="#3caaff">B</text>
+                <text x="640" y="135" text-anchor="middle" font-size="13" fill="#cde6ff" font-family="Menlo">Bob</text>
+                <text x="640" y="152" text-anchor="middle" font-size="11" fill="#888" font-family="Menlo">needs K</text>
+                <!-- Wire -->
+                <line x1="118" y1="80" x2="602" y2="80" stroke="#ffbd2e" stroke-width="2" marker-end="url(#arrR)"/>
+                <rect x="300" y="58" width="120" height="30" rx="6" fill="#0a0a0d" stroke="#ffbd2e"/>
+                <text x="360" y="79" text-anchor="middle" font-size="13" fill="#ffbd2e" font-family="Menlo">“the key is K”</text>
+                <!-- Eve in the middle -->
+                <circle cx="360" cy="200" r="32" fill="#1a1a22" stroke="#ff5f56" stroke-width="2"/>
+                <text x="360" y="206" text-anchor="middle" font-size="22" fill="#ff5f56">E</text>
+                <text x="360" y="252" text-anchor="middle" font-size="13" fill="#ffd0cd" font-family="Menlo">Eve (eavesdropper)</text>
+                <text x="360" y="268" text-anchor="middle" font-size="11" fill="#888" font-family="Menlo">copies K → Decrypt(K, c)</text>
+                <line x1="360" y1="95" x2="360" y2="165" stroke="#ff5f56" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrRed)"/>
+              </svg>
+              <div class="caption">If the key travels through the same channel as the messages, anyone listening (Eve) can capture it and decrypt everything.</div>
+            </div>
+
+            <div class="chapter-lab" data-chapter="4"></div>
+
+            <p style="margin-top:14px">
+              AES only encrypts 16 bytes at a time. To encrypt a long file we
+              chain blocks together. <em>How</em> we chain them turns out to
+              matter a lot. Chapter 5.
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 5 ============================ -->
+          <article class="module" id="m5">
+            <div class="module-label">MODULE 05 · MODES</div>
+            <h2>Modes of operation — chaining the blocks</h2>
+            <p class="lead">
+              Block ciphers like AES encrypt 16 bytes at a time. To encrypt a
+              long message we string blocks together using a <em>mode</em>.
+              The choice matters.
+            </p>
+
+            <ul>
+              <li><strong>ECB</strong> — each block encrypted independently.
+                Identical plaintext blocks produce identical ciphertext blocks.
+                Patterns leak through. <strong>Don't use it.</strong>
+                The famous <em>“ECB Penguin”</em> image is the standard demo.</li>
+              <li><strong>CBC</strong> — each block is XORed with the previous
+                ciphertext block before encrypting. Patterns disappear.</li>
+              <li><strong>GCM</strong> — modern authenticated mode. Detects
+                tampering for free. The default in TLS 1.3.</li>
+            </ul>
+
+            <p>
+              In the lab you'll encrypt the same file with ECB and with CBC and
+              compare the bytes. CBC's output looks like random noise; ECB's
+              gives away its structure.
+            </p>
+
+            <div class="chapter-lab" data-chapter="5"></div>
+
+            <p style="margin-top:14px">
+              We have hidden the data. But how do we know nobody changed it?
+              That's what hashing is for. Chapter 6.
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 6 ============================ -->
+          <article class="module" id="m6">
+            <div class="module-label">MODULE 06 · INTEGRITY</div>
+            <h2>Hashing — fingerprints for data</h2>
+            <p class="lead">
+              A <strong>hash function</strong> turns any input into a
+              fixed-size fingerprint. Same input always gives the same hash;
+              change one bit and the hash changes completely.
+            </p>
+
+            <table class="nf-table">
+              <thead><tr><th>Function</th><th>Output</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>MD5</td><td>128 bits</td><td>Broken — collisions easy</td></tr>
+                <tr><td>SHA-1</td><td>160 bits</td><td>Broken since 2017</td></tr>
+                <tr><td>SHA-256</td><td>256 bits</td><td>Modern default</td></tr>
+                <tr><td>SHA-3, BLAKE2/3</td><td>variable</td><td>Modern alternatives</td></tr>
+              </tbody>
+            </table>
+
+            <p>
+              Hashes are used for: file integrity (compare sums), password
+              storage (with bcrypt / Argon2 to slow attackers down), and
+              digital signatures (Chapter 8). Add a <em>secret key</em> to a
+              hash and you get an <strong>HMAC</strong>: anyone with the key
+              can verify the message; nobody without it can forge one.
+            </p>
+
+            <h3>What it achieves &amp; what it can't</h3>
+            <div class="method-card">
+              <div class="obj">
+                <h4>Objective</h4>
+                <strong>Integrity.</strong> Detect any change to the data.
+                One bit flipped → a totally different fingerprint. Cheap to
+                compute, easy to compare.
+              </div>
+              <div class="weak">
+                <h4>Weakness</h4>
+                <strong>No identity, no secrecy.</strong> An attacker who can
+                edit the data can also re-hash it and replace both. A hash
+                alone proves nothing about <em>who</em> sent it. Old hashes
+                (MD5, SHA-1) also have collision attacks.
+              </div>
+              <div class="alt">
+                <h4>Alternatives</h4>
+                <strong>HMAC</strong> mixes a shared key into the hash so
+                attackers can't forge it. <strong>Digital signatures</strong>
+                (Chapter 8) bind the hash to a private key. Use SHA-256 or
+                SHA-3 instead of MD5/SHA-1.
+              </div>
+            </div>
+
+            <div class="chapter-lab" data-chapter="6"></div>
+
+            <p style="margin-top:14px">
+              So far everything we did needed both sides to share a key in
+              advance. Chapter 7 solves <em>how</em> two strangers share a key
+              in the first place.
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 7 ============================ -->
+          <article class="module" id="m7">
+            <div class="module-label">MODULE 07 · ASYMMETRIC</div>
+            <h2>Asymmetric encryption — two keys, one pair</h2>
+            <p class="lead">
+              The breakthrough of the 1970s: two keys that are mathematically
+              linked. A <strong>public</strong> key everyone can see, and a
+              <strong>private</strong> key only you have.
+            </p>
+
+            <p>
+              If Alice encrypts with Bob's <em>public</em> key, only Bob's
+              <em>private</em> key can decrypt it. They never had to share a
+              secret first. The most famous algorithm is <strong>RSA</strong>
+              (Rivest, Shamir, Adleman, 1977). Modern alternatives include
+              ECC (Elliptic Curves) and post-quantum lattice schemes.
+            </p>
+
+            <p>
+              Asymmetric is slow, so in real life we use it to exchange a
+              short symmetric key, then continue with AES. That's how TLS,
+              SSH and PGP all work.
+            </p>
+
+            <h3>What it achieves &amp; what it can't</h3>
+            <div class="method-card">
+              <div class="obj">
+                <h4>Objective</h4>
+                <strong>Confidentiality without a shared secret.</strong>
+                Anyone can encrypt to Bob using his <em>public</em> key; only
+                Bob's <em>private</em> key can decrypt. Solves Chapter 4's
+                key-distribution problem.
+              </div>
+              <div class="weak">
+                <h4>Weakness</h4>
+                <strong>Slow + identity trust.</strong> RSA is ~1000× slower
+                than AES, so we never encrypt big files with it directly.
+                Worse, if Eve tricks Bob into using <em>her</em> public key as
+                Alice's, she reads everything (man-in-the-middle).
+              </div>
+              <div class="alt">
+                <h4>Alternatives</h4>
+                <strong>Hybrid encryption</strong>: encrypt the data with AES,
+                encrypt only the AES key with RSA. Use <strong>certificates
+                (PKI)</strong> so a CA vouches that a public key really
+                belongs to its owner. <strong>ECC</strong> gives the same
+                security with smaller keys; post-quantum schemes are coming.
+              </div>
+            </div>
+
+            <div class="crypto-scene">
+              <svg viewBox="0 0 720 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Alice encrypts to Bob's public key; Eve sees the public key and ciphertext but cannot decrypt without Bob's private key.">
+                <defs>
+                  <marker id="arrR2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 z" fill="#3caaff"/>
+                  </marker>
+                </defs>
+                <!-- Alice -->
+                <circle cx="80"  cy="80" r="34" fill="#1a1a22" stroke="#27c93f" stroke-width="2"/>
+                <text x="80" y="86" text-anchor="middle" font-size="22" fill="#27c93f">A</text>
+                <text x="80" y="135" text-anchor="middle" font-size="13" fill="#cdf3d2" font-family="Menlo">Alice</text>
+                <text x="80" y="152" text-anchor="middle" font-size="11" fill="#888" font-family="Menlo">uses pub_B</text>
+                <!-- Bob -->
+                <circle cx="640" cy="80" r="34" fill="#1a1a22" stroke="#3caaff" stroke-width="2"/>
+                <text x="640" y="86" text-anchor="middle" font-size="22" fill="#3caaff">B</text>
+                <text x="640" y="135" text-anchor="middle" font-size="13" fill="#cde6ff" font-family="Menlo">Bob</text>
+                <text x="640" y="152" text-anchor="middle" font-size="11" fill="#888" font-family="Menlo">priv_B (secret)</text>
+                <!-- Wire -->
+                <line x1="118" y1="80" x2="602" y2="80" stroke="#3caaff" stroke-width="2" marker-end="url(#arrR2)"/>
+                <rect x="290" y="58" width="140" height="30" rx="6" fill="#0a0a0d" stroke="#3caaff"/>
+                <text x="360" y="79" text-anchor="middle" font-size="13" fill="#3caaff" font-family="Menlo">Enc(pub_B, m)</text>
+                <!-- Eve in the middle -->
+                <circle cx="360" cy="200" r="32" fill="#1a1a22" stroke="#ff5f56" stroke-width="2"/>
+                <text x="360" y="206" text-anchor="middle" font-size="22" fill="#ff5f56">E</text>
+                <text x="360" y="252" text-anchor="middle" font-size="13" fill="#ffd0cd" font-family="Menlo">Eve sees pub_B + ciphertext</text>
+                <text x="360" y="268" text-anchor="middle" font-size="11" fill="#888" font-family="Menlo">no priv_B → cannot decrypt ✅</text>
+                <line x1="360" y1="95" x2="360" y2="165" stroke="#555" stroke-width="2" stroke-dasharray="4 4"/>
+              </svg>
+              <div class="caption">Eve still listens, but the public key is harmless on its own — only Bob's private key can decrypt.</div>
+            </div>
+
+            <div class="chapter-lab" data-chapter="7"></div>
+
+            <p style="margin-top:14px">
+              We've used the public key to <em>send</em> a secret. What if we
+              flip it and use the <em>private</em> key to <em>prove</em>
+              something? That's a digital signature. Chapter 8.
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 8 ============================ -->
+          <article class="module" id="m8">
+            <div class="module-label">MODULE 08 · SIGNATURES</div>
+            <h2>Digital signatures — sign with private, verify with public</h2>
+            <p class="lead">
+              Reverse the keys. If you sign data with your <em>private</em>
+              key, anyone can verify with your <em>public</em> key that
+              <strong>only you</strong> could have signed it. That's a
+              digital signature.
+            </p>
+
+            <p>
+              In practice we sign a hash of the message rather than the whole
+              message — much faster, and good enough thanks to Chapter 6's
+              integrity guarantee. Combine signatures with a chain of trust
+              (X.509 certificates issued by a CA) and you get HTTPS, signed
+              software updates, and signed email.
+            </p>
+
+            <div class="cmd-block">Bob receives:  message + signature
+1. Hash the message himself.
+2. Decrypt the signature with Alice's public key — gives a hash.
+3. If the two hashes match, the message really came from Alice
+   AND has not been changed.</div>
+
+            <h3>What it achieves &amp; what it can't</h3>
+            <div class="method-card">
+              <div class="obj">
+                <h4>Objective</h4>
+                <strong>Authenticity + integrity + non-repudiation.</strong>
+                Prove <em>who</em> signed <em>what</em>, and stop the signer
+                denying it later. Used for HTTPS certificates, signed software
+                updates, signed email.
+              </div>
+              <div class="weak">
+                <h4>Weakness</h4>
+                <strong>Trust in the public key.</strong> Verification only
+                works if Bob has the <em>real</em> Alice's public key. If Eve
+                planted hers, she signs as “Alice” and Bob believes it.
+                Private-key theft is also game-over — anyone with priv_A can
+                impersonate Alice.
+              </div>
+              <div class="alt">
+                <h4>Alternatives / fixes</h4>
+                <strong>Certificates &amp; PKI</strong> (X.509) so a CA vouches
+                for the public key. <strong>Web of trust</strong> (PGP) where
+                friends sign each other's keys. <strong>Hardware tokens</strong>
+                (YubiKey, TPM) keep the private key off disk so it can't be
+                copied.
+              </div>
+            </div>
+
+            <div class="chapter-lab" data-chapter="8"></div>
+
+            <p style="margin-top:14px">
+              Where does all this show up in real life? Chapter 9.
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 9 ============================ -->
+          <article class="module" id="m9">
+            <div class="module-label">MODULE 09 · IN THE WILD</div>
+            <h2>Crypto in the wild</h2>
+            <p class="lead">
+              TLS, SSH, PGP, signed software updates, password managers,
+              blockchains — every one of them is a recipe built from the
+              ingredients in chapters 4 to 8.
+            </p>
+
+            <p>A typical TLS handshake:</p>
+            <ol>
+              <li><strong>Asymmetric</strong> (RSA / ECDH from Chapter 7) to
+                exchange a fresh symmetric key.</li>
+              <li><strong>Symmetric</strong> (AES-GCM from Chapters 4 and 5)
+                for the actual data.</li>
+              <li><strong>Hash + signature</strong> (Chapters 6 and 8) so both
+                sides know nothing was tampered with and to prove the server's
+                identity.</li>
+            </ol>
+
+            <p>
+              In the lab you'll inspect a real TLS certificate, verify a
+              file's checksum, and confirm <code>gpg</code> is installed —
+              ready for the capstone.
+            </p>
+
+            <div class="chapter-lab" data-chapter="9"></div>
+          </article>
+
+          <!-- ============================ CAPSTONE ============================ -->
+          <article class="finish-box" id="finish">
+            <h3>Capstone — your tiny PGP</h3>
+            <p>
+              Use everything in one go. In the sandbox, build a “send Bob a
+              secret note” pipeline:
+            </p>
+            <ul style="text-align:left; max-width:780px; margin: 0 auto; color:#ccc; font-size:14px; line-height:1.7;">
+              <li>Bob: <code>openssl genrsa</code> + <code>openssl rsa -pubout</code>
+                — gives you a key pair (Chapter 7).</li>
+              <li>Alice: write a message, encrypt it with AES (Chapter 4).</li>
+              <li>Alice: encrypt the AES password with Bob's public key
+                (Chapter 7).</li>
+              <li>Alice: sign the AES file with her own private key
+                (Chapter 8).</li>
+              <li>Bob: verify Alice's signature, decrypt the AES password with
+                his private key, then decrypt the message with that password.</li>
+            </ul>
+            <p style="margin-top:18px">
+              Congratulations — you've just built, by hand, the same recipe
+              that PGP and every TLS connection on the planet use.
+            </p>
+          </article>
+
+        </main>
+      </div>
+    </div>
+  </section>
+
+  <footer class="clean-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col footer-brand">
+          <div class="footer-logos">
+            <a href="https://www.utb.edu.bh/" target="_blank" rel="noopener" aria-label="University of Technology Bahrain">
+              <img src="assets/images/utblogo.png" alt="University of Technology Bahrain" class="footer-logo">
+            </a>
+            <a href="index.html" aria-label="Cybersecurity Club UTB">
+              <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB" class="footer-logo">
+            </a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="news.html">News</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="learning.html">Learning</a></li>
+            <li><a href="join.html">Apply to Join</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>University</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.utb.edu.bh/" target="_blank" rel="noopener">UTB Website</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Follow Us</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.instagram.com/utb_bahrain/" target="_blank" rel="noopener">Instagram — UTB</a></li>
+            <li><a href="https://www.instagram.com/sc_utb/" target="_blank" rel="noopener">Instagram — Student Council</a></li>
+            <li><a href="https://www.instagram.com/cyber_security_club_utb/" target="_blank" rel="noopener">Instagram — Cybersecurity Club</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <small>College of Computer Studies &middot; &copy; 2026 Cybersecurity Club &mdash; University of Technology Bahrain</small>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/app.js?v=notif4"></script>
+  <script src="assets/js/crypto-lab.js?v=2"></script>
+</body>
+
+</html>

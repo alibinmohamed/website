@@ -1,0 +1,76 @@
+# =============================================================================
+# cyber-network : network-fundamentals lab sandbox
+# -----------------------------------------------------------------------------
+# Separate from the Linux-course image (cyber-student). This container is what
+# the /api/network-terminal WebSocket attaches to. It has outbound Internet
+# access and all the networking tools students need across the nine chapters.
+#
+# Build with:   docker build -t cyber-network -f backend/docker/Dockerfile.network backend/docker
+# =============================================================================
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash \
+    coreutils \
+    findutils \
+    grep \
+    sed \
+    gawk \
+    less \
+    nano \
+    vim-tiny \
+    man-db \
+    file \
+    tree \
+    ca-certificates \
+    # --- core networking toolkit ---
+    iproute2 \
+    iputils-ping \
+    iputils-tracepath \
+    traceroute \
+    mtr-tiny \
+    net-tools \
+    dnsutils \
+    bind9-dnsutils \
+    whois \
+    curl \
+    wget \
+    netcat-openbsd \
+    telnet \
+    openssl \
+    tcpdump \
+    nmap \
+    ipcalc \
+    ntp \
+    ntpdate \
+    iperf3 \
+    # --- niceties ---
+    tzdata \
+    && rm -rf /var/lib/apt/lists/*
+
+# -----------------------------------------------------------------------------
+# Non-root user. uid 1001 on purpose — avoids colliding with the Linux-course
+# image's uid 1000 student if both images ever run on the same host.
+# -----------------------------------------------------------------------------
+RUN useradd -m -s /bin/bash -u 1001 netstudent
+
+USER netstudent
+WORKDIR /home/netstudent
+
+# Seed a few helper files so the home dir is not empty on first boot.
+RUN mkdir -p Documents notes captures topologies \
+    && printf 'Welcome to the Network Fundamentals sandbox.\nThis container is separate from the Linux course.\nType `help-net` for a cheat sheet.\n' > README.txt \
+    && printf '# Lab notebook\n' > notes/journal.md
+
+# A small help-net script so the MOTD can stay short.
+USER root
+RUN printf '#!/usr/bin/env bash\ncat <<EOF\nNetworking cheat sheet\n----------------------\n  ip a                     show interfaces\n  ip route                 show routing table\n  ss -tulpn                show listening sockets\n  ping -c 4 1.1.1.1        test reachability\n  traceroute utb.edu.bh    show path\n  dig utb.edu.bh           DNS query\n  curl -I https://utb.edu.bh\n  ntpq -p                  NTP peers\nEOF\n' > /usr/local/bin/help-net \
+    && chmod 755 /usr/local/bin/help-net
+
+# Custom prompt + MOTD tailored to the networking course.
+RUN printf '\nexport TERM=xterm-256color\nPS1='"'"'\\[\\e[0;36m\\]${STUDENT_NAME:-netstudent}@network-lab\\[\\e[0m\\]:\\[\\e[0;34m\\]\\w\\[\\e[0m\\]\\$ '"'"'\n[ -t 1 ] && printf "\\n\\033[1;36m== Network Fundamentals Sandbox ==\\033[0m\\n\\033[90mChapter %%s loaded. Type help-net for a cheat sheet.\\033[0m\\n\\n" "${NF_CHAPTER:-?}"\n' >> /home/netstudent/.bashrc
+
+USER netstudent
+CMD ["/bin/bash", "-l"]

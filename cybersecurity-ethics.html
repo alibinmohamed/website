@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cybersecurity Ethics &amp; Laws — Cybersecurity Club UTB</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=notif4" />
+  <style>
+    body { background: #0a0a0d; }
+
+    /* ===== Layout ===== */
+    .nf-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 28px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .nf-toc {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 14px;
+      height: calc(100vh - 140px);
+      overflow-y: auto;
+      position: sticky;
+      top: 90px;
+    }
+    .nf-toc h4 {
+      margin: 0 0 12px 4px;
+      font-size: 14px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+    .nf-toc a {
+      display: block;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      color: var(--text);
+      text-decoration: none;
+      margin-bottom: 4px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nf-toc a:hover { background: rgba(255, 255, 255, 0.06); }
+    .nf-toc a.active {
+      background: rgba(255, 189, 46, 0.15);
+      color: #ffbd2e;
+      font-weight: 600;
+    }
+    .nf-toc a .num {
+      font-family: monospace;
+      color: #ffbd2e;
+      margin-right: 8px;
+      font-size: 11px;
+    }
+    .nf-content { min-width: 0; }
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .back-button:hover { color: var(--accent); }
+
+    /* ===== Module card ===== */
+    .module {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 30px;
+      margin-bottom: 28px;
+      scroll-margin-top: 100px;
+    }
+    .module-label {
+      display: inline-block;
+      font-family: monospace;
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: #ffbd2e;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .module h2 { margin: 0 0 8px; font-size: 26px; }
+    .module .lead {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+      margin: 0 0 18px;
+    }
+    .module h3 {
+      font-size: 18px;
+      margin: 22px 0 10px;
+      color: #ffbd2e;
+    }
+    .module p {
+      line-height: 1.65;
+      color: #ccc;
+      font-size: 14px;
+    }
+    .module ul, .module ol {
+      line-height: 1.7;
+      color: #ccc;
+      font-size: 14px;
+      padding-left: 22px;
+    }
+    .module li { margin-bottom: 6px; }
+    .module strong { color: #fff; }
+    .module em { color: #eee; }
+    .module code {
+      background: rgba(0, 0, 0, 0.45);
+      color: #ffbd2e;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12.5px;
+      font-family: 'Menlo', 'Courier New', monospace;
+    }
+
+    /* ===== Tables ===== */
+    .nf-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 13px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .nf-table th, .nf-table td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .nf-table th {
+      background: rgba(255, 189, 46, 0.12);
+      color: #ffbd2e;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .nf-table tr:last-child td { border-bottom: none; }
+
+    /* ===== Callout ===== */
+    .tip, .warn, .src {
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .tip {
+      background: rgba(60, 170, 255, 0.07);
+      border-left: 4px solid #3caaff;
+      color: #cde6ff;
+    }
+    .tip strong { color: #3caaff; }
+    .warn {
+      background: rgba(255, 95, 86, 0.08);
+      border-left: 4px solid #ff5f56;
+      color: #ffd0cd;
+    }
+    .warn strong { color: #ff5f56; }
+    .src {
+      background: rgba(255, 189, 46, 0.06);
+      border-left: 4px solid #ffbd2e;
+      color: #ffe9b5;
+      font-size: 12.5px;
+    }
+    .src strong { color: #ffbd2e; }
+
+    /* ===== Chapter quiz container ===== */
+    .chapter-quiz {
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px dashed rgba(255, 189, 46, 0.25);
+    }
+    .quiz-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffe9b5;
+      margin-bottom: 12px;
+    }
+    .quiz-xp {
+      background: rgba(255, 189, 46, 0.18);
+      color: #ffbd2e;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-family: 'Menlo', monospace;
+    }
+    .quiz-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .quiz-empty {
+      padding: 18px;
+      border: 1px dashed rgba(255, 189, 46, 0.3);
+      border-radius: 12px;
+      color: #ffd479;
+      font-size: 13px;
+    }
+    .quiz-item {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      transition: border-color 0.2s;
+    }
+    .quiz-item.answered.correct {
+      border-color: rgba(39, 201, 63, 0.5);
+      background: rgba(39, 201, 63, 0.06);
+    }
+    .quiz-item.answered.wrong {
+      border-color: rgba(255, 95, 86, 0.5);
+      background: rgba(255, 95, 86, 0.05);
+    }
+    .quiz-prompt {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #ddd;
+      margin-bottom: 10px;
+    }
+    .quiz-prompt .num {
+      font-family: 'Menlo', monospace;
+      color: #ffbd2e;
+      font-weight: 700;
+      flex: 0 0 32px;
+    }
+    .quiz-prompt .text { flex: 1; color: #fff; }
+    .quiz-prompt .reward {
+      font-family: 'Menlo', monospace;
+      color: #ffbd2e;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .quiz-choices {
+      display: grid;
+      gap: 8px;
+    }
+    .quiz-choice {
+      text-align: left;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      color: #ddd;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.05s;
+    }
+    .quiz-choice:hover:not(:disabled) {
+      background: rgba(255, 189, 46, 0.08);
+      border-color: rgba(255, 189, 46, 0.45);
+    }
+    .quiz-choice:active:not(:disabled) { transform: translateY(1px); }
+    .quiz-choice:disabled { cursor: default; opacity: 0.85; }
+    .quiz-choice .letter {
+      font-family: 'Menlo', monospace;
+      color: #ffbd2e;
+      font-weight: 700;
+      flex: 0 0 22px;
+    }
+    .quiz-choice.is-correct {
+      background: rgba(39, 201, 63, 0.18);
+      border-color: rgba(39, 201, 63, 0.6);
+      color: #d8f5dd;
+    }
+    .quiz-choice.is-correct .letter { color: #27c93f; }
+    .quiz-choice.is-wrong {
+      background: rgba(255, 95, 86, 0.18);
+      border-color: rgba(255, 95, 86, 0.55);
+      color: #ffd0cd;
+    }
+    .quiz-choice.is-wrong .letter { color: #ff5f56; }
+
+    .quiz-feedback {
+      margin-top: 12px;
+      padding: 12px 14px;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #ddd;
+    }
+    .fb-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .fb-head.ok  { color: #27c93f; }
+    .fb-head.err { color: #ff5f56; }
+    .xp-pill {
+      background: rgba(39, 201, 63, 0.18);
+      color: #27c93f;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-family: 'Menlo', monospace;
+    }
+    .fb-explanation { margin: 4px 0; color: #ddd; }
+    .fb-source {
+      margin: 6px 0 0;
+      color: #ffbd2e;
+      font-size: 12px;
+      font-style: italic;
+    }
+
+    /* ===== Persistent XP toasts ===== */
+    #xpToastStack {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+      max-width: 360px;
+    }
+    .xp-toast {
+      pointer-events: auto;
+      background: linear-gradient(135deg, rgba(39, 201, 63, 0.18), rgba(255, 189, 46, 0.12));
+      border: 1px solid rgba(39, 201, 63, 0.55);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #e3ffe7;
+      font-size: 13px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      animation: xp-toast-in 0.35s ease;
+    }
+    .xp-toast.err {
+      background: linear-gradient(135deg, rgba(255, 95, 86, 0.18), rgba(255, 189, 46, 0.10));
+      border-color: rgba(255, 95, 86, 0.55);
+      color: #ffd0cd;
+    }
+    .xp-toast.fading { animation: xp-toast-out 0.6s ease forwards; }
+    .xp-toast .head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-weight: 700;
+      font-family: 'Menlo', monospace;
+      font-size: 13px;
+    }
+    .xp-toast.err .head { color: #ff5f56; }
+    .xp-toast .close {
+      background: transparent;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      padding: 0 4px;
+    }
+    .xp-toast .body { margin-top: 4px; font-size: 12.5px; line-height: 1.4; }
+    @keyframes xp-toast-in  { from { transform: translateY(20px); opacity: 0; }
+                              to   { transform: translateY(0);    opacity: 1; } }
+    @keyframes xp-toast-out { from { transform: translateY(0);     opacity: 1; }
+                              to   { transform: translateY(-20px); opacity: 0; } }
+
+    /* ===== Chapter lock overlay ===== */
+    article.module.chapter-locked { position: relative; filter: grayscale(0.6); }
+    article.module.chapter-locked > *:not(.chapter-lock-overlay) {
+      opacity: 0.35;
+      pointer-events: none;
+      user-select: none;
+    }
+    .chapter-lock-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, rgba(10,10,13,0.55), rgba(10,10,13,0.85));
+      border-radius: 18px;
+      z-index: 5;
+      pointer-events: auto;
+    }
+    .chapter-lock-card {
+      max-width: 420px;
+      text-align: center;
+      background: rgba(20, 20, 28, 0.92);
+      border: 1px solid rgba(255, 189, 46, 0.45);
+      border-radius: 16px;
+      padding: 22px 24px;
+      color: #ffe2a3;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    .chapter-lock-card .icon { font-size: 32px; line-height: 1; }
+    .chapter-lock-card h4 {
+      margin: 6px 0 8px;
+      font-size: 16px;
+      color: #ffd479;
+    }
+    .chapter-lock-card p {
+      margin: 0;
+      font-size: 13px;
+      color: #cdd6e3;
+      line-height: 1.5;
+    }
+
+    /* ===== Sticky course-wide XP bar ===== */
+    .course-xp-bar {
+      position: sticky;
+      top: 72px;
+      z-index: 50;
+      background: rgba(10, 10, 13, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .course-xp-bar .label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+    .course-xp-bar .value {
+      font-family: 'Menlo', monospace;
+      font-weight: 700;
+      color: #ffbd2e;
+      font-size: 14px;
+    }
+    .course-xp-bar .xp-track {
+      flex: 1;
+      min-width: 160px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .course-xp-bar .xp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ffbd2e, #ff8a2e);
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    .course-xp-bar .chapters-done { font-size: 12px; color: var(--muted); }
+    .course-xp-bar .chapters-done strong { color: #fff; }
+
+    /* ===== Header bar ===== */
+    .nf-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .nf-header-bar .stats { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    /* ===== Capstone ===== */
+    .finish-box {
+      background: linear-gradient(135deg, rgba(255, 189, 46, 0.12), rgba(255, 138, 46, 0.08));
+      border: 1px solid #ffbd2e;
+      border-radius: 20px;
+      padding: 28px 30px;
+      text-align: center;
+    }
+    .finish-box h3 { margin: 0 0 6px; font-size: 22px; }
+    .finish-box p { color: var(--muted); margin: 6px 0 16px; font-size: 14px; }
+
+    @media (max-width: 1000px) {
+      .nf-layout { grid-template-columns: 1fr; }
+      .nf-toc { position: relative; top: 0; height: auto; max-height: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a class="logo logo-utb" href="https://www.utb.edu.bh/" target="_blank" rel="noopener"
+        aria-label="University of Technology Bahrain">
+        <img src="assets/images/utblogo.png" alt="University of Technology Bahrain">
+      </a>
+      <a class="logo logo-club" href="index.html">
+        <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB">
+      </a>
+      <div class="auth-controls" data-auth-controls></div>
+      <button class="menu-toggle" aria-label="Toggle menu"></button>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="news.html">News</a>
+        <a href="join.html">Apply to Join</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="events.html">Events</a>
+        <a href="learning.html">Learning</a>
+        <a href="resources.html">Resources</a>
+        <a href="tracks.html">Cybersecurity Areas</a>
+        <a href="plan.html">Plan</a>
+        <a href="login.html">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="container">
+      <a class="back-button" href="learning.html">Back to Learning Paths</a>
+      <span class="eyebrow">Ethics &amp; Laws Track</span>
+      <h1 style="margin-top:14px">Cybersecurity Ethics &amp; Laws</h1>
+      <p>A short, beginner-friendly walk through the rules a cybersecurity
+        practitioner lives by. Nine connected chapters — each one answering a
+        question the previous chapter raised. Every chapter ends with a
+        four-question quiz; correct answers add XP to your dashboard and the
+        leaderboard, exactly like the other courses.</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 0;">
+    <div class="container">
+      <div class="course-xp-bar" id="courseXpBar">
+        <span class="label">Course XP</span>
+        <span class="value" id="courseXpValue">0 / 0</span>
+        <div class="xp-track"><div class="xp-fill" id="courseXpFill"></div></div>
+        <span class="chapters-done"><strong id="chaptersDone">0</strong> / 9 chapters complete</span>
+      </div>
+
+      <div class="nf-header-bar">
+        <div class="stats">
+          <span class="chip">Beginner-friendly</span>
+          <span class="chip">9 Chapters</span>
+          <span class="chip">36 Quiz Questions</span>
+          <span class="chip">~3 Hours</span>
+        </div>
+      </div>
+
+      <!--
+        How this course works
+        ---------------------
+        * Each chapter ends with a <div class="chapter-quiz" data-chapter="N">.
+          ethics-lab.js fetches the catalogue from /api/progress/ethics/catalogue
+          (which strips the correct-answer index server-side) and renders the
+          questions inside that container.
+        * Clicking a choice POSTs to /api/progress/ethics/answer. The Flask
+          backend validates the answer, awards XP for first-time correct
+          submissions, and returns the explanation + citation.
+        * Chapter N+1 unlocks once every question in chapter N is answered
+          correctly — same chapter-lock pattern as Network and Web courses.
+      -->
+
+      <div class="nf-layout">
+        <aside class="nf-toc" id="nfToc">
+          <h4>Curriculum</h4>
+          <a href="#m1"><span class="num">01</span>Intro to Ethics</a>
+          <a href="#m2"><span class="num">02</span>Professional Codes</a>
+          <a href="#m3"><span class="num">03</span>CIA Triad &amp; Privacy</a>
+          <a href="#m4"><span class="num">04</span>Privacy Laws</a>
+          <a href="#m5"><span class="num">05</span>Computer Crime Laws</a>
+          <a href="#m6"><span class="num">06</span>Authorised Access</a>
+          <a href="#m7"><span class="num">07</span>Disclosure &amp; CVE</a>
+          <a href="#m8"><span class="num">08</span>IP &amp; Licensing</a>
+          <a href="#m9"><span class="num">09</span>AI &amp; Surveillance</a>
+          <a href="#finish"><span class="num"></span>Capstone</a>
+        </aside>
+
+        <main class="nf-content">
+
+          <!-- ============================ MODULE 1 ============================ -->
+          <article class="module" id="m1">
+            <div class="module-label">MODULE 01 · WHY</div>
+            <h2>Why ethics?</h2>
+            <p class="lead">
+              You're starting a career where you'll have privileged access to other
+              people's computers and data. <strong>Ethics</strong> is the simple
+              question that follows: <em>when you have that power, how should you
+              use it?</em>
+            </p>
+            <p>
+              Ethics and law often agree, but not always. Reading a friend's email
+              is both unethical and illegal. Selling someone's location data is
+              legal in many countries but obviously not ok. The whole rest of this
+              course exists because “it's legal” isn't enough — you also need an
+              answer to “is it right?”
+            </p>
+
+            <h3>A useful test</h3>
+            <p>
+              Before you do something on a computer that isn't yours, ask:
+              <em>would I be comfortable if this showed up on tomorrow's news with
+              my name attached?</em> If the answer is no, stop.
+            </p>
+
+            <h3>What “ethical hacking” means</h3>
+            <p>
+              You'll hear the phrase a lot. It only means one thing: attacking a
+              system <strong>with written permission from its owner, inside an
+              agreed scope, to help that owner</strong>. Without permission, the
+              same actions are a crime — we'll see exactly which laws in Chapter 5.
+            </p>
+
+            <p>
+              The next chapter answers the obvious follow-up: <em>who decides what
+              “right” means in this profession?</em>
+            </p>
+
+            <div class="chapter-quiz" data-chapter="1"></div>
+          </article>
+
+          <!-- ============================ MODULE 2 ============================ -->
+          <article class="module" id="m2">
+            <div class="module-label">MODULE 02 · PROMISES</div>
+            <h2>Your code of honour</h2>
+            <p class="lead">
+              Chapter 1 said you need ethics. Chapter 2 answers: <em>who actually
+              writes them down?</em> The profession does. Every certificate you'll
+              ever earn — CISSP, CEH, OSCP, ACM membership — is signed under a
+              short written code. Break the code, lose the credential.
+            </p>
+
+            <h3>(ISC)² — four canons, in order</h3>
+            <ol>
+              <li>Protect society and the public.</li>
+              <li>Act honourably, honestly, justly, responsibly, legally.</li>
+              <li>Serve your clients well.</li>
+              <li>Look after the profession.</li>
+            </ol>
+            <p>
+              The order matters. If a paying client (Canon 3) asks you to do
+              something that hurts the public (Canon 1), the public wins.
+            </p>
+
+            <h3>ACM (2018)</h3>
+            <p>
+              The Association for Computing Machinery's code opens with one
+              sentence you can memorise: <em>“Contribute to society and to human
+              well-being.”</em> Everything else — honesty, fairness, privacy,
+              competent work — follows from that.
+            </p>
+
+            <h3>The pattern</h3>
+            <p>
+              Read enough of these codes (ACM, (ISC)², IEEE-CS, EC-Council) and
+              you'll notice they all rank <strong>the public first</strong>, then
+              honesty, then your client, then yourself. That's the pattern of
+              security ethics in one line.
+            </p>
+
+            <p>
+              Codes say “protect the public.” Chapter 3 asks: <em>protect
+              <u>what</u> exactly?</em>
+            </p>
+
+            <div class="chapter-quiz" data-chapter="2"></div>
+          </article>
+
+          <!-- ============================ MODULE 3 ============================ -->
+          <article class="module" id="m3">
+            <div class="module-label">MODULE 03 · WHAT WE PROTECT</div>
+            <h2>What we actually protect</h2>
+            <p class="lead">
+              The codes from Chapter 2 say “protect the public.” In a security
+              context, “protect” means three specific things, called the
+              <strong>CIA triad</strong>:
+            </p>
+            <table class="nf-table">
+              <thead><tr><th>Letter</th><th>Plain English</th><th>Broken when…</th></tr></thead>
+              <tbody>
+                <tr><td><strong>C</strong> — Confidentiality</td><td>Only the right
+                  people can read it.</td><td>A password database is leaked.</td></tr>
+                <tr><td><strong>I</strong> — Integrity</td><td>The data is correct
+                  and hasn't been changed.</td><td>A prescription record is
+                  altered.</td></tr>
+                <tr><td><strong>A</strong> — Availability</td><td>The system is up
+                  when people need it.</td><td>A DDoS knocks a hospital site
+                  offline.</td></tr>
+              </tbody>
+            </table>
+
+            <p>
+              That's it. Every breach you'll ever read about violates at least one
+              of those three letters.
+            </p>
+
+            <h3>One more thing: privacy</h3>
+            <p>
+              CIA covers data <em>about</em> the system. <strong>Privacy</strong>
+              covers data <em>about people</em>: their names, locations, health
+              records, browsing history. NIST treats privacy as its own concern
+              with the <em>NIST Privacy Framework</em>, exactly because it can be
+              violated even when CIA is intact.
+            </p>
+
+            <p>
+              Chapter 3 told you what to protect. Chapter 4 tells you what the
+              <em>law</em> says you must protect when the data belongs to people.
+            </p>
+
+            <div class="chapter-quiz" data-chapter="3"></div>
+          </article>
+
+          <!-- ============================ MODULE 4 ============================ -->
+          <article class="module" id="m4">
+            <div class="module-label">MODULE 04 · RULES ABOUT DATA</div>
+            <h2>The rules about data</h2>
+            <p class="lead">
+              Chapter 3 introduced privacy. Chapter 4 is the legal version of the
+              same idea: <em>when the data is about people, here is what the law
+              says you must do.</em> Three names cover most of what you'll meet.
+            </p>
+
+            <h3>GDPR — the European baseline</h3>
+            <p>
+              The General Data Protection Regulation (EU 2016/679) protects anyone
+              physically in the EU, no matter where the company is. The headline
+              numbers to remember: tell users why you're collecting their data,
+              let them ask for it back or have it deleted, and notify the
+              regulator within <strong>72 hours</strong> if you lose it.
+            </p>
+
+            <h3>HIPAA — American health data</h3>
+            <p>
+              HIPAA (1996) protects “Protected Health Information” in the United
+              States: anything a hospital, insurer or doctor records about you.
+            </p>
+
+            <h3>Bahrain PDPL — Law No. 30 of 2018</h3>
+            <p>
+              Bahrain's own privacy law, in force since 1 August 2019. It looks a
+              lot like GDPR: a lawful reason for collecting data, consent for
+              sensitive categories, limits on cross-border transfer, and a
+              regulator (the Personal Data Protection Authority) that can fine you.
+            </p>
+
+            <p>
+              Privacy laws control <em>how data may be used</em>. Chapter 5 covers
+              the other half: <em>what acts against systems are crimes.</em>
+            </p>
+
+            <div class="chapter-quiz" data-chapter="4"></div>
+          </article>
+
+          <!-- ============================ MODULE 5 ============================ -->
+          <article class="module" id="m5">
+            <div class="module-label">MODULE 05 · RULES ABOUT ACTS</div>
+            <h2>The rules about acts</h2>
+            <p class="lead">
+              Three statutes, three countries, one shared idea: <strong>touching
+              a computer you don't have permission for is a crime.</strong>
+            </p>
+
+            <ul>
+              <li><strong>U.S. Computer Fraud and Abuse Act (CFAA, 1986).</strong>
+                Bans accessing a computer without authorisation, or going beyond
+                what you were authorised to do.</li>
+              <li><strong>U.K. Computer Misuse Act 1990.</strong> Section 1 makes
+                unauthorised access an offence. Sections 2 and 3 add intent and
+                damage on top.</li>
+              <li><strong>Bahrain Decree-Law No. 60 of 2014.</strong> Bahrain's
+                cybercrime law. Same pattern: unauthorised access, electronic
+                fraud, attacks on national infrastructure — all criminal.</li>
+            </ul>
+
+            <div class="warn">
+              <strong>Practical line:</strong> running a port-scan or vulnerability
+              scan against a server you don't own and haven't been told you may
+              test is, under all three of these laws, a crime. “I was just
+              curious” is not a defence.
+            </div>
+
+            <p>
+              That single rule — “don't touch what you don't have permission
+              for” — is the bridge to Chapter 6, where we look at how permission
+              actually works in practice.
+            </p>
+
+            <div class="chapter-quiz" data-chapter="5"></div>
+          </article>
+
+          <!-- ============================ MODULE 6 ============================ -->
+          <article class="module" id="m6">
+            <div class="module-label">MODULE 06 · PERMISSION</div>
+            <h2>Permission is everything</h2>
+            <p class="lead">
+              Chapter 5 ended with the line: don't touch what you don't have
+              permission for. So how do real penetration testers stay on the
+              right side of that line every day? With <strong>paper</strong>.
+            </p>
+
+            <h3>What you need before you start</h3>
+            <ol>
+              <li><strong>Rules of Engagement (RoE).</strong> Which systems are
+                in scope, which techniques are allowed, what hours, who to call
+                if something breaks.</li>
+              <li><strong>Authorisation letter.</strong> A signature from someone
+                with the authority to bind the target organisation.</li>
+              <li><strong>NDA</strong> protecting the customer's data.</li>
+            </ol>
+            <p>
+              That short stack of paper is the only thing separating you from
+              the offences in Chapter 5. NIST writes this up as
+              <em>SP 800-115</em>; you'll see the same advice in every
+              professional curriculum.
+            </p>
+
+            <h3>Bug-bounty programmes &amp; “Safe Harbor”</h3>
+            <p>
+              When you can't get a private contract, public bug-bounty
+              programmes (HackerOne, Bugcrowd, Intigriti) play the same role.
+              Their <em>Safe Harbor</em> clause says: “if you stick to our scope
+              and rules, we won't pursue you legally.” Read the rules <em>before</em>
+              you press a key.
+            </p>
+
+            <p>
+              Once you have permission and you go looking, sooner or later you'll
+              actually find a vulnerability. Chapter 7 picks up exactly there.
+            </p>
+
+            <div class="chapter-quiz" data-chapter="6"></div>
+          </article>
+
+          <!-- ============================ MODULE 7 ============================ -->
+          <article class="module" id="m7">
+            <div class="module-label">MODULE 07 · WHAT TO DO WITH A BUG</div>
+            <h2>What to do when you find a bug</h2>
+            <p class="lead">
+              You've earned permission, you've tested, and now you've found
+              something serious. Who do you tell, when, and how much?
+            </p>
+
+            <h3>Three ways to disclose</h3>
+            <ul>
+              <li><strong>Full disclosure</strong> — publish immediately. Helps
+                defenders, but also hands the bug to attackers.</li>
+              <li><strong>Non-disclosure</strong> — keep it secret or sell it.
+                Leaves the public exposed.</li>
+              <li><strong>Coordinated disclosure</strong> — tell the vendor first,
+                give them a fair window to patch, then publish. This is what the
+                industry has settled on.</li>
+            </ul>
+
+            <h3>Numbers worth memorising</h3>
+            <ul>
+              <li><strong>90 days</strong> — Google Project Zero's standard
+                deadline.</li>
+              <li><strong>ISO/IEC 29147</strong> — the international standard for
+                receiving and handling vulnerability reports.</li>
+              <li><strong>CVE</strong> — “Common Vulnerabilities and Exposures”.
+                The unique public ID (e.g. <code>CVE-2024-3094</code>) every known
+                vulnerability gets. Run by <strong>MITRE</strong>.</li>
+            </ul>
+
+            <p>
+              Chapter 7 was about respecting the people who run the systems.
+              Chapter 8 is about respecting the people who wrote the code in the
+              first place.
+            </p>
+
+            <div class="chapter-quiz" data-chapter="7"></div>
+          </article>
+
+          <!-- ============================ MODULE 8 ============================ -->
+          <article class="module" id="m8">
+            <div class="module-label">MODULE 08 · OWNERSHIP</div>
+            <h2>Code, ideas, and ownership</h2>
+            <p class="lead">
+              You'll write code and use other people's code every single day.
+              Chapter 8 is the short version of the rules around <em>who owns
+              what</em> in software.
+            </p>
+
+            <h3>Four kinds of ownership</h3>
+            <ul>
+              <li><strong>Copyright</strong> — protects the code you wrote.</li>
+              <li><strong>Patent</strong> — protects an invention.</li>
+              <li><strong>Trademark</strong> — protects a name or logo.</li>
+              <li><strong>Trade secret</strong> — protects information you keep
+                confidential.</li>
+            </ul>
+
+            <h3>Open-source licences in one minute</h3>
+            <ul>
+              <li><strong>Permissive</strong> (MIT, Apache 2.0) — “do whatever
+                you want, just keep my name on it.”</li>
+              <li><strong>Copyleft</strong> (GPL) — “if you ship a product based
+                on my code, your product has to be open too.”</li>
+              <li><strong>Proprietary / EULA</strong> — you bought a licence to
+                use, not the code itself.</li>
+            </ul>
+
+            <p>
+              Picking the wrong licence in a school project is awkward; picking
+              the wrong licence in a startup is expensive. When in doubt, read it.
+            </p>
+
+            <p>
+              Chapters 1–8 are settled ground. Chapter 9 is where ethics is
+              still being figured out.
+            </p>
+
+            <div class="chapter-quiz" data-chapter="8"></div>
+          </article>
+
+          <!-- ============================ MODULE 9 ============================ -->
+          <article class="module" id="m9">
+            <div class="module-label">MODULE 09 · THE NEW FRONTIER</div>
+            <h2>The new frontier</h2>
+            <p class="lead">
+              Chapters 1–8 had clear answers. Chapter 9 is where the rules are
+              still being written — and where you'll spend most of your career.
+            </p>
+
+            <h3>AI</h3>
+            <p>
+              AI systems can fail in ways no human attacker would: a hiring model
+              that's biased against women, a face-recognition system that
+              misidentifies people of colour, a chatbot that confidently invents
+              medical advice. The <strong>EU AI Act (2024)</strong> is the first
+              big law to address it, sorting AI systems by risk: unacceptable,
+              high, limited, minimal. The <strong>NIST AI Risk Management
+              Framework</strong> (2023) is the matching voluntary playbook.
+            </p>
+
+            <h3>Surveillance</h3>
+            <p>
+              In 2013 <strong>Edward Snowden</strong> disclosed that the NSA was
+              running mass-surveillance programmes (PRISM and others) that were
+              technically lawful but politically and ethically explosive. The
+              point isn't whether Snowden was right — it's that <em>lawful</em>
+              and <em>ethical</em> aren't always the same word, exactly as we
+              said in Chapter 1.
+            </p>
+
+            <h3>Where you fit in</h3>
+            <p>
+              The codes from Chapter 2 still apply. The CIA triad from Chapter 3
+              still applies. The “permission is everything” rule from Chapter 6
+              still applies. The novelty in this chapter is that the next big
+              ethics question — about AI, about privacy, about whistleblowing —
+              will be answered by people in your generation. Maybe by you.
+            </p>
+
+            <div class="chapter-quiz" data-chapter="9"></div>
+          </article>
+
+          <!-- ============================ CAPSTONE ============================ -->
+          <article class="finish-box" id="finish">
+            <h3>Capstone — Write the Club's Code of Conduct</h3>
+            <p>
+              You've walked from “why ethics?” to “the new frontier” in nine
+              short chapters. Pull it together by writing a one-page
+              <strong>Code of Conduct</strong> for the UTB Cybersecurity Club
+              that uses ideas from every chapter:
+            </p>
+            <ul style="text-align:left; max-width:780px; margin: 0 auto; color:#ccc; font-size:14px; line-height:1.7;">
+              <li>Open with the order of duties from Chapter 2 (public, honesty,
+                client, colleagues, self).</li>
+              <li>State what “authorised testing” means inside Club labs and
+                outside them, citing the laws in Chapter 5.</li>
+              <li>Say how members will disclose any vulnerability they find, using
+                the rules from Chapter 7.</li>
+              <li>Add a short review process for alleged breaches.</li>
+            </ul>
+            <p style="margin-top:18px">
+              Send the draft to a senior Club member. A signed Code of Conduct
+              earns you a place in the Club's organised pen-tests and bug-bounty
+              triage events.
+            </p>
+          </article>
+
+        </main>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="clean-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col footer-brand">
+          <div class="footer-logos">
+            <a href="https://www.utb.edu.bh/" target="_blank" rel="noopener"
+              aria-label="University of Technology Bahrain">
+              <img src="assets/images/utblogo.png" alt="University of Technology Bahrain" class="footer-logo">
+            </a>
+            <a href="index.html" aria-label="Cybersecurity Club UTB">
+              <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB" class="footer-logo">
+            </a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="news.html">News</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="learning.html">Learning</a></li>
+            <li><a href="join.html">Apply to Join</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>University</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.utb.edu.bh/" target="_blank" rel="noopener">UTB Website</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Follow Us</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.instagram.com/utb_bahrain/" target="_blank" rel="noopener">Instagram — UTB</a></li>
+            <li><a href="https://www.instagram.com/sc_utb/" target="_blank" rel="noopener">Instagram — Student Council</a></li>
+            <li><a href="https://www.instagram.com/cyber_security_club_utb/" target="_blank" rel="noopener">Instagram — Cybersecurity Club</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <small>College of Computer Studies &middot; &copy; 2026 Cybersecurity Club &mdash; University of Technology
+          Bahrain</small>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/app.js?v=notif4"></script>
+  <script src="assets/js/ethics-lab.js?v=1"></script>
+</body>
+
+</html>

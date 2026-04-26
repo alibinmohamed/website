@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin Portal</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=notif4" />
+  <style>
+    .admin-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 0 0 18px 0;
+      padding: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+    }
+    .admin-tabs button {
+      flex: 1 0 auto;
+      padding: 10px 14px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted, #aaa);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      letter-spacing: 0.02em;
+    }
+    .admin-tabs button:hover { color: #fff; }
+    .admin-tabs button.active {
+      background: rgba(255, 47, 79, 0.12);
+      border-color: rgba(255, 47, 79, 0.5);
+      color: #fff;
+    }
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; }
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .admin-table th,
+    .admin-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      text-align: left;
+      vertical-align: top;
+    }
+    .admin-table th { font-weight: 600; color: var(--muted, #aaa); font-size: 12px; }
+    .admin-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .admin-tag.ok        { background: rgba(46, 204, 113, 0.15); color: #2ecc71; }
+    .admin-tag.warn      { background: rgba(255, 155, 61, 0.18); color: #ff9b3d; }
+    .admin-tag.bad       { background: rgba(255, 47, 79, 0.18);  color: #ff2f4f; }
+    .admin-tag.info      { background: rgba(82, 152, 255, 0.18); color: #5298ff; }
+    .admin-tag.muted     { background: rgba(255,255,255,0.06);   color: #aaa; }
+    .admin-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .admin-form-grid label { display: block; font-size: 12px; color: var(--muted, #aaa); margin-bottom: 4px; }
+    .admin-form-grid input,
+    .admin-form-grid textarea,
+    .admin-form-grid select {
+      width: 100%;
+      padding: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      color: #fff;
+    }
+    .admin-form-grid textarea { min-height: 80px; resize: vertical; }
+    .event-card {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 14px;
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+    .event-card img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+    .event-card .placeholder {
+      width: 100%; height: 100%; min-height: 80px;
+      background: rgba(255,255,255,0.04);
+      border: 1px dashed rgba(255,255,255,0.1);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted, #aaa); font-size: 11px;
+    }
+    .ua-cell {
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--muted, #aaa);
+    }
+    .privacy-note {
+      margin-top: 12px;
+      font-size: 11px;
+      color: var(--muted, #888);
+    }
+  </style>
+</head>
+<body>
+<header class="header">
+  <div class="container nav">
+    <a class="logo logo-utb" href="https://www.utb.edu.bh/" target="_blank" rel="noopener" aria-label="University of Technology Bahrain">
+      <img src="assets/images/utblogo.png" alt="University of Technology Bahrain">
+    </a>
+    <a class="logo logo-club" href="index.html">
+      <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB">
+    </a>
+    <div class="auth-controls" data-auth-controls></div>
+    <button class="menu-toggle" aria-label="Toggle menu"></button>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About Us</a>
+      <a href="news.html">News</a>
+      <a href="join.html">Apply to Join</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="events.html">Events</a>
+      <a href="learning.html">Learning</a>
+      <a href="resources.html">Resources</a>
+      <a href="tracks.html">Cybersecurity Areas</a>
+      <a href="plan.html">Plan</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero clean">
+  <div class="container">
+    <span class="eyebrow">Administrator</span>
+    <h1 style="margin-top:14px">Admin Dashboard</h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div id="adminLoginDiv" class="card simple-login" style="max-width: 400px; margin: 0 auto;">
+      <h2>🔐 Admin Login</h2>
+      <form id="adminLoginForm">
+        <div style="margin-bottom: 16px;"><label>Admin Password</label><input type="password" id="adminPassword" placeholder="Enter admin password" required></div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+        <div id="adminLoginStatus" style="margin-top: 12px; text-align: center;"></div>
+      </form>
+      <div style="margin-top: 16px; text-align: center; padding: 12px; background: rgba(255,47,79,0.1); border-radius: 8px;">
+        <small>Default Password: <strong style="color: #ff2f4f;">CyberAdmin2026!</strong></small>
+      </div>
+    </div>
+
+    <div id="adminContent" style="display: none;">
+      <!-- Tab bar -->
+      <div class="admin-tabs" data-admin-tabs>
+        <button data-tab="overview"     class="active">Overview</button>
+        <button data-tab="applications">Pending Applications</button>
+        <button data-tab="members">Members</button>
+        <button data-tab="audit">Activity Log</button>
+        <button data-tab="events">Events</button>
+      </div>
+
+      <!-- ─────────── Overview ─────────── -->
+      <div class="admin-panel active" data-tab-panel="overview">
+        <div class="stats-grid" style="margin-bottom: 24px;">
+          <div class="stat-box"><div class="num" id="pendingCount">0</div><div>Pending Applications</div></div>
+          <div class="stat-box"><div class="num" id="approvedCount">0</div><div>Active Members</div></div>
+          <div class="stat-box"><div class="num" id="totalCount">0</div><div>Total Records</div></div>
+          <div class="stat-box"><div class="num" id="eventsTotalCount">0</div><div>Events</div></div>
+          <div class="stat-box"><div class="num" id="failedLoginCount">0</div><div>Failed Logins (24h)</div></div>
+        </div>
+
+        <div class="card">
+          <h2>Recent Logins</h2>
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>When</th>
+                  <th>Member / Email</th>
+                  <th>Action</th>
+                  <th>IP</th>
+                  <th>Device</th>
+                </tr>
+              </thead>
+              <tbody id="recentLoginsBody"><tr><td colspan="5" style="text-align:center;color:var(--muted);">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────────── Pending Applications ─────────── -->
+      <div class="admin-panel" data-tab-panel="applications">
+        <div class="card">
+          <h2>Pending Applications</h2>
+          <div id="pendingApplications" class="clean-list"></div>
+        </div>
+      </div>
+
+      <!-- ─────────── Members ─────────── -->
+      <div class="admin-panel" data-tab-panel="members">
+        <div class="card">
+          <h2>Active Members</h2>
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Student ID</th>
+                  <th>Year</th>
+                  <th>Major</th>
+                  <th>XP</th>
+                  <th>Status</th>
+                  <th>Last Seen</th>
+                  <th>Last IP</th>
+                  <th>Last Device</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="membersList"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────────── Activity Log ─────────── -->
+      <div class="admin-panel" data-tab-panel="audit">
+        <div class="card">
+          <h2>Activity Log</h2>
+          <div class="admin-form-grid" style="grid-template-columns: 200px 1fr 100px;">
+            <div>
+              <label>Action</label>
+              <select id="auditFilterAction">
+                <option value="all">All actions</option>
+                <option value="login_success">Member login success</option>
+                <option value="login_failure">Member login failure</option>
+                <option value="admin_login_success">Admin login success</option>
+                <option value="admin_login_failure">Admin login failure</option>
+                <option value="api_request">API request</option>
+              </select>
+            </div>
+            <div>
+              <label>Search (email · IP · path)</label>
+              <input id="auditFilterSearch" type="text" placeholder="e.g. 192.168 or @utb.edu.bh">
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <button id="auditApplyBtn" class="btn btn-primary" style="width:100%;">Apply</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>When</th>
+                  <th>Action</th>
+                  <th>Member / Email</th>
+                  <th>Path</th>
+                  <th>Status</th>
+                  <th>IP</th>
+                  <th>Device</th>
+                  <th>Session</th>
+                </tr>
+              </thead>
+              <tbody id="auditLogBody"><tr><td colspan="8" style="text-align:center;color:var(--muted);">Loading…</td></tr></tbody>
+            </table>
+          </div>
+          <p class="privacy-note">
+            For security monitoring we record IP address, user-agent and a per-browser session id for every authenticated request. Records older than 90 days are pruned.
+          </p>
+        </div>
+      </div>
+
+      <!-- ─────────── Events ─────────── -->
+      <div class="admin-panel" data-tab-panel="events">
+        <div class="card" style="margin-bottom: 20px;">
+          <h2 id="eventFormHeading">Create event</h2>
+          <form id="eventForm">
+            <input type="hidden" id="eventId" value="">
+            <div class="admin-form-grid">
+              <div style="grid-column: 1 / -1;">
+                <label>Title *</label>
+                <input id="eventTitle" type="text" required placeholder="e.g. Capture-the-flag night">
+              </div>
+              <div style="grid-column: 1 / -1;">
+                <label>Description</label>
+                <textarea id="eventDescription" placeholder="What is this event about?"></textarea>
+              </div>
+              <div>
+                <label>Start *</label>
+                <input id="eventStartsAt" type="datetime-local" required>
+              </div>
+              <div>
+                <label>End</label>
+                <input id="eventEndsAt" type="datetime-local">
+              </div>
+              <div>
+                <label>Location</label>
+                <input id="eventLocation" type="text" placeholder="e.g. CCS Hall">
+              </div>
+              <div>
+                <label>Image (png/jpg/webp, ≤ 4 MB)</label>
+                <input id="eventImage" type="file" accept="image/png,image/jpeg,image/webp">
+              </div>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button type="submit" class="btn btn-primary" id="eventSubmitBtn">Create event</button>
+              <button type="button" class="btn btn-secondary" id="eventCancelBtn" style="display:none;">Cancel edit</button>
+            </div>
+            <div id="eventFormStatus" style="margin-top: 8px;"></div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Existing events</h2>
+          <div id="eventsList"></div>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px; text-align: right;"><button id="adminLogoutBtn" class="btn btn-secondary">Logout</button></div>
+    </div>
+
+    <!-- Approve-application modal: creates the member then emails them a one-time setup link. -->
+    <div id="createModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+      <div class="card" style="max-width: 520px; margin: 20px; position: relative;">
+        <button onclick="closeModal()" style="position: absolute; top: 10px; right: 20px; background: none; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button>
+        <h2>Approve Application</h2>
+        <input type="hidden" id="modalEmail">
+        <p style="font-size: 13px; color: var(--muted, #aaa); margin-top: 4px;">
+          Approving creates the member account and emails the applicant a one-time link to choose their own password.
+          The link is valid for 24 hours.
+        </p>
+        <div style="margin-bottom: 16px;"><label>Student Name</label><input type="text" id="modalName" readonly style="background: rgba(255,255,255,0.05); width: 100%; padding: 12px; border-radius: 8px;"></div>
+        <div style="margin-bottom: 16px;"><label>Email</label><input type="email" id="modalEmailDisplay" readonly style="background: rgba(255,255,255,0.05); width: 100%; padding: 12px; border-radius: 8px;"></div>
+        <button onclick="createAccount()" class="btn btn-primary" style="width: 100%;">Approve &amp; email setup link</button>
+        <div id="createStatus" style="margin-top: 12px;"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="clean-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col footer-brand">
+        <div class="footer-logos">
+          <a href="https://www.utb.edu.bh/" target="_blank" rel="noopener" aria-label="University of Technology Bahrain">
+            <img src="assets/images/utblogo.png" alt="University of Technology Bahrain" class="footer-logo">
+          </a>
+          <a href="index.html" aria-label="Cybersecurity Club UTB">
+            <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB" class="footer-logo">
+          </a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul class="footer-links">
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="news.html">News</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="learning.html">Learning</a></li>
+          <li><a href="join.html">Apply to Join</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>University</h4>
+        <ul class="footer-links">
+          <li><a href="https://www.utb.edu.bh/" target="_blank" rel="noopener">UTB Website</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Follow Us</h4>
+        <ul class="footer-links">
+          <li><a href="https://www.instagram.com/utb_bahrain/" target="_blank" rel="noopener">Instagram — UTB</a></li>
+          <li><a href="https://www.instagram.com/sc_utb/" target="_blank" rel="noopener">Instagram — Student Council</a></li>
+          <li><a href="https://www.instagram.com/cyber_security_club_utb/" target="_blank" rel="noopener">Instagram — Cybersecurity Club</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <small>College of Computer Studies &middot; &copy; 2026 Cybersecurity Club &mdash; University of Technology Bahrain</small>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/app.js?v=notif4"></script>
+</body>
+</html>

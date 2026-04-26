@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apply to Join</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=notif4" />
+  <style>
+    .form-hint {
+      display: block;
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--muted, #888);
+    }
+    .form-hint strong { color: #fff; }
+    .field-error {
+      display: block;
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--warning, #ff9b3d);
+    }
+    [data-join-form] input.invalid,
+    [data-join-form] select.invalid {
+      border-color: var(--warning, #ff9b3d) !important;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script type="text/javascript">
+    // ── EmailJS Configuration ──────────────────────────────────────────────────
+    // Replace the three placeholder values below with your actual EmailJS credentials.
+    // You can find them at: https://dashboard.emailjs.com
+    const EMAILJS_PUBLIC_KEY  = "KuRicwmIiNYOLfe9a";
+    const EMAILJS_SERVICE_ID  = "service_4y56ihf";
+    const EMAILJS_TEMPLATE_ID = "template_n3cr4j8";
+
+    (function() {
+      emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    })();
+
+    // Called by app.js after a successful application submission
+    window.sendApplicationEmail = function(applicantName, applicantEmail, studentId, year, major, phone, motivation) {
+      var adminLink = window.location.origin + '/admin.html';
+      var appDate   = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+      return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        student_name:       applicantName,
+        student_email:      applicantEmail,
+        student_id:         studentId,
+        student_year:       year,
+        student_major:      major,
+        student_phone:      phone || "Not provided",
+        student_motivation: motivation || "—",
+        application_date:   appDate,
+        admin_link:         adminLink,
+        reply_to:           applicantEmail
+      });
+    };
+  </script>
+</head>
+<body>
+<header class="header">
+  <div class="container nav">
+    <a class="logo logo-utb" href="https://www.utb.edu.bh/" target="_blank" rel="noopener" aria-label="University of Technology Bahrain">
+      <img src="assets/images/utblogo.png" alt="University of Technology Bahrain">
+    </a>
+    <a class="logo logo-club" href="index.html">
+      <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB">
+    </a>
+    <div class="auth-controls" data-auth-controls></div>
+    <button class="menu-toggle" aria-label="Toggle menu"></button>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About Us</a>
+      <a href="news.html">News</a>
+      <a href="join.html">Apply to Join</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="events.html">Events</a>
+      <a href="learning.html">Learning</a>
+      <a href="resources.html">Resources</a>
+      <a href="tracks.html">Cybersecurity Areas</a>
+      <a href="plan.html">Plan</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero clean">
+  <div class="container">
+    <span class="eyebrow">Membership</span>
+    <h1 style="margin-top:14px">Apply to Join</h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container grid grid-2">
+    <div class="card">
+      <h2>Application Form</h2>
+      <form class="grid" data-join-form novalidate>
+        <div class="form-grid">
+          <div>
+            <label>Full name *</label>
+            <input name="name" required
+                   pattern="^\s*\S+\s+\S+.*$"
+                   title="Enter your first and last name (e.g. Ali Hassan)"
+                   placeholder="First Last"
+                   autocomplete="name">
+            <small class="form-hint">Use your first name and last name, e.g. <em>Ali Hassan</em>.</small>
+          </div>
+          <div>
+            <label>University email *</label>
+            <input type="email" name="email" required
+                   pattern="^[^\s@]+@utb\.edu\.bh$"
+                   title="Use your @utb.edu.bh email address"
+                   placeholder="name@utb.edu.bh"
+                   autocomplete="email">
+            <small class="form-hint">Only <strong>@utb.edu.bh</strong> addresses are accepted.</small>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div>
+            <label>Student ID *</label>
+            <input name="studentId" required
+                   pattern="^(?i)bh[A-Za-z0-9]+$"
+                   title="Student ID must start with bh"
+                   placeholder="bh202312345"
+                   autocomplete="off">
+            <small class="form-hint">Your UTB Student ID must start with <strong>bh</strong>.</small>
+          </div>
+          <div>
+            <label>Year of study</label>
+            <select name="year">
+              <option>1st year</option>
+              <option>2nd year</option>
+              <option>3rd year</option>
+              <option>4th year</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <div>
+            <label>Phone number</label>
+            <div style="display:flex; gap:8px;">
+              <select name="phoneCountry" style="flex:0 0 auto; min-width:140px; max-width:180px;"
+                      aria-label="Country dialling code">
+                <optgroup label="GCC">
+                  <option value="+973" data-country="BH">🇧🇭 Bahrain (+973)</option>
+                  <option value="+966" data-country="SA">🇸🇦 Saudi Arabia (+966)</option>
+                  <option value="+971" data-country="AE">🇦🇪 UAE (+971)</option>
+                  <option value="+965" data-country="KW">🇰🇼 Kuwait (+965)</option>
+                  <option value="+968" data-country="OM">🇴🇲 Oman (+968)</option>
+                  <option value="+974" data-country="QA">🇶🇦 Qatar (+974)</option>
+                </optgroup>
+                <optgroup label="World">
+                  <option value="+93"   data-country="AF">🇦🇫 Afghanistan (+93)</option>
+                  <option value="+355"  data-country="AL">🇦🇱 Albania (+355)</option>
+                  <option value="+213"  data-country="DZ">🇩🇿 Algeria (+213)</option>
+                  <option value="+376"  data-country="AD">🇦🇩 Andorra (+376)</option>
+                  <option value="+244"  data-country="AO">🇦🇴 Angola (+244)</option>
+                  <option value="+54"   data-country="AR">🇦🇷 Argentina (+54)</option>
+                  <option value="+374"  data-country="AM">🇦🇲 Armenia (+374)</option>
+                  <option value="+61"   data-country="AU">🇦🇺 Australia (+61)</option>
+                  <option value="+43"   data-country="AT">🇦🇹 Austria (+43)</option>
+                  <option value="+994"  data-country="AZ">🇦🇿 Azerbaijan (+994)</option>
+                  <option value="+1242" data-country="BS">🇧🇸 Bahamas (+1242)</option>
+                  <option value="+880"  data-country="BD">🇧🇩 Bangladesh (+880)</option>
+                  <option value="+1246" data-country="BB">🇧🇧 Barbados (+1246)</option>
+                  <option value="+375"  data-country="BY">🇧🇾 Belarus (+375)</option>
+                  <option value="+32"   data-country="BE">🇧🇪 Belgium (+32)</option>
+                  <option value="+501"  data-country="BZ">🇧🇿 Belize (+501)</option>
+                  <option value="+229"  data-country="BJ">🇧🇯 Benin (+229)</option>
+                  <option value="+975"  data-country="BT">🇧🇹 Bhutan (+975)</option>
+                  <option value="+591"  data-country="BO">🇧🇴 Bolivia (+591)</option>
+                  <option value="+387"  data-country="BA">🇧🇦 Bosnia &amp; Herzegovina (+387)</option>
+                  <option value="+267"  data-country="BW">🇧🇼 Botswana (+267)</option>
+                  <option value="+55"   data-country="BR">🇧🇷 Brazil (+55)</option>
+                  <option value="+673"  data-country="BN">🇧🇳 Brunei (+673)</option>
+                  <option value="+359"  data-country="BG">🇧🇬 Bulgaria (+359)</option>
+                  <option value="+226"  data-country="BF">🇧🇫 Burkina Faso (+226)</option>
+                  <option value="+257"  data-country="BI">🇧🇮 Burundi (+257)</option>
+                  <option value="+855"  data-country="KH">🇰🇭 Cambodia (+855)</option>
+                  <option value="+237"  data-country="CM">🇨🇲 Cameroon (+237)</option>
+                  <option value="+1"    data-country="CA">🇨🇦 Canada (+1)</option>
+                  <option value="+238"  data-country="CV">🇨🇻 Cape Verde (+238)</option>
+                  <option value="+236"  data-country="CF">🇨🇫 Central African Republic (+236)</option>
+                  <option value="+235"  data-country="TD">🇹🇩 Chad (+235)</option>
+                  <option value="+56"   data-country="CL">🇨🇱 Chile (+56)</option>
+                  <option value="+86"   data-country="CN">🇨🇳 China (+86)</option>
+                  <option value="+57"   data-country="CO">🇨🇴 Colombia (+57)</option>
+                  <option value="+269"  data-country="KM">🇰🇲 Comoros (+269)</option>
+                  <option value="+243"  data-country="CD">🇨🇩 Congo (DRC) (+243)</option>
+                  <option value="+242"  data-country="CG">🇨🇬 Congo (Republic) (+242)</option>
+                  <option value="+506"  data-country="CR">🇨🇷 Costa Rica (+506)</option>
+                  <option value="+225"  data-country="CI">🇨🇮 Côte d'Ivoire (+225)</option>
+                  <option value="+385"  data-country="HR">🇭🇷 Croatia (+385)</option>
+                  <option value="+53"   data-country="CU">🇨🇺 Cuba (+53)</option>
+                  <option value="+357"  data-country="CY">🇨🇾 Cyprus (+357)</option>
+                  <option value="+420"  data-country="CZ">🇨🇿 Czechia (+420)</option>
+                  <option value="+45"   data-country="DK">🇩🇰 Denmark (+45)</option>
+                  <option value="+253"  data-country="DJ">🇩🇯 Djibouti (+253)</option>
+                  <option value="+1767" data-country="DM">🇩🇲 Dominica (+1767)</option>
+                  <option value="+1809" data-country="DO">🇩🇴 Dominican Republic (+1809)</option>
+                  <option value="+593"  data-country="EC">🇪🇨 Ecuador (+593)</option>
+                  <option value="+20"   data-country="EG">🇪🇬 Egypt (+20)</option>
+                  <option value="+503"  data-country="SV">🇸🇻 El Salvador (+503)</option>
+                  <option value="+240"  data-country="GQ">🇬🇶 Equatorial Guinea (+240)</option>
+                  <option value="+291"  data-country="ER">🇪🇷 Eritrea (+291)</option>
+                  <option value="+372"  data-country="EE">🇪🇪 Estonia (+372)</option>
+                  <option value="+268"  data-country="SZ">🇸🇿 Eswatini (+268)</option>
+                  <option value="+251"  data-country="ET">🇪🇹 Ethiopia (+251)</option>
+                  <option value="+679"  data-country="FJ">🇫🇯 Fiji (+679)</option>
+                  <option value="+358"  data-country="FI">🇫🇮 Finland (+358)</option>
+                  <option value="+33"   data-country="FR">🇫🇷 France (+33)</option>
+                  <option value="+241"  data-country="GA">🇬🇦 Gabon (+241)</option>
+                  <option value="+220"  data-country="GM">🇬🇲 Gambia (+220)</option>
+                  <option value="+995"  data-country="GE">🇬🇪 Georgia (+995)</option>
+                  <option value="+49"   data-country="DE">🇩🇪 Germany (+49)</option>
+                  <option value="+233"  data-country="GH">🇬🇭 Ghana (+233)</option>
+                  <option value="+30"   data-country="GR">🇬🇷 Greece (+30)</option>
+                  <option value="+1473" data-country="GD">🇬🇩 Grenada (+1473)</option>
+                  <option value="+502"  data-country="GT">🇬🇹 Guatemala (+502)</option>
+                  <option value="+224"  data-country="GN">🇬🇳 Guinea (+224)</option>
+                  <option value="+245"  data-country="GW">🇬🇼 Guinea-Bissau (+245)</option>
+                  <option value="+592"  data-country="GY">🇬🇾 Guyana (+592)</option>
+                  <option value="+509"  data-country="HT">🇭🇹 Haiti (+509)</option>
+                  <option value="+504"  data-country="HN">🇭🇳 Honduras (+504)</option>
+                  <option value="+852"  data-country="HK">🇭🇰 Hong Kong (+852)</option>
+                  <option value="+36"   data-country="HU">🇭🇺 Hungary (+36)</option>
+                  <option value="+354"  data-country="IS">🇮🇸 Iceland (+354)</option>
+                  <option value="+91"   data-country="IN">🇮🇳 India (+91)</option>
+                  <option value="+62"   data-country="ID">🇮🇩 Indonesia (+62)</option>
+                  <option value="+98"   data-country="IR">🇮🇷 Iran (+98)</option>
+                  <option value="+964"  data-country="IQ">🇮🇶 Iraq (+964)</option>
+                  <option value="+353"  data-country="IE">🇮🇪 Ireland (+353)</option>
+                  <option value="+972"  data-country="IL">🇮🇱 Israel (+972)</option>
+                  <option value="+39"   data-country="IT">🇮🇹 Italy (+39)</option>
+                  <option value="+1876" data-country="JM">🇯🇲 Jamaica (+1876)</option>
+                  <option value="+81"   data-country="JP">🇯🇵 Japan (+81)</option>
+                  <option value="+962"  data-country="JO">🇯🇴 Jordan (+962)</option>
+                  <option value="+7"    data-country="KZ">🇰🇿 Kazakhstan (+7)</option>
+                  <option value="+254"  data-country="KE">🇰🇪 Kenya (+254)</option>
+                  <option value="+383"  data-country="XK">🇽🇰 Kosovo (+383)</option>
+                  <option value="+996"  data-country="KG">🇰🇬 Kyrgyzstan (+996)</option>
+                  <option value="+856"  data-country="LA">🇱🇦 Laos (+856)</option>
+                  <option value="+371"  data-country="LV">🇱🇻 Latvia (+371)</option>
+                  <option value="+961"  data-country="LB">🇱🇧 Lebanon (+961)</option>
+                  <option value="+266"  data-country="LS">🇱🇸 Lesotho (+266)</option>
+                  <option value="+231"  data-country="LR">🇱🇷 Liberia (+231)</option>
+                  <option value="+218"  data-country="LY">🇱🇾 Libya (+218)</option>
+                  <option value="+423"  data-country="LI">🇱🇮 Liechtenstein (+423)</option>
+                  <option value="+370"  data-country="LT">🇱🇹 Lithuania (+370)</option>
+                  <option value="+352"  data-country="LU">🇱🇺 Luxembourg (+352)</option>
+                  <option value="+853"  data-country="MO">🇲🇴 Macau (+853)</option>
+                  <option value="+261"  data-country="MG">🇲🇬 Madagascar (+261)</option>
+                  <option value="+265"  data-country="MW">🇲🇼 Malawi (+265)</option>
+                  <option value="+60"   data-country="MY">🇲🇾 Malaysia (+60)</option>
+                  <option value="+960"  data-country="MV">🇲🇻 Maldives (+960)</option>
+                  <option value="+223"  data-country="ML">🇲🇱 Mali (+223)</option>
+                  <option value="+356"  data-country="MT">🇲🇹 Malta (+356)</option>
+                  <option value="+222"  data-country="MR">🇲🇷 Mauritania (+222)</option>
+                  <option value="+230"  data-country="MU">🇲🇺 Mauritius (+230)</option>
+                  <option value="+52"   data-country="MX">🇲🇽 Mexico (+52)</option>
+                  <option value="+373"  data-country="MD">🇲🇩 Moldova (+373)</option>
+                  <option value="+377"  data-country="MC">🇲🇨 Monaco (+377)</option>
+                  <option value="+976"  data-country="MN">🇲🇳 Mongolia (+976)</option>
+                  <option value="+382"  data-country="ME">🇲🇪 Montenegro (+382)</option>
+                  <option value="+212"  data-country="MA">🇲🇦 Morocco (+212)</option>
+                  <option value="+258"  data-country="MZ">🇲🇿 Mozambique (+258)</option>
+                  <option value="+95"   data-country="MM">🇲🇲 Myanmar (+95)</option>
+                  <option value="+264"  data-country="NA">🇳🇦 Namibia (+264)</option>
+                  <option value="+977"  data-country="NP">🇳🇵 Nepal (+977)</option>
+                  <option value="+31"   data-country="NL">🇳🇱 Netherlands (+31)</option>
+                  <option value="+64"   data-country="NZ">🇳🇿 New Zealand (+64)</option>
+                  <option value="+505"  data-country="NI">🇳🇮 Nicaragua (+505)</option>
+                  <option value="+227"  data-country="NE">🇳🇪 Niger (+227)</option>
+                  <option value="+234"  data-country="NG">🇳🇬 Nigeria (+234)</option>
+                  <option value="+850"  data-country="KP">🇰🇵 North Korea (+850)</option>
+                  <option value="+389"  data-country="MK">🇲🇰 North Macedonia (+389)</option>
+                  <option value="+47"   data-country="NO">🇳🇴 Norway (+47)</option>
+                  <option value="+92"   data-country="PK">🇵🇰 Pakistan (+92)</option>
+                  <option value="+970"  data-country="PS">🇵🇸 Palestine (+970)</option>
+                  <option value="+507"  data-country="PA">🇵🇦 Panama (+507)</option>
+                  <option value="+675"  data-country="PG">🇵🇬 Papua New Guinea (+675)</option>
+                  <option value="+595"  data-country="PY">🇵🇾 Paraguay (+595)</option>
+                  <option value="+51"   data-country="PE">🇵🇪 Peru (+51)</option>
+                  <option value="+63"   data-country="PH">🇵🇭 Philippines (+63)</option>
+                  <option value="+48"   data-country="PL">🇵🇱 Poland (+48)</option>
+                  <option value="+351"  data-country="PT">🇵🇹 Portugal (+351)</option>
+                  <option value="+1787" data-country="PR">🇵🇷 Puerto Rico (+1787)</option>
+                  <option value="+40"   data-country="RO">🇷🇴 Romania (+40)</option>
+                  <option value="+7"    data-country="RU">🇷🇺 Russia (+7)</option>
+                  <option value="+250"  data-country="RW">🇷🇼 Rwanda (+250)</option>
+                  <option value="+685"  data-country="WS">🇼🇸 Samoa (+685)</option>
+                  <option value="+221"  data-country="SN">🇸🇳 Senegal (+221)</option>
+                  <option value="+381"  data-country="RS">🇷🇸 Serbia (+381)</option>
+                  <option value="+248"  data-country="SC">🇸🇨 Seychelles (+248)</option>
+                  <option value="+232"  data-country="SL">🇸🇱 Sierra Leone (+232)</option>
+                  <option value="+65"   data-country="SG">🇸🇬 Singapore (+65)</option>
+                  <option value="+421"  data-country="SK">🇸🇰 Slovakia (+421)</option>
+                  <option value="+386"  data-country="SI">🇸🇮 Slovenia (+386)</option>
+                  <option value="+252"  data-country="SO">🇸🇴 Somalia (+252)</option>
+                  <option value="+27"   data-country="ZA">🇿🇦 South Africa (+27)</option>
+                  <option value="+82"   data-country="KR">🇰🇷 South Korea (+82)</option>
+                  <option value="+211"  data-country="SS">🇸🇸 South Sudan (+211)</option>
+                  <option value="+34"   data-country="ES">🇪🇸 Spain (+34)</option>
+                  <option value="+94"   data-country="LK">🇱🇰 Sri Lanka (+94)</option>
+                  <option value="+249"  data-country="SD">🇸🇩 Sudan (+249)</option>
+                  <option value="+597"  data-country="SR">🇸🇷 Suriname (+597)</option>
+                  <option value="+46"   data-country="SE">🇸🇪 Sweden (+46)</option>
+                  <option value="+41"   data-country="CH">🇨🇭 Switzerland (+41)</option>
+                  <option value="+963"  data-country="SY">🇸🇾 Syria (+963)</option>
+                  <option value="+886"  data-country="TW">🇹🇼 Taiwan (+886)</option>
+                  <option value="+992"  data-country="TJ">🇹🇯 Tajikistan (+992)</option>
+                  <option value="+255"  data-country="TZ">🇹🇿 Tanzania (+255)</option>
+                  <option value="+66"   data-country="TH">🇹🇭 Thailand (+66)</option>
+                  <option value="+228"  data-country="TG">🇹🇬 Togo (+228)</option>
+                  <option value="+676"  data-country="TO">🇹🇴 Tonga (+676)</option>
+                  <option value="+1868" data-country="TT">🇹🇹 Trinidad &amp; Tobago (+1868)</option>
+                  <option value="+216"  data-country="TN">🇹🇳 Tunisia (+216)</option>
+                  <option value="+90"   data-country="TR">🇹🇷 Türkiye (+90)</option>
+                  <option value="+993"  data-country="TM">🇹🇲 Turkmenistan (+993)</option>
+                  <option value="+256"  data-country="UG">🇺🇬 Uganda (+256)</option>
+                  <option value="+380"  data-country="UA">🇺🇦 Ukraine (+380)</option>
+                  <option value="+44"   data-country="GB">🇬🇧 United Kingdom (+44)</option>
+                  <option value="+1"    data-country="US">🇺🇸 United States (+1)</option>
+                  <option value="+598"  data-country="UY">🇺🇾 Uruguay (+598)</option>
+                  <option value="+998"  data-country="UZ">🇺🇿 Uzbekistan (+998)</option>
+                  <option value="+58"   data-country="VE">🇻🇪 Venezuela (+58)</option>
+                  <option value="+84"   data-country="VN">🇻🇳 Vietnam (+84)</option>
+                  <option value="+967"  data-country="YE">🇾🇪 Yemen (+967)</option>
+                  <option value="+260"  data-country="ZM">🇿🇲 Zambia (+260)</option>
+                  <option value="+263"  data-country="ZW">🇿🇼 Zimbabwe (+263)</option>
+                </optgroup>
+              </select>
+              <input name="phoneNumber"
+                     inputmode="numeric"
+                     pattern="^[0-9 ]{6,15}$"
+                     title="6–15 digits, no country code"
+                     placeholder="33112233"
+                     autocomplete="tel-national"
+                     style="flex:1;">
+            </div>
+            <small class="form-hint">GCC codes are listed first; full world codes follow. Enter the local number only.</small>
+          </div>
+        </div>
+        <div>
+          <label>Major</label>
+          <select name="major">
+            <option>Computer Science</option>
+            <option>Computer Engineering</option>
+            <option>Information Technology</option>
+            <option>Cybersecurity</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label>Why do you want to join?</label>
+          <textarea name="motivation" rows="3"
+                    placeholder="Tell us about your interest in cybersecurity..."></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" type="submit">Submit Application</button>
+        </div>
+      </form>
+      <div data-join-result style="margin-top:16px"></div>
+    </div>
+    <div class="apply-side">
+      <div class="card">
+        <h3>What You Will Receive</h3>
+        <div class="simple-list">
+          <div class="item">Hands-on workshops in penetration testing, OSINT, digital forensics, and cryptography</div>
+          <div class="item">CTF activities that develop teamwork, creativity, and practical problem-solving</div>
+          <div class="item">Exposure to ethical hacking foundations and secure cybersecurity practices</div>
+          <div class="item">Preparation for certifications, internships, and future career opportunities</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="clean-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col footer-brand">
+        <div class="footer-logos">
+          <a href="https://www.utb.edu.bh/" target="_blank" rel="noopener" aria-label="University of Technology Bahrain">
+            <img src="assets/images/utblogo.png" alt="University of Technology Bahrain" class="footer-logo">
+          </a>
+          <a href="index.html" aria-label="Cybersecurity Club UTB">
+            <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB" class="footer-logo">
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul class="footer-links">
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="news.html">News</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="learning.html">Learning</a></li>
+          <li><a href="join.html">Apply to Join</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>University</h4>
+        <ul class="footer-links">
+          <li><a href="https://www.utb.edu.bh/" target="_blank" rel="noopener">UTB Website</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Follow Us</h4>
+        <ul class="footer-links">
+          <li><a href="https://www.instagram.com/utb_bahrain/" target="_blank" rel="noopener">Instagram — UTB</a></li>
+          <li><a href="https://www.instagram.com/sc_utb/" target="_blank" rel="noopener">Instagram — Student Council</a></li>
+          <li><a href="https://www.instagram.com/cyber_security_club_utb/" target="_blank" rel="noopener">Instagram — Cybersecurity Club</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <small>College of Computer Studies &middot; &copy; 2026 Cybersecurity Club &mdash; University of Technology Bahrain</small>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/app.js?v=notif4"></script>
+</body>
+</html>

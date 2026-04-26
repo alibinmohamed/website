@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Learning Paths</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=notif4" />
+  <style>
+    .path-card {
+      cursor: pointer;
+      transition: transform 0.3s, border-color 0.3s, opacity 0.3s, filter 0.3s;
+      position: relative;
+    }
+    .path-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent);
+    }
+    .path-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    .learning-paths-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+    .user-progress-card {
+      background: linear-gradient(135deg, rgba(255, 47, 79, 0.1), transparent);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+
+    /* ---- Lock / enroll / continue states for course cards ---- */
+    .path-card.locked    { filter: grayscale(0.85); opacity: 0.55; cursor: not-allowed; }
+    .path-card.locked:hover { transform: none; border-color: var(--border); }
+    .path-card .state-badge {
+      display: inline-block; font-family: 'Menlo', monospace; font-size: 11px;
+      letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px;
+      border-radius: 12px; margin-top: 12px;
+    }
+    .path-card.locked     .state-badge { background: rgba(255,255,255,0.06); color: #888; }
+    .path-card.unlocked   .state-badge { background: rgba(60,170,255,0.15);   color: #3caaff; }
+    .path-card.enrolled   .state-badge { background: rgba(255,189,46,0.18);   color: #ffbd2e; }
+    .path-card.completed  .state-badge { background: rgba(39,201,63,0.18);    color: #27c93f; }
+    .path-card .action-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 14px; padding: 9px 16px;
+      border: none; border-radius: 10px; cursor: pointer;
+      font-size: 13px; font-weight: 700; font-family: inherit;
+    }
+    .path-card.unlocked .action-btn {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #0a0a0d;
+    }
+    .path-card.unlocked .action-btn:hover { filter: brightness(1.1); }
+    .path-card.enrolled .action-btn,
+    .path-card.completed .action-btn {
+      background: transparent; color: var(--accent); border: 1px solid var(--accent);
+    }
+    .path-card.locked .action-btn {
+      background: transparent; color: #888;
+      border: 1px dashed #444; cursor: not-allowed;
+    }
+    .path-card .prereq-hint {
+      font-size: 12px; color: #ff8a8a; margin-top: 8px; line-height: 1.4;
+      font-family: 'Menlo', monospace;
+    }
+
+    /* The progress bar only renders for enrolled / completed cards. */
+    .path-card.locked   .progress,
+    .path-card.unlocked .progress { display: none; }
+
+    @media (max-width: 768px) {
+      .learning-paths-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a class="logo logo-utb" href="https://www.utb.edu.bh/" target="_blank" rel="noopener"
+        aria-label="University of Technology Bahrain">
+        <img src="assets/images/utblogo.png" alt="University of Technology Bahrain">
+      </a>
+      <a class="logo logo-club" href="index.html">
+        <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB">
+      </a>
+      <div class="auth-controls" data-auth-controls></div>
+      <button class="menu-toggle" aria-label="Toggle menu"></button>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="news.html">News</a>
+        <a href="join.html">Apply to Join</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="events.html">Events</a>
+        <a href="learning.html">Learning</a>
+        <a href="resources.html">Resources</a>
+        <a href="tracks.html">Cybersecurity Areas</a>
+        <a href="plan.html">Plan</a>
+        <a href="login.html">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="container">
+      <span class="eyebrow">Learning Hub</span>
+      <h1 style="margin-top:14px">Choose Your Learning Path</h1>
+      <p>Courses unlock in order: Ethics &rarr; Linux &rarr; Network &rarr; Cryptography &rarr; Web &rarr; Penetration Testing.
+        Each course only opens after you finish the previous one. Click <strong>Enroll</strong> to add a course to your dashboard.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="user-progress-card" id="userProgressCard" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h3 id="userName" style="margin: 0;">Welcome back!</h3>
+            <p id="userEmail" style="margin: 4px 0 0;">Continue your learning journey</p>
+          </div>
+          <div>
+            <span class="chip">🏆 Total XP: <span id="totalXP">0</span></span>
+            <span class="chip">📚 Enrolled: <span id="coursesCompleted">0</span>/6</span>
+          </div>
+        </div>
+        <!--
+          One thin progress line per ENROLLED course. Bars + their wrapper
+          rows are toggled by loadUserProgressForLearning() in app.js based
+          on the /api/progress/enrollments response. Order matches the
+          unlock chain so the user reads top-to-bottom.
+        -->
+        <div style="margin-top: 18px; display: grid; gap: 10px;" id="welcomeProgressList">
+          <div data-welcome-row="ethics">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px;"><span>⚖️ Cybersecurity Ethics &amp; Laws</span><span id="welcomeEthicsLabel">0%</span></div>
+            <div class="progress"><span id="welcomeEthicsBar" style="width: 0%; display: block; height: 4px; background: #ffbd2e; border-radius: 4px;"></span></div>
+          </div>
+          <div data-welcome-row="linux">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px;"><span>🐧 Linux Fundamentals</span><span id="welcomeLinuxLabel">0%</span></div>
+            <div class="progress"><span id="welcomeLinuxBar" style="width: 0%; display: block; height: 4px; background: var(--accent); border-radius: 4px;"></span></div>
+          </div>
+          <div data-welcome-row="network">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px;"><span>🌐 Network Fundamentals</span><span id="welcomeNetworkLabel">0%</span></div>
+            <div class="progress"><span id="welcomeNetworkBar" style="width: 0%; display: block; height: 4px; background: #3caaff; border-radius: 4px;"></span></div>
+          </div>
+          <div data-welcome-row="crypto">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px;"><span>🔑 Cryptography</span><span id="welcomeCryptoLabel">0%</span></div>
+            <div class="progress"><span id="welcomeCryptoBar" style="width: 0%; display: block; height: 4px; background: #ff8a2e; border-radius: 4px;"></span></div>
+          </div>
+          <div data-welcome-row="web">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px;"><span>🕸️ Web &amp; Application Fundamentals</span><span id="welcomeWebLabel">0%</span></div>
+            <div class="progress"><span id="welcomeWebBar" style="width: 0%; display: block; height: 4px; background: #b29cff; border-radius: 4px;"></span></div>
+          </div>
+          <div data-welcome-row="pentest">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px;"><span>💥 Penetration Testing</span><span id="welcomePentestLabel">0%</span></div>
+            <div class="progress"><span id="welcomePentestBar" style="width: 0%; display: block; height: 4px; background: #ff5f56; border-radius: 4px;"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!--
+        Course cards. Each carries data-course (the API key) and
+        data-target (the page URL to open once enrolled).
+        loadUserProgressForLearning() in app.js paints the
+        locked/unlocked/enrolled/completed state, sets the action button
+        text, and wires the click handler.
+
+        Order is the canonical unlock chain:
+          Ethics → Linux → Network → Crypto → Web → Pentest
+      -->
+      <div class="learning-paths-grid">
+
+        <div class="card path-card" data-course="ethics" data-target="cybersecurity-ethics.html">
+          <div class="path-icon">⚖️</div>
+          <h3>Cybersecurity Ethics &amp; Laws</h3>
+          <p>The starting course. Learn the ethical frameworks and legal instruments every practitioner must know — ACM &amp; (ISC)² codes, GDPR, U.S. CFAA, U.K. Computer Misuse Act, Bahrain's PDPL and Cybercrime Law, NIST frameworks, EU AI Act. Each chapter ends with a server-graded multiple-choice quiz.</p>
+          <div class="chips" style="margin-top: 12px;">
+            <span class="chip">Beginner</span>
+            <span class="chip">9 Chapters</span>
+            <span class="chip">36 MCQs</span>
+          </div>
+          <div class="state-badge" data-state-badge>Loading…</div>
+          <div class="prereq-hint" data-prereq-hint style="display:none;"></div>
+          <div><button type="button" class="action-btn" data-action-btn>…</button></div>
+          <div class="progress" style="margin-top: 12px;">
+            <span id="ethicsPathProgress"
+              style="width: 0%; display: block; height: 4px; background: #ffbd2e; border-radius: 4px;"></span>
+          </div>
+        </div>
+
+        <div class="card path-card" data-course="linux" data-target="linux-lab.html">
+          <div class="path-icon">🐧</div>
+          <h3>Linux Fundamentals</h3>
+          <p>Master Linux commands, navigation, permissions, search, and a Docker-based capstone lab that ends with a certificate and UTB flag challenge.</p>
+          <div class="chips" style="margin-top: 12px;">
+            <span class="chip">Beginner</span>
+            <span class="chip">9 Modules</span>
+            <span class="chip">Docker Lab + Certificate</span>
+          </div>
+          <div class="state-badge" data-state-badge>Loading…</div>
+          <div class="prereq-hint" data-prereq-hint style="display:none;"></div>
+          <div><button type="button" class="action-btn" data-action-btn>…</button></div>
+          <div class="progress" style="margin-top: 12px;">
+            <span id="linuxProgress"
+              style="width: 0%; display: block; height: 4px; background: var(--accent); border-radius: 4px;"></span>
+          </div>
+        </div>
+
+        <div class="card path-card" data-course="network" data-target="network-fundamentals.html">
+          <div class="path-icon">🌐</div>
+          <h3>Network Fundamentals</h3>
+          <p>A beginner-friendly curriculum covering networks, OSI model, IP addresses, ports, service types, topology, application protocols, command lines, and synchronization — each with a hands-on lab.</p>
+          <div class="chips" style="margin-top: 12px;">
+            <span class="chip">Beginner</span>
+            <span class="chip">9 Modules</span>
+            <span class="chip">Practical Labs</span>
+          </div>
+          <div class="state-badge" data-state-badge>Loading…</div>
+          <div class="prereq-hint" data-prereq-hint style="display:none;"></div>
+          <div><button type="button" class="action-btn" data-action-btn>…</button></div>
+          <div class="progress" style="margin-top: 12px;">
+            <span id="networkProgress"
+              style="width: 0%; display: block; height: 4px; background: #3caaff; border-radius: 4px;"></span>
+          </div>
+        </div>
+
+        <div class="card path-card" data-course="crypto" data-target="cryptography.html">
+          <div class="path-icon">🔑</div>
+          <h3>Cryptography</h3>
+          <p>From letter-shifting ciphers to modern AES, RSA and digital signatures — nine connected chapters with tiny <code>openssl</code> labs in your own sandbox terminal.</p>
+          <div class="chips" style="margin-top: 12px;">
+            <span class="chip">Beginner</span>
+            <span class="chip">9 Chapters</span>
+            <span class="chip">Practical Labs</span>
+          </div>
+          <div class="state-badge" data-state-badge>Loading…</div>
+          <div class="prereq-hint" data-prereq-hint style="display:none;"></div>
+          <div><button type="button" class="action-btn" data-action-btn>…</button></div>
+          <div class="progress" style="margin-top: 12px;">
+            <span id="cryptoPathProgress"
+              style="width: 0%; display: block; height: 4px; background: #ff8a2e; border-radius: 4px;"></span>
+          </div>
+        </div>
+
+        <div class="card path-card" data-course="web" data-target="web-fundamentals.html">
+          <div class="path-icon">🕸️</div>
+          <h3>Web &amp; Application Fundamentals</h3>
+          <p>Clients and servers, HTTP vs HTTPS, DNS, URLs and parameters, headers and cookies, proxies, web app architecture, and the developer toolbox — each with a hands-on lab.</p>
+          <div class="chips" style="margin-top: 12px;">
+            <span class="chip">Beginner</span>
+            <span class="chip">9 Modules</span>
+            <span class="chip">Practical Labs</span>
+          </div>
+          <div class="state-badge" data-state-badge>Loading…</div>
+          <div class="prereq-hint" data-prereq-hint style="display:none;"></div>
+          <div><button type="button" class="action-btn" data-action-btn>…</button></div>
+          <div class="progress" style="margin-top: 12px;">
+            <span id="webPathProgress"
+              style="width: 0%; display: block; height: 4px; background: #b29cff; border-radius: 4px;"></span>
+          </div>
+        </div>
+
+        <div class="card path-card" data-course="pentest" data-target="penetration-testing.html">
+          <div class="path-icon">💥</div>
+          <h3>Penetration Testing</h3>
+          <p>The final, largest course — twelve chapters covering ethics, scoping, reconnaissance, nmap, service enumeration, sniffing, XSS, SQL injection, Burp Suite, Metasploit, password attacks, privilege escalation and reporting. Capstone in a Kali desktop sandbox.</p>
+          <div class="chips" style="margin-top: 12px;">
+            <span class="chip">All Levels</span>
+            <span class="chip">12 Chapters</span>
+            <span class="chip">48 Lab Tasks</span>
+          </div>
+          <div class="state-badge" data-state-badge>Loading…</div>
+          <div class="prereq-hint" data-prereq-hint style="display:none;"></div>
+          <div><button type="button" class="action-btn" data-action-btn>…</button></div>
+          <div class="progress" style="margin-top: 12px;">
+            <span id="pentestPathProgress"
+              style="width: 0%; display: block; height: 4px; background: #ff5f56; border-radius: 4px;"></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="clean-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col footer-brand">
+          <div class="footer-logos">
+            <a href="https://www.utb.edu.bh/" target="_blank" rel="noopener"
+              aria-label="University of Technology Bahrain">
+              <img src="assets/images/utblogo.png" alt="University of Technology Bahrain" class="footer-logo">
+            </a>
+            <a href="index.html" aria-label="Cybersecurity Club UTB">
+              <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB" class="footer-logo">
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="news.html">News</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="learning.html">Learning</a></li>
+            <li><a href="join.html">Apply to Join</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>University</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.utb.edu.bh/" target="_blank" rel="noopener">UTB Website</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Follow Us</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.instagram.com/utb_bahrain/" target="_blank" rel="noopener">Instagram — UTB</a></li>
+            <li><a href="https://www.instagram.com/sc_utb/" target="_blank" rel="noopener">Instagram — Student Council</a></li>
+            <li><a href="https://www.instagram.com/cyber_security_club_utb/" target="_blank" rel="noopener">Instagram — Cybersecurity Club</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <small>College of Computer Studies &middot; &copy; 2026 Cybersecurity Club &mdash; University of Technology Bahrain</small>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/app.js?v=notif4"></script>
+  <!--
+    The Learning Hub state (locked / unlocked / enrolled / completed) is
+    painted by loadUserProgressForLearning() in assets/js/app.js. It calls
+    /api/progress/enrollments to discover the chain status and then walks
+    [data-course] cards to apply the correct class, action button label,
+    and prerequisite hint.
+  -->
+</body>
+
+</html>

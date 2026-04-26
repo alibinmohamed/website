@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile - Cybersecurity Club UTB</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=notif4" />
+  <style>
+    /* Profile page-only tweaks. Re-uses .card / .btn / etc. tokens.    */
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    @media (min-width: 880px) {
+      .profile-grid { grid-template-columns: 2fr 1fr; }
+    }
+    .field-row {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .field-row:last-child { border-bottom: none; }
+    .field-row .label {
+      font-size: 13px;
+      color: var(--muted, #888);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .field-row .label .lock-icon {
+      font-size: 14px;
+      opacity: 0.85;
+    }
+    .field-row .value {
+      font-size: 15px;
+      color: #fff;
+      word-break: break-word;
+    }
+    .field-row .value.muted { color: var(--muted, #888); font-style: italic; }
+    .field-row input[type="text"],
+    .field-row select {
+      width: 100%;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    .field-row input[type="text"]:focus,
+    .field-row select:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(255, 47, 79, 0.05);
+    }
+    .enrollment-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(255, 47, 79, 0.15), rgba(255, 138, 46, 0.1));
+      border: 1px solid rgba(255, 47, 79, 0.25);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: #fff;
+      margin: 4px 6px 4px 0;
+    }
+    .friend-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      margin-bottom: 8px;
+    }
+    .friend-row .friend-meta {
+      font-size: 12px;
+      color: var(--muted, #888);
+    }
+    .friend-row .friend-link {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .friend-row .friend-link:hover { color: var(--accent); }
+    .friend-empty {
+      text-align: center;
+      padding: 28px 16px;
+      color: var(--muted, #888);
+      font-size: 14px;
+    }
+    .request-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      margin-bottom: 8px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .status-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .status-pill.pending  { background: rgba(255, 189, 46, 0.15); color: #ffbd2e; border: 1px solid rgba(255, 189, 46, 0.4); }
+    .status-pill.accepted { background: rgba(39, 201, 63, 0.15);  color: #27c93f; border: 1px solid rgba(39, 201, 63, 0.4); }
+    .status-pill.rejected { background: rgba(255, 95, 86, 0.15);  color: #ff5f56; border: 1px solid rgba(255, 95, 86, 0.4); }
+    .request-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .request-actions button {
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: transparent;
+      color: #fff;
+      padding: 5px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .request-actions button.accept:hover {
+      background: rgba(39, 201, 63, 0.15);
+      border-color: #27c93f;
+      color: #27c93f;
+    }
+    .request-actions button.reject:hover {
+      background: rgba(255, 95, 86, 0.15);
+      border-color: #ff5f56;
+      color: #ff5f56;
+    }
+    .request-section h4 {
+      margin: 18px 0 8px;
+      font-size: 13px;
+      color: var(--muted, #888);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .add-friend-form {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .add-friend-form input {
+      flex: 1;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    .add-friend-form input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(255, 47, 79, 0.05);
+    }
+    .add-friend-status {
+      font-size: 12px;
+      margin-top: 8px;
+      min-height: 16px;
+    }
+    .friend-row .remove-friend {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--muted, #888);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-left: 8px;
+      font-family: inherit;
+    }
+    .friend-row .remove-friend:hover {
+      color: var(--warning, #ff9b3d);
+      border-color: var(--warning, #ff9b3d);
+    }
+    #saveStatus {
+      min-height: 20px;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+<header class="header">
+  <div class="container nav">
+    <a class="logo logo-utb" href="https://www.utb.edu.bh/" target="_blank" rel="noopener" aria-label="University of Technology Bahrain">
+      <img src="assets/images/utblogo.png" alt="University of Technology Bahrain">
+    </a>
+    <a class="logo logo-club" href="index.html">
+      <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB">
+    </a>
+    <div class="auth-controls" data-auth-controls></div>
+    <button class="menu-toggle" aria-label="Toggle menu"></button>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About Us</a>
+      <a href="news.html">News</a>
+      <a href="join.html">Apply to Join</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="profile.html">Profile</a>
+      <a href="events.html">Events</a>
+      <a href="learning.html">Learning</a>
+      <a href="resources.html">Resources</a>
+      <a href="tracks.html">Cybersecurity Areas</a>
+      <a href="plan.html">Plan</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero clean">
+  <div class="container">
+    <span class="eyebrow">Account</span>
+    <h1 style="margin-top:14px">My Profile</h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <!-- Login prompt — visible only when NOT logged in -->
+    <div id="profileLoginPrompt" style="display:none; text-align:center;">
+      <div class="card" style="padding: 48px;">
+        <div style="font-size: 48px; margin-bottom: 16px;">🔐</div>
+        <h3>Login to view your profile</h3>
+        <p style="margin: 16px 0;">Your profile is private — log in to see your enrolled courses, friends, and account details.</p>
+        <a href="login.html" class="btn btn-primary">Login Now</a>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div id="profileLoading" class="card" style="text-align:center; padding: 32px;">
+      Loading your profile…
+    </div>
+
+    <!-- Profile content -->
+    <div id="profileContent" style="display:none;">
+      <!-- Identity card (read-only fields + editable form) -->
+      <div class="profile-grid">
+        <div class="card">
+          <div style="display:flex; align-items:center; gap:18px; margin-bottom:24px;">
+            <div id="profileAvatar" style="width:64px; height:64px; border-radius:50%;
+                  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+                  display:flex; align-items:center; justify-content:center;
+                  font-weight:800; font-size:24px; color:#fff;">U</div>
+            <div>
+              <h2 id="profileName" style="margin:0;">—</h2>
+              <p id="profileEmailHeader" style="margin:4px 0 0; color:var(--muted, #888); font-size:14px;">—</p>
+            </div>
+          </div>
+
+          <h3 style="margin:0 0 12px;">Account Details</h3>
+
+          <!-- Read-only -->
+          <div class="field-row">
+            <div class="label"><span>Full Name</span><span class="lock-icon" aria-label="Locked">🔒</span></div>
+            <div class="value" id="profileNameValue">—</div>
+          </div>
+          <div class="field-row">
+            <div class="label"><span>Email</span><span class="lock-icon" aria-label="Locked">🔒</span></div>
+            <div class="value" id="profileEmailValue">—</div>
+          </div>
+          <div class="field-row">
+            <div class="label"><span>Student ID</span><span class="lock-icon" aria-label="Locked">🔒</span></div>
+            <div class="value" id="profileStudentIdValue">—</div>
+          </div>
+          <div class="field-row">
+            <div class="label"><span>Member ID</span><span class="lock-icon" aria-label="Locked">🔒</span></div>
+            <div class="value" id="profileMemberIdValue">—</div>
+          </div>
+
+          <!-- Editable form -->
+          <form id="profileForm" style="margin-top:8px;">
+            <div class="field-row">
+              <div class="label">Year of Study</div>
+              <div>
+                <select id="profileYear" name="year">
+                  <option value="">— Prefer not to say —</option>
+                  <option value="Year 1">Year 1</option>
+                  <option value="Year 2">Year 2</option>
+                  <option value="Year 3">Year 3</option>
+                  <option value="Year 4">Year 4</option>
+                  <option value="Postgrad">Postgrad</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="label">Major</div>
+              <div>
+                <input type="text" id="profileMajor" name="major" maxlength="100"
+                       placeholder="e.g. Computer Science, Cybersecurity, Software Engineering" />
+              </div>
+            </div>
+
+            <div style="display:flex; gap:10px; align-items:center; margin-top:18px;">
+              <button type="submit" class="btn btn-primary" id="profileSaveBtn">Save Changes</button>
+              <button type="button" class="btn btn-secondary" id="profileResetBtn">Reset</button>
+              <span id="saveStatus"></span>
+            </div>
+          </form>
+        </div>
+
+        <!-- Sidebar: enrollments + friends -->
+        <div>
+          <div class="card" style="margin-bottom:18px;">
+            <h3 style="margin:0 0 12px;">Enrolled Courses</h3>
+            <div id="profileEnrollments">
+              <div style="color:var(--muted, #888); font-size:14px;">Loading…</div>
+            </div>
+            <div style="margin-top:16px;">
+              <a href="learning.html" class="btn btn-secondary" style="font-size:13px;">Browse all courses →</a>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="margin:0 0 12px;">Friends</h3>
+            <div id="profileFriends"></div>
+
+            <div class="request-section">
+              <h4>Send a request</h4>
+              <form id="addFriendForm" class="add-friend-form">
+                <input type="text" id="addFriendInput" inputmode="numeric" pattern="[0-9]*"
+                       placeholder="Enter friend's Member ID" autocomplete="off" />
+                <button type="submit" class="btn btn-primary" id="addFriendBtn">Send Request</button>
+              </form>
+              <div class="add-friend-status" id="addFriendStatus"></div>
+            </div>
+
+            <div class="request-section" id="incomingRequestsSection" style="display:none;">
+              <h4>Incoming Requests</h4>
+              <div id="incomingRequests"></div>
+            </div>
+
+            <div class="request-section" id="outgoingRequestsSection" style="display:none;">
+              <h4>Sent Requests</h4>
+              <div id="outgoingRequests"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="clean-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col footer-brand">
+        <div class="footer-logos">
+          <a href="https://www.utb.edu.bh/" target="_blank" rel="noopener" aria-label="University of Technology Bahrain">
+            <img src="assets/images/utblogo.png" alt="University of Technology Bahrain" class="footer-logo">
+          </a>
+          <a href="index.html" aria-label="Cybersecurity Club UTB">
+            <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB" class="footer-logo">
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul class="footer-links">
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="news.html">News</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="learning.html">Learning</a></li>
+          <li><a href="join.html">Apply to Join</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>University</h4>
+        <ul class="footer-links">
+          <li><a href="https://www.utb.edu.bh/" target="_blank" rel="noopener">UTB Website</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Follow Us</h4>
+        <ul class="footer-links">
+          <li><a href="https://www.instagram.com/utb_bahrain/" target="_blank" rel="noopener">Instagram — UTB</a></li>
+          <li><a href="https://www.instagram.com/sc_utb/" target="_blank" rel="noopener">Instagram — Student Council</a></li>
+          <li><a href="https://www.instagram.com/cyber_security_club_utb/" target="_blank" rel="noopener">Instagram — Cybersecurity Club</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <small>College of Computer Studies &middot; &copy; 2026 Cybersecurity Club &mdash; University of Technology Bahrain</small>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/app.js?v=notif4"></script>
+</body>
+</html>

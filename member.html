@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Member Profile - Cybersecurity Club UTB</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=notif4" />
+  <style>
+    .member-header {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+    .member-avatar {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 28px; color: #fff;
+    }
+    .member-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      color: var(--muted, #888);
+      font-size: 13px;
+      margin-top: 6px;
+    }
+    .enrollment-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(255, 47, 79, 0.15), rgba(255, 138, 46, 0.1));
+      border: 1px solid rgba(255, 47, 79, 0.25);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: #fff;
+      margin: 4px 6px 4px 0;
+    }
+    .activity-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      margin-bottom: 8px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .activity-row .xp {
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .activity-meta {
+      font-size: 12px;
+      color: var(--muted, #888);
+      margin-top: 2px;
+    }
+    .empty-block {
+      text-align: center;
+      padding: 24px 16px;
+      color: var(--muted, #888);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+<header class="header">
+  <div class="container nav">
+    <a class="logo logo-utb" href="https://www.utb.edu.bh/" target="_blank" rel="noopener" aria-label="University of Technology Bahrain">
+      <img src="assets/images/utblogo.png" alt="University of Technology Bahrain">
+    </a>
+    <a class="logo logo-club" href="index.html">
+      <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB">
+    </a>
+    <div class="auth-controls" data-auth-controls></div>
+    <button class="menu-toggle" aria-label="Toggle menu"></button>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About Us</a>
+      <a href="news.html">News</a>
+      <a href="join.html">Apply to Join</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="profile.html">Profile</a>
+      <a href="events.html">Events</a>
+      <a href="learning.html">Learning</a>
+      <a href="resources.html">Resources</a>
+      <a href="tracks.html">Cybersecurity Areas</a>
+      <a href="plan.html">Plan</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero clean">
+  <div class="container">
+    <span class="eyebrow">Friend</span>
+    <h1 style="margin-top:14px">Member Profile</h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <!-- Login prompt -->
+    <div id="memberLoginPrompt" style="display:none; text-align:center;">
+      <div class="card" style="padding: 48px;">
+        <div style="font-size: 48px; margin-bottom: 16px;">🔐</div>
+        <h3>Login to view this profile</h3>
+        <p style="margin: 16px 0;">Member profiles are visible to friends only — log in to continue.</p>
+        <a href="login.html" class="btn btn-primary">Login</a>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div id="memberLoading" class="card" style="text-align:center; padding: 32px;">
+      Loading profile…
+    </div>
+
+    <!-- Error state (e.g. not friends, member not found) -->
+    <div id="memberError" class="card" style="display:none; text-align:center; padding: 32px;">
+      <div style="font-size: 48px; margin-bottom: 16px;">🚫</div>
+      <h3 id="memberErrorTitle">Profile unavailable</h3>
+      <p id="memberErrorMessage" style="margin: 12px 0 20px;">—</p>
+      <a href="profile.html" class="btn btn-secondary">← Back to your profile</a>
+    </div>
+
+    <!-- Profile content -->
+    <div id="memberContent" style="display:none;">
+      <div style="margin-bottom: 16px;">
+        <a href="profile.html" class="btn btn-secondary" style="font-size:13px;">← Back to your profile</a>
+      </div>
+
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="member-header">
+          <div class="member-avatar" id="memberAvatar">U</div>
+          <div>
+            <h2 style="margin:0;" id="memberName">—</h2>
+            <div class="member-meta-row">
+              <span><strong>Major:</strong> <span id="memberMajor">—</span></span>
+              <span><strong>Last seen:</strong> <span id="memberLastSeen">—</span></span>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="margin:24px 0 12px;">Enrolled Courses</h3>
+        <div id="memberEnrollments">
+          <div class="empty-block">Loading…</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 12px;">Recent Activities</h3>
+        <div id="memberActivities">
+          <div class="empty-block">Loading…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="clean-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col footer-brand">
+        <div class="footer-logos">
+          <a href="https://www.utb.edu.bh/" target="_blank" rel="noopener" aria-label="University of Technology Bahrain">
+            <img src="assets/images/utblogo.png" alt="University of Technology Bahrain" class="footer-logo">
+          </a>
+          <a href="index.html" aria-label="Cybersecurity Club UTB">
+            <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB" class="footer-logo">
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul class="footer-links">
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="news.html">News</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="learning.html">Learning</a></li>
+          <li><a href="join.html">Apply to Join</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>University</h4>
+        <ul class="footer-links">
+          <li><a href="https://www.utb.edu.bh/" target="_blank" rel="noopener">UTB Website</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Follow Us</h4>
+        <ul class="footer-links">
+          <li><a href="https://www.instagram.com/utb_bahrain/" target="_blank" rel="noopener">Instagram — UTB</a></li>
+          <li><a href="https://www.instagram.com/sc_utb/" target="_blank" rel="noopener">Instagram — Student Council</a></li>
+          <li><a href="https://www.instagram.com/cyber_security_club_utb/" target="_blank" rel="noopener">Instagram — Cybersecurity Club</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <small>College of Computer Studies &middot; &copy; 2026 Cybersecurity Club &mdash; University of Technology Bahrain</small>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/app.js?v=notif4"></script>
+</body>
+</html>

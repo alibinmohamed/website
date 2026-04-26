@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web &amp; Application Fundamentals — Cybersecurity Club UTB</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=notif4" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm/css/xterm.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xterm/lib/xterm.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
+  <style>
+    body {
+      background: #0a0a0d;
+    }
+
+    /* ===== Layout ===== */
+    .nf-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 28px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .nf-toc {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 14px;
+      height: calc(100vh - 140px);
+      overflow-y: auto;
+      position: sticky;
+      top: 90px;
+    }
+
+    .nf-toc h4 {
+      margin: 0 0 12px 4px;
+      font-size: 14px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .nf-toc a {
+      display: block;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      color: var(--text);
+      text-decoration: none;
+      margin-bottom: 4px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .nf-toc a:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .nf-toc a.active {
+      background: rgba(178, 156, 255, 0.15);
+      color: #b29cff;
+      font-weight: 600;
+    }
+
+    .nf-toc a .num {
+      font-family: monospace;
+      color: #b29cff;
+      margin-right: 8px;
+      font-size: 11px;
+    }
+
+    .nf-content {
+      min-width: 0;
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .back-button:hover {
+      color: var(--accent);
+    }
+
+    /* ===== Module card ===== */
+    .module {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 30px;
+      margin-bottom: 28px;
+      scroll-margin-top: 100px;
+    }
+
+    .module-label {
+      display: inline-block;
+      font-family: monospace;
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: #b29cff;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .module h2 {
+      margin: 0 0 8px;
+      font-size: 26px;
+    }
+
+    .module .lead {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+      margin: 0 0 18px;
+    }
+
+    .module h3 {
+      font-size: 18px;
+      margin: 22px 0 10px;
+      color: #b29cff;
+    }
+
+    .module p {
+      line-height: 1.65;
+      color: #ccc;
+      font-size: 14px;
+    }
+
+    .module ul,
+    .module ol {
+      line-height: 1.7;
+      color: #ccc;
+      font-size: 14px;
+      padding-left: 22px;
+    }
+
+    .module li {
+      margin-bottom: 6px;
+    }
+
+    .module strong {
+      color: #fff;
+    }
+
+    .module code {
+      background: rgba(0, 0, 0, 0.45);
+      color: #ffbd2e;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12.5px;
+      font-family: 'Menlo', 'Courier New', monospace;
+    }
+
+    .module em {
+      color: #eee;
+    }
+
+    /* ===== Diagram tables ===== */
+    .nf-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 13px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .nf-table th,
+    .nf-table td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nf-table th {
+      background: rgba(178, 156, 255, 0.12);
+      color: #b29cff;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .nf-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* ===== Callout boxes ===== */
+    .tip,
+    .warn,
+    .lab {
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .tip {
+      background: rgba(60, 170, 255, 0.07);
+      border-left: 4px solid #3caaff;
+      color: #cde6ff;
+    }
+
+    .tip strong {
+      color: #3caaff;
+    }
+
+    .warn {
+      background: rgba(255, 95, 86, 0.08);
+      border-left: 4px solid #ff5f56;
+      color: #ffd0cd;
+    }
+
+    .warn strong {
+      color: #ff5f56;
+    }
+
+    .lab {
+      background: linear-gradient(135deg, rgba(178, 156, 255, 0.10), rgba(60, 170, 255, 0.05));
+      border: 1px solid rgba(178, 156, 255, 0.25);
+      border-left: 4px solid #b29cff;
+    }
+
+    .lab .lab-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      color: #b29cff;
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    .lab ol {
+      margin: 6px 0 0;
+      padding-left: 20px;
+    }
+
+    .lab .expected {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #ccc;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(178, 156, 255, 0.3);
+    }
+
+    .lab .expected strong {
+      color: #b29cff;
+    }
+
+    .cmd-block {
+      background: #050507;
+      border: 1px solid #1f1f25;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-family: 'Menlo', 'Courier New', monospace;
+      color: #9ef7a7;
+      font-size: 12.5px;
+      margin: 10px 0;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+
+    .cmd-block .prompt {
+      color: var(--accent);
+      user-select: none;
+    }
+
+    .cmd-block .comment {
+      color: #666;
+    }
+
+    /* ===== URL anatomy diagram ===== */
+    .url-anatomy {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 14px 0;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      font-family: 'Menlo', monospace;
+      font-size: 14px;
+      align-items: center;
+    }
+
+    .url-anatomy span {
+      padding: 6px 10px;
+      border-radius: 6px;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .url-anatomy .scheme   { background: rgba(60, 170, 255, 0.20); color: #cde6ff; }
+    .url-anatomy .userinfo { background: rgba(124, 77, 255, 0.20); color: #d6c8ff; }
+    .url-anatomy .host     { background: rgba(255, 47, 79, 0.20); color: #ffcfd5; }
+    .url-anatomy .port     { background: rgba(255, 189, 46, 0.20); color: #ffe9b5; }
+    .url-anatomy .path     { background: rgba(39, 201, 63, 0.18); color: #c2f0c8; }
+    .url-anatomy .query    { background: rgba(255, 95, 86, 0.18); color: #ffd0cd; }
+    .url-anatomy .fragment { background: rgba(140, 140, 140, 0.20); color: #ddd; }
+
+    /* ===== Per-chapter lab (task panel + terminal) ===== */
+    .chapter-lab {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px dashed rgba(178, 156, 255, 0.25);
+    }
+
+    .chapter-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 1100px) {
+      .chapter-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .task-panel {
+      background: rgba(178, 156, 255, 0.05);
+      border: 1px solid rgba(178, 156, 255, 0.25);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .task-panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #d8cdff;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(178, 156, 255, 0.18);
+    }
+
+    .task-panel-head .task-xp {
+      background: rgba(178, 156, 255, 0.18);
+      color: #b29cff;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-family: 'Menlo', monospace;
+    }
+
+    .task-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .task-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 10px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 10px;
+      font-size: 12.5px;
+      color: #ddd;
+      line-height: 1.45;
+      border: 1px solid transparent;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .task-list li .dot {
+      flex: 0 0 14px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #b29cff;
+      margin-top: 2px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .task-list li .title {
+      flex: 1;
+    }
+
+    .task-list li .xp {
+      font-family: 'Menlo', monospace;
+      font-size: 11px;
+      color: #ffbd2e;
+      white-space: nowrap;
+    }
+
+    .task-list li.done {
+      background: rgba(39, 201, 63, 0.1);
+      border-color: rgba(39, 201, 63, 0.4);
+      color: #bfe3c3;
+    }
+
+    .task-list li.done .dot {
+      background: #27c93f;
+      border-color: #27c93f;
+      box-shadow: 0 0 8px rgba(39, 201, 63, 0.6);
+    }
+
+    .task-list li.done .title {
+      text-decoration: line-through;
+      text-decoration-color: rgba(39, 201, 63, 0.4);
+    }
+
+    .task-list li.just-awarded {
+      animation: task-pop 0.5s ease;
+    }
+
+    @keyframes task-pop {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+
+    .xp-floater {
+      position: fixed;
+      pointer-events: none;
+      font-family: 'Menlo', monospace;
+      font-weight: 700;
+      font-size: 16px;
+      color: #27c93f;
+      text-shadow: 0 0 8px rgba(39, 201, 63, 0.6);
+      z-index: 2000;
+      animation: xp-float 1.4s ease-out forwards;
+    }
+
+    @keyframes xp-float {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-60px); opacity: 0; }
+    }
+
+    /* ===== Persistent XP toasts ===== */
+    #xpToastStack {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+      max-width: 360px;
+    }
+    .xp-toast {
+      pointer-events: auto;
+      background: linear-gradient(135deg, rgba(39, 201, 63, 0.18), rgba(178, 156, 255, 0.12));
+      border: 1px solid rgba(39, 201, 63, 0.55);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #e3ffe7;
+      font-size: 13px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      animation: xp-toast-in 0.35s ease;
+    }
+    .xp-toast.fading { animation: xp-toast-out 0.6s ease forwards; }
+    .xp-toast .head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-weight: 700;
+      color: #27c93f;
+      font-family: 'Menlo', monospace;
+      font-size: 13px;
+    }
+    .xp-toast .close {
+      background: transparent;
+      border: none;
+      color: #d8cdff;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      padding: 0 4px;
+    }
+    .xp-toast .body {
+      margin-top: 4px;
+      font-size: 12.5px;
+      color: #d8e6cf;
+      line-height: 1.4;
+    }
+    @keyframes xp-toast-in {
+      from { transform: translateY(20px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    @keyframes xp-toast-out {
+      from { transform: translateY(0);     opacity: 1; }
+      to   { transform: translateY(-20px); opacity: 0; }
+    }
+
+    /* ===== Chapter lock overlay ===== */
+    article.module.chapter-locked {
+      position: relative;
+      filter: grayscale(0.6);
+    }
+    article.module.chapter-locked > *:not(.chapter-lock-overlay) {
+      opacity: 0.35;
+      pointer-events: none;
+      user-select: none;
+    }
+    .chapter-lock-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, rgba(10,10,13,0.55), rgba(10,10,13,0.85));
+      border-radius: 18px;
+      z-index: 5;
+      pointer-events: auto;
+    }
+    .chapter-lock-card {
+      max-width: 420px;
+      text-align: center;
+      background: rgba(20, 20, 28, 0.92);
+      border: 1px solid rgba(178, 156, 255, 0.45);
+      border-radius: 16px;
+      padding: 22px 24px;
+      color: #d8cdff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    .chapter-lock-card .icon { font-size: 32px; line-height: 1; }
+    .chapter-lock-card h4 {
+      margin: 6px 0 8px;
+      font-size: 16px;
+      color: #b29cff;
+    }
+    .chapter-lock-card p {
+      margin: 0;
+      font-size: 13px;
+      color: #cdd6e3;
+      line-height: 1.5;
+    }
+
+    .chapter-term-wrap {
+      background: #0a0a0d;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 320px;
+    }
+
+    .chapter-term-head {
+      background: #1a1a1a;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #333;
+      flex-shrink: 0;
+    }
+
+    .chapter-term-head .terminal-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .chapter-term-head .terminal-dot.red    { background: #ff5f56; }
+    .chapter-term-head .terminal-dot.yellow { background: #ffbd2e; }
+    .chapter-term-head .terminal-dot.green  { background: #27c93f; }
+
+    .chapter-term-head .terminal-title {
+      color: #888;
+      font-size: 11px;
+      margin-left: 8px;
+      flex: 1;
+    }
+
+    .chapter-term-head .terminal-status {
+      font-size: 11px;
+      padding: 2px 10px;
+      border-radius: 20px;
+      background: rgba(39, 201, 63, 0.15);
+      color: #27c93f;
+    }
+
+    .chapter-term-head .terminal-status.offline {
+      background: rgba(255, 189, 46, 0.15);
+      color: #ffbd2e;
+    }
+
+    .chapter-terminal {
+      flex: 1;
+      padding: 10px;
+      min-height: 280px;
+      font-size: 12px;
+      font-family: 'Menlo', 'Courier New', monospace;
+    }
+
+    /* ===== Sticky course-wide XP bar ===== */
+    .course-xp-bar {
+      position: sticky;
+      top: 72px;
+      z-index: 50;
+      background: rgba(10, 10, 13, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .course-xp-bar .label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .course-xp-bar .value {
+      font-family: 'Menlo', monospace;
+      font-weight: 700;
+      color: #b29cff;
+      font-size: 14px;
+    }
+
+    .course-xp-bar .xp-track {
+      flex: 1;
+      min-width: 160px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .course-xp-bar .xp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #b29cff, #3caaff);
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .course-xp-bar .chapters-done {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .course-xp-bar .chapters-done strong {
+      color: #fff;
+    }
+
+    /* ===== Progress / header bar ===== */
+    .nf-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .nf-header-bar .stats {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .nf-header-bar .stats .chip {
+      font-size: 12px;
+    }
+
+    /* ===== Final certificate-style box ===== */
+    .finish-box {
+      background: linear-gradient(135deg, rgba(178, 156, 255, 0.12), rgba(60, 170, 255, 0.08));
+      border: 1px solid #b29cff;
+      border-radius: 20px;
+      padding: 28px 30px;
+      text-align: center;
+    }
+
+    .finish-box h3 {
+      margin: 0 0 6px;
+      font-size: 22px;
+    }
+
+    .finish-box p {
+      color: var(--muted);
+      margin: 6px 0 16px;
+      font-size: 14px;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 1000px) {
+      .nf-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .nf-toc {
+        position: relative;
+        top: 0;
+        height: auto;
+        max-height: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a class="logo logo-utb" href="https://www.utb.edu.bh/" target="_blank" rel="noopener"
+        aria-label="University of Technology Bahrain">
+        <img src="assets/images/utblogo.png" alt="University of Technology Bahrain">
+      </a>
+      <a class="logo logo-club" href="index.html">
+        <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB">
+      </a>
+      <div class="auth-controls" data-auth-controls></div>
+      <button class="menu-toggle" aria-label="Toggle menu"></button>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="news.html">News</a>
+        <a href="join.html">Apply to Join</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="events.html">Events</a>
+        <a href="learning.html">Learning</a>
+        <a href="resources.html">Resources</a>
+        <a href="tracks.html">Cybersecurity Areas</a>
+        <a href="plan.html">Plan</a>
+        <a href="login.html">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="container">
+      <a class="back-button" href="learning.html">Back to Learning Paths</a>
+      <span class="eyebrow">Web Course</span>
+      <h1 style="margin-top:14px">Web &amp; Application Fundamentals</h1>
+      <p>A beginner-friendly course that teaches you how the web actually works.
+        Nine short chapters, each with a simple explanation and a hands-on lab
+        you can do right here in your browser — no installs, no prior knowledge required.</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 0;">
+    <div class="container">
+      <div class="course-xp-bar" id="courseXpBar">
+        <span class="label">Course XP</span>
+        <span class="value" id="courseXpValue">0 / 0</span>
+        <div class="xp-track"><div class="xp-fill" id="courseXpFill"></div></div>
+        <span class="chapters-done"><strong id="chaptersDone">0</strong> / 9 chapters complete</span>
+      </div>
+
+      <div class="nf-header-bar">
+        <div class="stats">
+          <span class="chip">Beginner</span>
+          <span class="chip">9 Chapters</span>
+          <span class="chip">9 Practical Labs</span>
+          <span class="chip">~15 Hours</span>
+        </div>
+      </div>
+
+      <!--
+        Everything a student needs lives inside this page:
+        - a small sandbox terminal under every chapter (real or simulated)
+        - the same XP collection system as the Linux + Network courses, so
+          progress on this page rolls up into the dashboard, leaderboard and
+          learning-hub welcome card automatically.
+        No external tool or website is required to complete this course.
+      -->
+
+      <div class="nf-layout">
+        <!-- ================= TOC ================= -->
+        <aside class="nf-toc" id="nfToc">
+          <h4>Curriculum</h4>
+          <a href="#m1"><span class="num">01</span>Introduction</a>
+          <a href="#m2"><span class="num">02</span>Clients &amp; Servers</a>
+          <a href="#m3"><span class="num">03</span>HTTP vs HTTPS</a>
+          <a href="#m4"><span class="num">04</span>DNS &amp; Domains</a>
+          <a href="#m5"><span class="num">05</span>URLs &amp; Parameters</a>
+          <a href="#m6"><span class="num">06</span>Headers &amp; Cookies</a>
+          <a href="#m7"><span class="num">07</span>Proxies &amp; Caching</a>
+          <a href="#m8"><span class="num">08</span>Web App Architecture</a>
+          <a href="#m9"><span class="num">09</span>Developer Toolbox</a>
+          <a href="#finish"><span class="num"></span>Capstone</a>
+        </aside>
+
+        <!-- ================= CONTENT ================= -->
+        <main class="nf-content">
+
+          <!-- =============== MODULE 1 =============== -->
+          <article class="module" id="m1">
+            <div class="module-label">MODULE 01 · FOUNDATIONS</div>
+            <h2>Introduction to the Web</h2>
+            <p class="lead">
+              The <strong>web</strong> is a layer that runs on top of the Internet. The Internet is
+              just wires, radios and routers moving raw data around. The web is what happens when one
+              computer (a <em>client</em>) asks another computer (a <em>server</em>) for a document and
+              that document is rendered as a page you can read, click and type into.
+            </p>
+
+            <h3>Web vs Internet</h3>
+            <ul>
+              <li><strong>Internet</strong> — the global network of networks. Carries every kind of
+                traffic: web, email, video calls, gaming, file transfer.</li>
+              <li><strong>Web</strong> — one specific service that uses the Internet, defined by three
+                things invented at CERN in 1989: <strong>URLs</strong> (addresses for documents),
+                <strong>HTTP</strong> (the request language), and <strong>HTML</strong> (the document
+                format).</li>
+            </ul>
+
+            <h3>The Three Building Blocks of Every Web Page</h3>
+            <table class="nf-table">
+              <thead>
+                <tr><th>Language</th><th>Job</th><th>You'll see it as…</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>HTML</strong></td><td>Structure / content</td><td>Headings, paragraphs, links, forms</td></tr>
+                <tr><td><strong>CSS</strong></td><td>Look &amp; feel</td><td>Colours, fonts, layout, spacing</td></tr>
+                <tr><td><strong>JavaScript</strong></td><td>Behaviour</td><td>Interactive widgets, fetching data without reloading</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Why Beginners Should Learn This Course</h3>
+            <ul>
+              <li>Every modern app talks HTTP somewhere. Mobile apps, games, banking, IoT — they all
+                speak the same protocol.</li>
+              <li>You cannot break, defend, or build something well if you don't know how it works.</li>
+              <li>The vocabulary in this course (URL, header, cookie, proxy, DNS) is shared across
+                Web Security, Penetration Testing, Cloud Security and Application Security tracks.</li>
+            </ul>
+
+            <div class="tip">
+              <strong>Professor's note:</strong> when people say "web app" they usually mean something
+              you use through a browser. When they say "API" they usually mean the same thing without
+              the visual layer. The protocol underneath is identical.
+            </div>
+
+            <div class="lab">
+              <div class="lab-title">Lab 1 — Your First Web Request</div>
+              <ol>
+                <li>Click the <strong>Start the Chapter 1 sandbox terminal</strong> button below to
+                  open a fresh shell in the <code>cyber-web</code> Docker container.</li>
+                <li>Read the welcome file: <code>cat README.txt</code>.</li>
+                <li>Make your very first HTTP request: <code>curl http://example.com</code>.</li>
+                <li>Resolve a name to an IP: <code>host example.com</code>.</li>
+                <li>Show the server who you are pretending to be:
+                  <code>curl -A 'Mozilla/5.0' http://example.com</code>.</li>
+              </ol>
+              <div class="expected">
+                <strong>Deliverable:</strong> a screenshot of the four commands you just ran. Each one
+                that the system recognises will tick its objective in the side panel and add to your
+                Course XP bar at the top of this page.
+              </div>
+              <div class="chapter-lab" data-chapter="1"></div>
+            </div>
+          </article>
+
+          <!-- =============== MODULE 2 =============== -->
+          <article class="module" id="m2">
+            <div class="module-label">MODULE 02 · WHO TALKS TO WHOM</div>
+            <h2>Clients &amp; Servers</h2>
+            <p class="lead">
+              Every web interaction is a <strong>request</strong> from a client and a
+              <strong>response</strong> from a server. There are no surprises in this model — once you
+              internalise it, every confusing thing you'll encounter later (caches, proxies, CDNs,
+              load balancers) is just a box that sits between the two.
+            </p>
+
+            <h3>The Client</h3>
+            <ul>
+              <li>Initiates the conversation.</li>
+              <li>Examples: a browser (Chrome, Firefox), a mobile app, the <code>curl</code> command,
+                another server calling an API.</li>
+              <li>Speaks the same HTTP either way — the server can't tell a browser from
+                <code>curl</code> unless you tell it (via the <em>User-Agent</em> header).</li>
+            </ul>
+
+            <h3>The Server</h3>
+            <ul>
+              <li>Listens on a port (typically 80 for HTTP, 443 for HTTPS).</li>
+              <li>Returns a response: a status code, headers, and (usually) a body.</li>
+              <li>Common server software: <strong>nginx</strong>, <strong>Apache</strong>,
+                <strong>IIS</strong>, plus application-server frameworks like Express, Django, Flask,
+                Spring.</li>
+            </ul>
+
+            <h3>The HTTP Request, in Plain English</h3>
+            <div class="cmd-block">GET /index.html HTTP/1.1
+Host: example.com
+User-Agent: Mozilla/5.0
+Accept: text/html
+<span class="comment">(blank line)</span></div>
+            <p>
+              The first line is the <em>request line</em> (method, path, version). After it come
+              <em>headers</em>, then a blank line, then an optional body (used by methods like
+              <code>POST</code> and <code>PUT</code>).
+            </p>
+
+            <h3>The HTTP Response</h3>
+            <div class="cmd-block">HTTP/1.1 200 OK
+Server: nginx
+Content-Type: text/html
+Content-Length: 1270
+<span class="comment">(blank line)</span>
+&lt;!doctype html&gt;&lt;html&gt;&lt;body&gt;&lt;h1&gt;It works!&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;</div>
+
+            <h3>HTTP Methods You'll Actually See</h3>
+            <table class="nf-table">
+              <thead>
+                <tr><th>Method</th><th>Purpose</th><th>Body?</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>GET</code></td><td>Read a resource</td><td>No</td></tr>
+                <tr><td><code>POST</code></td><td>Create / submit a form</td><td>Yes</td></tr>
+                <tr><td><code>PUT</code></td><td>Replace a resource</td><td>Yes</td></tr>
+                <tr><td><code>PATCH</code></td><td>Partially update a resource</td><td>Yes</td></tr>
+                <tr><td><code>DELETE</code></td><td>Remove a resource</td><td>Optional</td></tr>
+                <tr><td><code>HEAD</code></td><td>Like GET but only the headers</td><td>No</td></tr>
+                <tr><td><code>OPTIONS</code></td><td>Ask the server what it allows</td><td>No</td></tr>
+              </tbody>
+            </table>
+
+            <div class="lab">
+              <div class="lab-title">Lab 2 — See the Conversation Live</div>
+              <ol>
+                <li>Watch a full request and response: <code>curl -v http://example.com</code>.</li>
+                <li>Send a POST: <code>curl -X POST http://example.com</code>.</li>
+                <li>Open a raw TCP connection and pretend to be a browser:
+                  <code>nc example.com 80</code>.</li>
+                <li>Run your own tiny server in this sandbox:
+                  <code>python3 -m http.server 8000</code>.</li>
+              </ol>
+              <div class="expected">
+                <strong>Deliverable:</strong> notice how every request begins with a method + path
+                line, and every response begins with a status code. That is the entire web in two
+                lines.
+              </div>
+              <div class="chapter-lab" data-chapter="2"></div>
+            </div>
+          </article>
+
+          <!-- =============== MODULE 3 =============== -->
+          <article class="module" id="m3">
+            <div class="module-label">MODULE 03 · PROTOCOLS</div>
+            <h2>HTTP vs HTTPS</h2>
+            <p class="lead">
+              <strong>HTTP</strong> sends every byte of the conversation in plain text — anyone on the
+              network path can read it. <strong>HTTPS</strong> is exactly the same HTTP, wrapped
+              inside an encrypted tunnel called <strong>TLS</strong>. That single change is what
+              makes online banking, login forms and private messaging viable.
+            </p>
+
+            <h3>The Two Differences You Care About</h3>
+            <table class="nf-table">
+              <thead>
+                <tr><th></th><th>HTTP</th><th>HTTPS</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Default port</td><td>80</td><td>443</td></tr>
+                <tr><td>Encrypted?</td><td>No</td><td>Yes (TLS)</td></tr>
+                <tr><td>Identity proven?</td><td>No</td><td>Yes — server presents an X.509 certificate</td></tr>
+                <tr><td>Tamper-evident?</td><td>No</td><td>Yes — TLS detects any in-flight modification</td></tr>
+                <tr><td>Used in production?</td><td>Almost never anymore</td><td>The default everywhere</td></tr>
+              </tbody>
+            </table>
+
+            <h3>What TLS Actually Does</h3>
+            <ol>
+              <li><strong>Identity:</strong> the server presents a certificate signed by a Certificate
+                Authority (CA) that the client already trusts.</li>
+              <li><strong>Key exchange:</strong> client and server agree on a fresh, single-use secret
+                key without ever putting it on the wire.</li>
+              <li><strong>Encryption:</strong> from then on, every byte is encrypted with that key.</li>
+            </ol>
+            <p>
+              Once TLS finishes, everything <em>inside</em> the tunnel is regular HTTP. That is why
+              <code>curl http://...</code> and <code>curl https://...</code> look almost identical
+              from a tooling perspective — only the transport changed.
+            </p>
+
+            <div class="warn">
+              <strong>Security angle:</strong> a "valid" HTTPS connection only proves that you are
+              talking to the certificate's owner — it does <em>not</em> prove the page is honest.
+              Phishing sites can and do use real HTTPS certificates.
+            </div>
+
+            <h3>HTTP Status Codes — The Tens You Must Know</h3>
+            <table class="nf-table">
+              <thead>
+                <tr><th>Range</th><th>Meaning</th><th>Examples</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1xx</td><td>Informational</td><td>100 Continue</td></tr>
+                <tr><td>2xx</td><td>Success</td><td>200 OK · 201 Created · 204 No Content</td></tr>
+                <tr><td>3xx</td><td>Redirect</td><td>301 Permanent · 302 Found · 304 Not Modified</td></tr>
+                <tr><td>4xx</td><td>Client error</td><td>400 Bad Request · 401 Unauthorized · 403 Forbidden · 404 Not Found</td></tr>
+                <tr><td>5xx</td><td>Server error</td><td>500 Internal · 502 Bad Gateway · 503 Service Unavailable</td></tr>
+              </tbody>
+            </table>
+
+            <div class="lab">
+              <div class="lab-title">Lab 3 — Watch HTTP Become HTTPS</div>
+              <ol>
+                <li>Plain HTTP: <code>curl http://example.com</code>.</li>
+                <li>Same site over TLS: <code>curl https://example.com</code>.</li>
+                <li>Peek inside the TLS handshake:
+                  <code>openssl s_client -connect example.com:443</code>.</li>
+                <li>Headers only: <code>curl -I https://example.com</code>.</li>
+              </ol>
+              <div class="expected">
+                <strong>Deliverable:</strong> a one-paragraph explanation of why a Wi-Fi attacker on
+                the same coffee-shop network can read the URL when you visit
+                <code>http://example.com</code> but not when you visit <code>https://example.com</code>.
+              </div>
+              <div class="chapter-lab" data-chapter="3"></div>
+            </div>
+          </article>
+
+          <!-- =============== MODULE 4 =============== -->
+          <article class="module" id="m4">
+            <div class="module-label">MODULE 04 · NAMES</div>
+            <h2>DNS, Domains &amp; Subdomains</h2>
+            <p class="lead">
+              Computers route packets by IP address, not by name. <strong>DNS</strong> — the Domain
+              Name System — is the global directory that turns names humans can remember
+              (<code>utb.edu.bh</code>) into addresses computers can use (<code>185.220.101.4</code>).
+            </p>
+
+            <h3>The Domain Hierarchy, Right-to-Left</h3>
+            <p>Read a domain right-to-left. Each dot is a level in a tree:</p>
+            <div class="cmd-block"><span class="comment">www . cyber . utb . edu . bh .</span>
+   ↑      ↑       ↑    ↑    ↑    ↑
+   |      |       |    |    |    └─ root (always implied)
+   |      |       |    |    └────── TLD ("bh" — Bahrain)
+   |      |       |    └─────────── second-level ("edu")
+   |      |       └──────────────── registered domain ("utb")
+   |      └──────────────────────── subdomain ("cyber")
+   └─────────────────────────────── host / sub-subdomain ("www")</div>
+
+            <h3>The DNS Records You'll Actually Look Up</h3>
+            <table class="nf-table">
+              <thead>
+                <tr><th>Type</th><th>Means</th><th>Example value</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>A</strong></td><td>IPv4 address</td><td><code>93.184.216.34</code></td></tr>
+                <tr><td><strong>AAAA</strong></td><td>IPv6 address</td><td><code>2606:2800:220:1:248:1893:25c8:1946</code></td></tr>
+                <tr><td><strong>CNAME</strong></td><td>"This name is an alias for that name"</td><td><code>www → example.com</code></td></tr>
+                <tr><td><strong>MX</strong></td><td>Mail exchanger for the domain</td><td><code>10 mail.example.com</code></td></tr>
+                <tr><td><strong>NS</strong></td><td>Authoritative nameserver</td><td><code>a.iana-servers.net</code></td></tr>
+                <tr><td><strong>TXT</strong></td><td>Free-form text (SPF, DKIM, verification)</td><td><code>v=spf1 -all</code></td></tr>
+              </tbody>
+            </table>
+
+            <h3>How a DNS Lookup Actually Happens</h3>
+            <ol>
+              <li>Your OS asks a <strong>resolver</strong> (often your router or
+                <code>1.1.1.1</code>).</li>
+              <li>The resolver asks a <strong>root server</strong> for the TLD's nameservers.</li>
+              <li>It then asks the TLD nameserver for the domain's nameservers.</li>
+              <li>Finally it asks the domain's <strong>authoritative nameserver</strong> for the
+                record. The answer is cached for the record's <em>TTL</em>.</li>
+            </ol>
+
+            <h3>Subdomains Are Just Free Labels</h3>
+            <p>
+              The owner of <code>example.com</code> can create as many subdomains as they want —
+              <code>blog.example.com</code>, <code>api.example.com</code>, <code>shop.example.com</code>.
+              Each subdomain is technically a different host and can point to a completely different
+              server.
+            </p>
+
+            <div class="lab">
+              <div class="lab-title">Lab 4 — Resolve Like a Sysadmin</div>
+              <ol>
+                <li>A record: <code>dig example.com</code>.</li>
+                <li>Mail servers: <code>dig -t MX example.com</code>.</li>
+                <li>Nameservers: <code>dig -t NS example.com</code>.</li>
+                <li>Registration info: <code>whois example.com</code>.</li>
+              </ol>
+              <div class="expected">
+                <strong>Deliverable:</strong> a short table listing the A, MX and NS records you found
+                and a sentence describing why the MX server is usually a different host from the web
+                server.
+              </div>
+              <div class="chapter-lab" data-chapter="4"></div>
+            </div>
+          </article>
+
+          <!-- =============== MODULE 5 =============== -->
+          <article class="module" id="m5">
+            <div class="module-label">MODULE 05 · ADDRESSES</div>
+            <h2>URLs &amp; Parameters</h2>
+            <p class="lead">
+              A <strong>URL</strong> is a structured string that tells a browser <em>where</em> a
+              resource is and <em>how</em> to ask for it. Every part has a name and a job. Once you
+              know all the pieces, you can read any link on the Internet.
+            </p>
+
+            <h3>Anatomy of a URL</h3>
+            <div class="url-anatomy">
+              <span class="scheme">https</span>://
+              <span class="userinfo">user:pass</span>@
+              <span class="host">api.example.com</span>:
+              <span class="port">8443</span>
+              <span class="path">/v1/users</span>
+              <span class="query">?id=42&amp;sort=name</span>
+              <span class="fragment">#section-3</span>
+            </div>
+
+            <table class="nf-table">
+              <thead>
+                <tr><th>Part</th><th>Purpose</th><th>Often optional?</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Scheme (<code>https</code>)</td><td>Protocol to use</td><td>Required</td></tr>
+                <tr><td>Userinfo (<code>user:pass</code>)</td><td>Basic-auth credentials</td><td>Yes (rarely used today)</td></tr>
+                <tr><td>Host (<code>api.example.com</code>)</td><td>Which server to talk to</td><td>Required</td></tr>
+                <tr><td>Port (<code>8443</code>)</td><td>Which TCP port</td><td>Yes — defaults to 80/443</td></tr>
+                <tr><td>Path (<code>/v1/users</code>)</td><td>Which resource on the server</td><td>Defaults to <code>/</code></td></tr>
+                <tr><td>Query (<code>?id=42&amp;...</code>)</td><td>Named parameters for the server</td><td>Yes</td></tr>
+                <tr><td>Fragment (<code>#section-3</code>)</td><td>Position within the page</td><td>Yes — never sent to the server</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Query-string Parameters (a.k.a. "GET parameters")</h3>
+            <p>
+              A query string starts with <code>?</code> and is a list of <code>name=value</code>
+              pairs separated by <code>&amp;</code>. Spaces and special characters must be
+              <strong>URL-encoded</strong>: <code>hello world</code> becomes
+              <code>hello%20world</code> or <code>hello+world</code>.
+            </p>
+            <div class="cmd-block"><span class="prompt">$</span> curl 'http://example.com/search?q=hello%20world&amp;lang=en'</div>
+
+            <h3>Form Data — POST Parameters</h3>
+            <p>
+              When a form uses <code>method="POST"</code>, the parameters travel in the request body
+              instead of the URL. They are still <code>name=value</code> pairs, but the body's
+              <code>Content-Type</code> tells the server how to parse them
+              (<code>application/x-www-form-urlencoded</code> or <code>multipart/form-data</code>).
+            </p>
+            <div class="cmd-block"><span class="prompt">$</span> curl --data 'name=ali&amp;role=student' http://example.com/register</div>
+
+            <div class="warn">
+              <strong>Security angle:</strong> never put passwords or session tokens in the
+              query string — URLs end up in browser history, server logs and the
+              <code>Referer</code> header. Use POST bodies or the <code>Authorization</code>
+              header instead.
+            </div>
+
+            <div class="lab">
+              <div class="lab-title">Lab 5 — Speak the URL Language Fluently</div>
+              <ol>
+                <li>Send query parameters:
+                  <code>curl 'http://example.com/?q=hello&amp;lang=en'</code>.</li>
+                <li>Submit form data with POST:
+                  <code>curl --data 'name=ali&amp;role=student' http://example.com</code>.</li>
+                <li>URL-encode safely:
+                  <code>curl --data-urlencode 'q=hello world' http://example.com</code>.</li>
+                <li>Hit a non-default port: <code>curl http://example.com:8080/</code>.</li>
+              </ol>
+              <div class="expected">
+                <strong>Deliverable:</strong> annotate one of your own URLs (e.g. a Google search
+                you ran today) and label every part using the table above.
+              </div>
+              <div class="chapter-lab" data-chapter="5"></div>
+            </div>
+          </article>
+
+          <!-- =============== MODULE 6 =============== -->
+          <article class="module" id="m6">
+            <div class="module-label">MODULE 06 · METADATA</div>
+            <h2>Headers, Cookies &amp; Sessions</h2>
+            <p class="lead">
+              The body of an HTTP request or response is the obvious bit. The <strong>headers</strong>
+              are where most of the interesting work happens — language preferences, authentication,
+              caching policies, and (on the server side) the famous <em>cookies</em> that turn the
+              stateless web into something that remembers who you are.
+            </p>
+
+            <h3>Common Request Headers</h3>
+            <table class="nf-table">
+              <thead>
+                <tr><th>Header</th><th>What it tells the server</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>Host</code></td><td>Which virtual host to serve (one IP can host many domains).</td></tr>
+                <tr><td><code>User-Agent</code></td><td>Which client/browser is sending the request.</td></tr>
+                <tr><td><code>Accept</code></td><td>Which content types the client can read.</td></tr>
+                <tr><td><code>Accept-Language</code></td><td>Preferred natural languages.</td></tr>
+                <tr><td><code>Authorization</code></td><td>Credentials (Basic, Bearer, etc.).</td></tr>
+                <tr><td><code>Cookie</code></td><td>Stored state from previous responses.</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Common Response Headers</h3>
+            <table class="nf-table">
+              <thead>
+                <tr><th>Header</th><th>What the server is telling you</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>Content-Type</code></td><td>What the body is (<code>text/html</code>, <code>application/json</code>…).</td></tr>
+                <tr><td><code>Content-Length</code></td><td>Size of the body in bytes.</td></tr>
+                <tr><td><code>Cache-Control</code></td><td>How long this response can be reused.</td></tr>
+                <tr><td><code>Set-Cookie</code></td><td>"Please remember this and send it back next time."</td></tr>
+                <tr><td><code>Location</code></td><td>Where to redirect to (with 3xx codes).</td></tr>
+                <tr><td><code>Server</code></td><td>What software is answering (often hidden in production).</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Cookies — The Web's Memory</h3>
+            <p>
+              HTTP itself is stateless: the server forgets you the moment the response is sent. To
+              keep you logged in, the server includes a <code>Set-Cookie</code> header. Your browser
+              stores it, and includes it on every subsequent request to the same domain via the
+              <code>Cookie</code> header.
+            </p>
+            <div class="cmd-block">Set-Cookie: session=abc123def; Path=/; HttpOnly; Secure; SameSite=Lax</div>
+            <ul>
+              <li><strong>HttpOnly</strong> — JavaScript cannot read the cookie. Defeats most XSS
+                cookie-theft attacks.</li>
+              <li><strong>Secure</strong> — only sent over HTTPS.</li>
+              <li><strong>SameSite</strong> — controls when the cookie is sent on cross-site
+                navigation (Lax / Strict / None). Mitigates CSRF.</li>
+            </ul>
+
+            <div class="lab">
+              <div class="lab-title">Lab 6 — Inspect and Manipulate Headers</div>
+              <ol>
+                <li>List the response headers:
+                  <code>curl -I https://example.com</code>.</li>
+                <li>Send a custom header:
+                  <code>curl -H 'X-Demo: 1' http://example.com</code>.</li>
+                <li>Send a cookie:
+                  <code>curl -b 'session=abc123' http://example.com</code>.</li>
+                <li>Save received cookies into a jar:
+                  <code>curl -c cookies.txt http://example.com</code>.</li>
+              </ol>
+              <div class="expected">
+                <strong>Deliverable:</strong> open <code>cookies.txt</code> in the sandbox
+                (<code>cat cookies.txt</code>) and explain what each column means using the section
+                above.
+              </div>
+              <div class="chapter-lab" data-chapter="6"></div>
+            </div>
+          </article>
+
+          <!-- =============== MODULE 7 =============== -->
+          <article class="module" id="m7">
+            <div class="module-label">MODULE 07 · BOXES IN THE MIDDLE</div>
+            <h2>Proxies &amp; Caching</h2>
+            <p class="lead">
+              In real life there are almost always boxes between the client and the server. They
+              relay, inspect, cache or rewrite traffic. The two most important ones are
+              <strong>proxies</strong> (which forward your request) and <strong>caches</strong>
+              (which remember the response so the next request is faster).
+            </p>
+
+            <h3>Forward Proxy vs Reverse Proxy</h3>
+            <table class="nf-table">
+              <thead>
+                <tr><th></th><th>Forward Proxy</th><th>Reverse Proxy</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Sits in front of</td><td>The client</td><td>The server</td></tr>
+                <tr><td>Used by</td><td>Companies, schools, security tools</td><td>Web service operators</td></tr>
+                <tr><td>Typical purpose</td><td>Filter/log outbound traffic, inspect HTTPS, anonymise</td><td>Load balance, terminate TLS, cache, hide origin</td></tr>
+                <tr><td>Examples</td><td>Burp Suite, OWASP ZAP, corporate proxy</td><td>nginx, Cloudflare, AWS ALB</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Caching, Briefly</h3>
+            <ul>
+              <li><strong>Browser cache</strong> — your own browser stores responses locally so
+                returning to a page is instant.</li>
+              <li><strong>CDN</strong> (Content Delivery Network) — Cloudflare, Akamai, Fastly. A
+                global mesh of reverse proxies that caches popular content close to the user.</li>
+              <li><strong>Cache-Control</strong> headers — the server tells caches how long, and
+                under what conditions, the response can be reused.</li>
+            </ul>
+
+            <h3>Following Redirects</h3>
+            <p>
+              Servers often respond with <code>301</code> or <code>302</code> and a
+              <code>Location:</code> header pointing somewhere else (e.g. HTTP → HTTPS, old URL → new
+              URL). Browsers follow them silently. <code>curl</code> does not, unless you ask:
+              <code>-L</code> / <code>--location</code>.
+            </p>
+
+            <div class="lab">
+              <div class="lab-title">Lab 7 — Send Traffic Through a Proxy</div>
+              <ol>
+                <li>Start a tiny local web server in another part of the sandbox:
+                  <code>python3 -m http.server 8080</code> (then <code>Ctrl+C</code> when done).</li>
+                <li>Send a request through a proxy address:
+                  <code>curl -x http://127.0.0.1:8080 http://example.com</code>.</li>
+                <li>Bypass the cache:
+                  <code>curl -H 'Cache-Control: no-cache' http://example.com</code>.</li>
+                <li>Follow redirects:
+                  <code>curl -L http://example.com</code>.</li>
+              </ol>
+              <div class="expected">
+                <strong>Deliverable:</strong> a paragraph describing one real-world use case for a
+                forward proxy (e.g. school filtering) and one for a reverse proxy (e.g. Cloudflare).
+              </div>
+              <div class="chapter-lab" data-chapter="7"></div>
+            </div>
+          </article>
+
+          <!-- =============== MODULE 8 =============== -->
+          <article class="module" id="m8">
+            <div class="module-label">MODULE 08 · ARCHITECTURE</div>
+            <h2>Web Application Architecture</h2>
+            <p class="lead">
+              Modern web applications are not single programs — they are usually several layers
+              cooperating over HTTP. Knowing where the boundaries are makes everything you read in
+              tutorials, blog posts and CTF challenges click into place.
+            </p>
+
+            <h3>The Three Tiers</h3>
+            <ul>
+              <li><strong>Front-end</strong> — runs in the user's browser. HTML, CSS, JavaScript,
+                often a framework like React or Vue. Talks to the back-end via HTTP.</li>
+              <li><strong>Back-end</strong> — server-side code (Python/Flask, Node/Express,
+                Java/Spring, Go, Ruby/Rails…). Receives HTTP requests and decides what to do.</li>
+              <li><strong>Database</strong> — stores persistent state. Relational (PostgreSQL,
+                MySQL, SQLite) or document (MongoDB, DynamoDB).</li>
+            </ul>
+
+            <h3>APIs &amp; JSON</h3>
+            <p>
+              Most back-ends today expose a <strong>REST API</strong> that returns
+              <strong>JSON</strong> instead of HTML. The same back-end can serve a website, a mobile
+              app, and a CLI client simply by speaking JSON over HTTP.
+            </p>
+            <div class="cmd-block">{
+  "id": 583231,
+  "login": "octocat",
+  "name": "The Octocat",
+  "company": "@github",
+  "public_repos": 8
+}</div>
+
+            <h3>Common Stacks You'll Hear About</h3>
+            <table class="nf-table">
+              <thead>
+                <tr><th>Stack</th><th>Pieces</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>LAMP</td><td>Linux + Apache + MySQL + PHP</td></tr>
+                <tr><td>MEAN / MERN</td><td>Mongo + Express + Angular/React + Node</td></tr>
+                <tr><td>JAMstack</td><td>JavaScript + APIs + pre-rendered Markup</td></tr>
+                <tr><td>SPA + REST</td><td>Single-Page App in the browser, JSON REST on the server</td></tr>
+              </tbody>
+            </table>
+
+            <div class="tip">
+              <strong>Professor's note:</strong> "GraphQL", "gRPC" and "WebSockets" are alternative
+              protocols you'll meet next, but every one of them sits on top of (or alongside) HTTP.
+              Master HTTP first.
+            </div>
+
+            <div class="lab">
+              <div class="lab-title">Lab 8 — Talk to a Real API</div>
+              <ol>
+                <li>Hit a real REST API:
+                  <code>curl https://api.github.com/users/octocat</code>.</li>
+                <li>Ask politely for JSON:
+                  <code>curl -H 'Accept: application/json' https://api.github.com</code>.</li>
+                <li>Pretty-print it: <code>curl https://api.github.com | jq .</code>.</li>
+                <li>Pretend to update something: <code>curl -X PUT http://example.com/item/1</code>.</li>
+              </ol>
+              <div class="expected">
+                <strong>Deliverable:</strong> a screenshot of the prettified JSON response and a
+                one-sentence guess at which database table backs the <code>octocat</code> user
+                record.
+              </div>
+              <div class="chapter-lab" data-chapter="8"></div>
+            </div>
+          </article>
+
+          <!-- =============== MODULE 9 =============== -->
+          <article class="module" id="m9">
+            <div class="module-label">MODULE 09 · TOOLS OF THE TRADE</div>
+            <h2>The Developer Toolbox</h2>
+            <p class="lead">
+              You now know the language; this last chapter teaches you the tools. Real practitioners
+              live in three places: the browser DevTools, a command-line HTTP client (usually
+              <code>curl</code> or <code>HTTPie</code>), and an interception proxy (Burp / ZAP).
+            </p>
+
+            <h3>Browser DevTools (F12 / Cmd+Opt+I)</h3>
+            <ul>
+              <li><strong>Network tab</strong> — every request the page makes, with timing,
+                headers, status, body. The single most useful tab on the entire web.</li>
+              <li><strong>Console</strong> — the JavaScript REPL of the page. Type
+                <code>document.title</code> and hit Enter.</li>
+              <li><strong>Application / Storage</strong> — cookies, localStorage, sessionStorage,
+                IndexedDB.</li>
+              <li><strong>Elements</strong> — live DOM tree; you can edit it on the fly.</li>
+            </ul>
+
+            <h3>Command-Line Power Moves with <code>curl</code></h3>
+            <table class="nf-table">
+              <thead>
+                <tr><th>Flag</th><th>What it does</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>-v</code></td><td>Verbose — show request &amp; response in detail.</td></tr>
+                <tr><td><code>-I</code></td><td>Headers only (HEAD).</td></tr>
+                <tr><td><code>-L</code></td><td>Follow redirects.</td></tr>
+                <tr><td><code>-o file</code></td><td>Save response body to a file.</td></tr>
+                <tr><td><code>-s</code></td><td>Silent — drop progress bars, pipe-friendly.</td></tr>
+                <tr><td><code>-w</code></td><td>Print stats after the request (<code>%{time_total}</code>).</td></tr>
+                <tr><td><code>-H 'X: y'</code></td><td>Send a custom header.</td></tr>
+                <tr><td><code>-d k=v</code></td><td>Send a POST body.</td></tr>
+                <tr><td><code>-x proxy</code></td><td>Send through a proxy (Burp / ZAP).</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Pipes and One-Liners</h3>
+            <p>
+              <code>curl</code> plays nicely with classic Unix tools. The shell pipe (<code>|</code>)
+              connects them.
+            </p>
+            <div class="cmd-block"><span class="prompt">$</span> curl -s https://api.github.com | jq .
+<span class="prompt">$</span> curl -s http://example.com | head
+<span class="prompt">$</span> curl -s http://example.com | grep -i &lt;title&gt;</div>
+
+            <div class="lab">
+              <div class="lab-title">Lab 9 — Be Your Own DevTools</div>
+              <ol>
+                <li>Verbose request:
+                  <code>curl -v https://example.com</code>.</li>
+                <li>Save the page:
+                  <code>curl -o page.html http://example.com</code>.</li>
+                <li>Pipe into a filter:
+                  <code>curl -s http://example.com | head</code>.</li>
+                <li>Time the request:
+                  <code>curl -w '%{time_total}\n' -o /dev/null -s http://example.com</code>.</li>
+              </ol>
+              <div class="expected">
+                <strong>Deliverable:</strong> compare the timing you measured to the same request
+                from a different region (e.g. ask a friend to run it). Networks aren't equal.
+              </div>
+              <div class="chapter-lab" data-chapter="9"></div>
+            </div>
+          </article>
+
+          <!-- =============== CAPSTONE =============== -->
+          <article class="finish-box" id="finish">
+            <h3>Capstone — Put It All Together</h3>
+            <p>
+              You've now covered every basic concept: clients and servers, HTTP vs HTTPS, DNS,
+              domains and subdomains, URLs and parameters, headers and cookies, proxies and caching,
+              web app architecture, and the developer toolbox. For your capstone, build a tiny
+              "request explorer" using <strong>only</strong> what this course taught:
+            </p>
+            <ul style="text-align:left; max-width:780px; margin: 0 auto; color:#ccc; font-size:14px; line-height:1.7;">
+              <li>Pick any public website you use daily.</li>
+              <li>Use <code>dig</code>, <code>whois</code>, and <code>host</code> to map its DNS
+                footprint (A, MX, NS, two interesting subdomains).</li>
+              <li>Use <code>curl -v</code> to capture one full request/response cycle and label
+                every header.</li>
+              <li>Use <code>curl -I</code> to identify which caching strategy the site uses
+                (<code>Cache-Control</code>, <code>ETag</code>, <code>Last-Modified</code>).</li>
+              <li>Use <code>openssl s_client</code> to extract the TLS certificate's CN, issuer and
+                validity dates.</li>
+              <li>Write a one-page report describing what you found and which OWASP-style risks each
+                response header does (or does not) defend against.</li>
+            </ul>
+            <p style="margin-top:18px">
+              When your report is ready, share it in the club Discord for feedback from a senior
+              member. Completing this capstone qualifies you to move on to <strong>Web
+              Security</strong> proper, <strong>Application Security</strong>, and the OWASP Top 10.
+            </p>
+          </article>
+
+        </main>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="clean-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col footer-brand">
+          <div class="footer-logos">
+            <a href="https://www.utb.edu.bh/" target="_blank" rel="noopener"
+              aria-label="University of Technology Bahrain">
+              <img src="assets/images/utblogo.png" alt="University of Technology Bahrain" class="footer-logo">
+            </a>
+            <a href="index.html" aria-label="Cybersecurity Club UTB">
+              <img src="assets/images/logo.png?v=2" alt="Cybersecurity Club UTB" class="footer-logo">
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="news.html">News</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="learning.html">Learning</a></li>
+            <li><a href="join.html">Apply to Join</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>University</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.utb.edu.bh/" target="_blank" rel="noopener">UTB Website</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Follow Us</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.instagram.com/utb_bahrain/" target="_blank" rel="noopener">Instagram — UTB</a></li>
+            <li><a href="https://www.instagram.com/sc_utb/" target="_blank" rel="noopener">Instagram — Student Council</a></li>
+            <li><a href="https://www.instagram.com/cyber_security_club_utb/" target="_blank" rel="noopener">Instagram — Cybersecurity Club</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <small>College of Computer Studies &middot; &copy; 2026 Cybersecurity Club &mdash; University of Technology
+          Bahrain</small>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/app.js?v=notif4"></script>
+  <script src="assets/js/web-lab.js?v=3"></script>
+</body>
+
+</html>
